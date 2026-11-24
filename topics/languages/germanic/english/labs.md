@@ -127,7 +127,7 @@ Here *person* (Latin *persona* via French), *steals* (Old English *stelan*), *pr
 
 *An individual who commits larceny by misappropriating the property of another individual engages in conduct constituting a violation of legal norms and merits the imposition of punitive sanctions.*
 
-The Latinate density is extreme: *individual* (Latin *individuus*), *commits* (Latin *committere*), *larceny* (Latin *latrocinium* via French *larcin*), *misappropriating* (Latin *appropriare*), *engages* (French *engager* from Latin), *conduct* (Latin *conductus*), *constituting* (Latin *constituere*), *violation* (Latin *violare*), *imposition* (Latin *imponere*), *punitive* (Latin *punire*), *sanctions* (Latin *sancire*). The syntax is heavily nominalized (*the imposition of punitive sanctions* instead of *punish*) and uses passive constructions (*merits the imposition* instead of *should be punished*).
+The Latinate density is extreme: *individual* (Latin *individuus*), *commits* (Latin *committere*), *larceny* (Latin *latrocinium* via French *larcin*), *misappropriating* (Latin *appropriare*), *engages* (French *engager*, from Latin *in-* + Germanic *gage*), *conduct* (Latin *conductus*), *constituting* (Latin *constituere*), *violation* (Latin *violare*), *imposition* (Latin *imponere*), *punitive* (Latin *punire*), *sanctions* (Latin *sancire*). The syntax is heavily nominalized (*the imposition of punitive sanctions* instead of *punish*) and uses active voice with extreme nominalization (*merits the imposition* instead of *should be punished*).
 
 Execute this register transformation for the following three propositional contents, producing all three register variants for each:
 
@@ -161,7 +161,7 @@ Record your transcriptions and compare them with the pronunciations of speakers 
 
 The operational significance of this merger lies in its near-completion in Western American and Canadian English. Speakers with the merger have one fewer phonemic distinction to maintain, simplifying their vowel system but potentially creating homophony (identical pronunciation of distinct words). For example, *collar* and *caller* become homophones, disambiguated only by context. This merger is a live sound change in progress, advancing from west to east across the United States over the past century.
 
-The *marry-merry-Mary* merger involves three historically distinct vowel patterns: *marry* with the short /æ/ vowel (TRAP vowel), *merry* with the short /ɛ/ vowel (DRESS vowel), and *Mary* with a diphthong or tense vowel (often /eɪ/ or /eə/). In most American dialects, all three words have merged to a single pronunciation, typically /ˈmɛɹi/ or /ˈmæɹi/, with the distinction lost. In contrast, British RP and some conservative American dialects maintain the three-way contrast, pronouncing *marry* as /ˈmæɹi/, *merry* as /ˈmɛɹi/, and *Mary* as /ˈmeəɹi/.
+The *marry-merry-Mary* merger involves three historically distinct vowel patterns: *marry* with the short /æ/ vowel (TRAP vowel), *merry* with the short /ɛ/ vowel (DRESS vowel), and *Mary* with a diphthong or tense vowel (often /eɪ/ or /eə/). In most American dialects, all three words have merged to a single pronunciation, /ˈmɛɹi/, with the distinction lost. In contrast, British RP and some conservative American dialects maintain the three-way contrast, pronouncing *marry* as /ˈmæɹi/, *merry* as /ˈmɛɹi/, and *Mary* as /ˈmeəɹi/.
 
 Execute the same minimal pair test protocol for this merger:
 
@@ -200,7 +200,7 @@ Document your results in a structured dialect profile table showing your pronunc
 
 Shift from phonological to lexical variation. You will use corpus data to quantify the distribution of synonyms across registers and demonstrate empirically the stratification between Germanic, French, and Latinate vocabulary. Access the Corpus of Contemporary American English (COCA) at english-corpora.org and execute the following frequency queries.
 
-Take the synonym set *begin, start, commence, initiate*. These four verbs are semantically similar but differ in register and etymological origin: *begin* is Germanic (Old English *beginnan*), *start* is Germanic (Old English *styrtan*), *commence* is Latinate via French (Latin *com-* + *initiare*), and *initiate* is pure Latinate (Latin *initiare*). Query each verb in COCA and record the frequency per million words in each of the five major subcorpora: spoken, fiction, popular magazines, newspapers, and academic journals.
+Take the synonym set *begin, start, commence, initiate*. These four verbs are semantically similar but differ in register and etymological origin: *begin* is Germanic (Old English *beginnan*), *start* is Germanic (Old English *styrtan*), *commence* is Latinate via Old French *comencer* (from Vulgar Latin *cominitiare*), and *initiate* is Latinate from direct Latin *initiare*. Query each verb in COCA and record the frequency per million words in each of the five major subcorpora: spoken, fiction, popular magazines, newspapers, and academic journals.
 
 Your query results will show a systematic distribution pattern. *Begin* and *start* will dominate in spoken and fiction registers, with frequencies above 200 per million words. *Commence* will be rare in spoken and fiction (below 5 per million) but more common in academic and newspaper registers (10-20 per million). *Initiate* will show the steepest register gradient, vanishingly rare in spoken discourse (below 2 per million) but frequent in academic writing (above 50 per million).
 
@@ -332,14 +332,14 @@ Take the following Modern English words and reconstruct their Middle English pro
 | *meet* | /miːt/ | *mete* | /meːt/ |
 | *goose* | /ɡuːs/ | *goos* | /ɡoːs/ |
 | *meat* | /miːt/ | *mete* | /mɛːt/ |
-| *boat* | /boʊt/ | *boot* | /bɔːt/ |
+| *boat* | /boʊt/ | *boot* | /boːt/ |
 | *name* | /neɪm/ | *name* | /naːm/ |
 
 Verify your reconstructions against Middle English texts. Read a passage from Chaucer's *Canterbury Tales* (circa 1400) in reconstructed Middle English pronunciation. The opening lines of the General Prologue, *Whan that Aprill with his shoures soote / The droghte of March hath perced to the roote*, should be pronounced approximately:
 
 /ʍan ðat apˈril wɪð hɪs ˈʃuːrəs soːt / ðə ˈdrʌxt ə marʧ haθ ˈpɛrsəd toː ðə roːt/
 
-Note the differences from modern pronunciation: *Aprill* has a trilled /r/ and a dark /l/; *shoures* has a long /uː/ where modern English has /aʊ/; *soote* has a long /oː/ where modern English *sweet* has /iː/ (though *soote* meaning "sweet" has been replaced by the French borrowing). The spelling ⟨oo⟩ consistently represented /oː/ in Middle English, which later raised to /uː/ in Modern English, explaining why *goose, food, moon* have /uː/ today.
+Note the differences from modern pronunciation: *Aprill* has a trilled /r/ and a dark /l/; *shoures* has a long /uː/ where modern English has /aʊ/; *soote* has a long /oː/ where modern English *sweet* has /iː/ (though the Middle English *soote* has been replaced by the cognate Modern English *sweet*). The spelling ⟨oo⟩ consistently represented /oː/ in Middle English, which later raised to /uː/ in Modern English, explaining why *goose, food, moon* have /uː/ today.
 
 Now apply the Great Vowel Shift forward to predict how Modern English would have evolved if it had continued for another 200 years. Extrapolate the chain shift: if /iː/ diphthongized to /aɪ/, and /aɪ/ is now a diphthong, what would the next stage be? Some dialects of English are already undergoing a second stage: the diphthong /aɪ/ is monophthongizing to /aː/ in Southern American English (the Southern Vowel Shift), and /aʊ/ is fronting to /æʊ/ in Canadian English (Canadian Raising). Predict the vowel values for the following words if these shifts continue for 200 years:
 
@@ -413,7 +413,7 @@ When analyzing or producing text in different registers, apply the following lex
 **Formal Academic Register (Latinate Stratum):**
 
 - Action verbs: *acquire, procure, generate, execute, commence, terminate, allocate, furnish, examine, comprehend*
-- Nouns: *entity, component, agent, offspring, progenitor, domicile, occupation, duration, methodology*
+- Nouns: *entity, component, agent, progeny, progenitor, domicile, occupation, duration, methodology*
 - Adjectives: *affirmative, adverse, substantial, negligible, antiquated, contemporary, elevated, diminished, arduous, facile*
 - Syntax: Nominalizations (*the acquisition of*, *the provision of*), passive constructions, hypotactic subordination with *which, whereby, wherein*
 

@@ -184,7 +184,7 @@ Prepare four distinct chromium(III) complexes representing different points on t
 
 The tris(oxalato)chromate(III) complex provides a bidentate chelating ligand environment. Prepare potassium tris(oxalato)chromate(III) trihydrate by mixing stoichiometric quantities of chromium(III) chloride and potassium oxalate in aqueous solution and heating gently to promote complex formation. The oxalate ligands bind through carboxylate oxygen atoms to form six-coordinate octahedral geometry with three chelating rings. The green crystalline product precipitates upon cooling and can be recrystallized from hot water to improve purity. The complex exhibits enhanced thermodynamic stability relative to monodentate ligand systems due to the chelate effect, which increases the entropy of complex formation by releasing more than one water molecule per bound ligand.
 
-For a strong-field reference point, hexacyanochromate(III) complexes provide the limiting case of σ-donor and π-acceptor ligand interactions. Prepare potassium hexacyanochromate(III) by oxidizing hexacyanochromate(II) with hydrogen peroxide in alkaline solution. The cyanide ligands impose the largest ligand field splitting of any common ligand due to strong σ-donation from the carbon lone pair and π-backbonding into cyanide π* orbitals. The yellow-green complex exhibits low-spin d³ configuration with all three electrons occupying the lower t₂g manifold, resulting in dramatically different magnetic properties compared to high-spin hexaaqua complexes.
+For a strong-field reference point, hexacyanochromate(III) complexes provide the limiting case of σ-donor and π-acceptor ligand interactions. Prepare potassium hexacyanochromate(III) by oxidizing hexacyanochromate(II) with hydrogen peroxide in alkaline solution. The cyanide ligands impose the largest ligand field splitting of any common ligand due to strong σ-donation from the carbon lone pair and π-backbonding into cyanide π* orbitals. The yellow-green complex exhibits a d³ configuration with all three electrons occupying the lower t₂g manifold, resulting in dramatically different magnetic properties compared to high-spin hexaaqua complexes.
 
 Measure the UV-visible absorption spectrum for each complex at a fixed concentration of 0.010 M to enable direct comparison of peak positions and intensities. Dissolve each solid complex in deionized water or appropriate buffer solution to maintain consistent pH across all samples. Some complexes exhibit pH-dependent speciation; hexaammine complexes decompose slowly in acidic solution, while cyanide complexes remain stable only under alkaline conditions. Verify solution pH using a calibrated glass electrode and adjust if necessary using dilute HCl or NaOH. Allow solutions to equilibrate for 30 minutes before spectroscopic measurement to ensure complete dissolution and thermal equilibration.
 
@@ -395,7 +395,7 @@ delta_g_error_kj = delta_g_error / 1000
 print(f"\nPropagated Error in ΔG° at 25°C: ± {delta_g_error_kj:.2f} kJ/mol")
 ```
 
-The van't Hoff analysis reveals whether ligand substitution proceeds exothermically or endothermically and quantifies the entropic driving force from solvent release during chelate formation. A negative slope in the van't Hoff plot indicates exothermic ligand exchange with ΔH° < 0, while a positive intercept signifies favorable entropy change with ΔS° > 0. The ammonia-water exchange typically exhibits small positive enthalpy due to the slightly weaker Cr-NH₃ bonds compared to Cr-OH₂, offset by positive entropy from the release of ordered hydration shells around the complex. The Gibbs free energy at standard conditions determines the equilibrium position at 25°C and predicts whether the reaction proceeds spontaneously under ambient laboratory conditions.
+The van't Hoff analysis reveals whether ligand substitution proceeds exothermically or endothermically and quantifies the entropic driving force from solvent release during chelate formation. A negative slope in the van't Hoff plot indicates exothermic ligand exchange with ΔH° < 0, while a positive intercept signifies favorable entropy change with ΔS° > 0. The ammonia-water exchange typically exhibits small negative enthalpy due to the slightly stronger Cr-NH₃ bonds compared to Cr-OH₂, offset by positive entropy from the release of ordered hydration shells around the complex. The Gibbs free energy at standard conditions determines the equilibrium position at 25°C and predicts whether the reaction proceeds spontaneously under ambient laboratory conditions.
 
 ## Exercise 3: Boundary Condition Stress Testing & Uncertainty Analysis
 
@@ -673,9 +673,9 @@ ax1.loglog(extreme_scan_rates, theoretical_ip, 'b-', linewidth=3,
            label='Faradaic Current (Randles-Sevcik)')
 ax1.loglog(extreme_scan_rates, capacitive_current, 'r--', linewidth=3,
            label='Capacitive Charging Current')
-ax1.fill_between(extreme_scan_rates, 0, 100, where=np.array(extreme_scan_rates) < 50,
+ax1.fill_between(extreme_scan_rates, 0.1, 100, where=np.array(extreme_scan_rates) < 50,
                   alpha=0.2, color='orange', label='Convection-Limited Regime')
-ax1.fill_between(extreme_scan_rates, 0, 100, where=np.array(extreme_scan_rates) > 1000,
+ax1.fill_between(extreme_scan_rates, 0.1, 100, where=np.array(extreme_scan_rates) > 1000,
                   alpha=0.2, color='red', label='Capacitance-Limited Regime')
 ax1.set_xlabel('Scan Rate (mV/s)', fontsize=12, fontweight='bold')
 ax1.set_ylabel('Current (μA)', fontsize=12, fontweight='bold')

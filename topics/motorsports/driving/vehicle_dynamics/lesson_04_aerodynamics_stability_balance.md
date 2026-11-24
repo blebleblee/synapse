@@ -271,7 +271,7 @@ flowchart TD
     subgraph RideHeight ["Ride Height & Rake"]
         FRH["Front Ride Height<br/>85 mm<br/>(static, measured at hub)"]
         RRH["Rear Ride Height<br/>100 mm<br/>(static, measured at hub)"]
-        RAKE["Rake Angle<br/>0.9 degrees<br/>(nose-down)"]
+        RAKE["Rake Angle<br/>0.3 degrees<br/>(nose-down)"]
     end
     
     subgraph Springs ["Spring Rates"]

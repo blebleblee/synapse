@@ -199,7 +199,7 @@ When $\theta = 1$, this reduces to the standard logistic model. For $\theta < 1$
 
 $$\frac{dN}{dt} = r N(t) \left[1 - \frac{N(t - \tau)}{K}\right]$$
 
-incorporates a time delay $\tau$ between population density and its regulatory effect (e.g., resource depletion today reflects consumption yesterday, or predator populations today respond to prey abundance in the past). For small delays ($r\tau < \pi/2 \approx 1.57$), the population exhibits damped oscillations converging to $K$. For larger delays ($r\tau > \pi/2$), oscillations amplify, and for very large delays ($r\tau > e/2 \approx 1.36$ in some formulations), the system exhibits deterministic chaos—complex, aperiodic dynamics despite purely deterministic equations.
+incorporates a time delay $\tau$ between population density and its regulatory effect (e.g., resource depletion today reflects consumption yesterday, or predator populations today respond to prey abundance in the past). For small delays ($r\tau < \pi/2 \approx 1.57$), the population exhibits damped oscillations converging to $K$. For larger delays ($r\tau > \pi/2$), oscillations amplify, and for sufficiently large delays the system exhibits deterministic chaos—complex, aperiodic dynamics despite purely deterministic equations.
 
 **Discrete-time models** describe populations with non-overlapping generations (annual plants, insects with synchronized emergence, semelparous salmon). The discrete logistic equation (also called the Ricker model in fisheries):
 

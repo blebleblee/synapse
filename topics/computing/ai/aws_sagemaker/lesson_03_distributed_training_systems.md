@@ -8,7 +8,7 @@ Understanding distributed training rigorously requires that you internalize thre
 
 SageMaker's distributed training surface is best understood as a managed reconciliation loop wrapped around these physical realities. When you launch a `CreateTrainingJob` API call with an instance count greater than one, SageMaker's control plane provisions the requested fleet, injects environment variables describing the cluster topology (`SM_HOSTS`, `SM_CURRENT_HOST`, `SM_NUM_GPUS`), bootstraps inter-node networking over AWS Elastic Fabric Adapter, and hands off to your training script inside a container environment where every node already knows its rank, local rank, and world size. This is the foundational contract: SageMaker owns the infrastructure lifecycle; your code owns the gradient computation.
 
-The Elastic Fabric Adapter (EFA) deserves careful attention because it is the substrate on which all high-performance collective operations run. EFA is a network interface that bypasses the OS kernel for inter-node messaging, implementing RDMA (Remote Direct Memory Access) semantics directly between GPU memory regions on separate physical hosts. When NCCL (the NVIDIA Collective Communications Library) executes an `AllReduce` over EFA, the gradient tensor is never copied to CPU memory, never traverses the Linux TCP/IP stack, and never pays a context-switch penalty. The latency of a single NCCL `AllReduce` on a 100-node cluster with EFA is roughly 2–5 milliseconds for a 1 GB tensor, compared to 50–200 milliseconds over standard Ethernet. This two-order-of-magnitude difference is what makes the difference between a training job that scales linearly with node count and one that regresses toward uselessness beyond eight nodes.
+The Elastic Fabric Adapter (EFA) deserves careful attention because it is the substrate on which all high-performance collective operations run. EFA is a network interface that bypasses the OS kernel for inter-node messaging, implementing RDMA (Remote Direct Memory Access) semantics directly between GPU memory regions on separate physical hosts. When NCCL (the NVIDIA Collective Communications Library) executes an `AllReduce` over EFA, the gradient tensor is never copied to CPU memory, never traverses the Linux TCP/IP stack, and never pays a context-switch penalty. The latency of a single NCCL `AllReduce` on a 100-node cluster with EFA is roughly 20–50 milliseconds for a 1 GB tensor, compared to 50–200 milliseconds over standard Ethernet. This two-order-of-magnitude difference is what makes the difference between a training job that scales linearly with node count and one that regresses toward uselessness beyond eight nodes.
 
 ---
 
@@ -172,7 +172,6 @@ def train_step(model, optimizer, batch):
     with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
         output = model(**batch)
         loss = output["loss"]
-    scaler.scale(loss).backward()
     return loss
 
 def load_checkpoint(checkpoint_dir, model, optimizer):
@@ -202,8 +201,8 @@ def save_checkpoint(checkpoint_dir, model, optimizer, epoch, step):
 checkpoint_dir = os.environ.get("SM_CHECKPOINT_DIR", "/opt/ml/checkpoints")
 start_epoch, start_step = load_checkpoint(checkpoint_dir, model, optimizer)
 
-# training loop omitted for brevity; each iteration calls train_step, 
-# optimizer.step(), and periodic save_checkpoint with the checkpoint_dir
+# training loop: for each batch, optimizer.zero_grad(); loss = train_step(model, optimizer, batch);
+# scaler.step(optimizer); scaler.update(); periodic save_checkpoint with checkpoint_dir
 ```
 
 The `@smp.step` decorator is architecturally significant: it transforms a function that computes loss and gradients for a single batch into one that internally splits the batch into microbatches, executes the pipeline forward and backward passes across all stages, and accumulates gradients before returning. The decorator handles all inter-stage activation and gradient communication transparently, allowing the user-facing training logic to remain agnostic to the parallelism topology.
@@ -307,7 +306,6 @@ tuner = HyperparameterTuner(
             "Regex": r"train_loss=([0-9\\.]+)",
         },
     ],
-    early_stopping_type="Auto",
 )
 
 tuner.fit(
@@ -330,7 +328,7 @@ if dist.get_rank() == 0:
 
 ### Training Compiler Optimizations
 
-SageMaker Training Compiler integrates XLA (Accelerated Linear Algebra) compilation into PyTorch training via PyTorch/XLA and, for NVIDIA GPUs, via `torch._dynamo` with the `inductor` backend. The core value proposition is that the compiler can analyze the full computation graph of a training step—not just individual operator calls—and apply cross-operator optimizations that the PyTorch eager execution model cannot. These include operator fusion (combining a matrix multiply, bias add, and activation function into a single CUDA kernel that never materializes the intermediate tensors), memory layout optimization (choosing row-major versus column-major strides to maximize cache line utilization in subsequent operations), and loop tiling (selecting tile sizes for matrix multiply that maximize L2 cache reuse for specific hardware).
+SageMaker Training Compiler integrates XLA (Accelerated Linear Algebra) compilation into PyTorch training via PyTorch/XLA, which is used across NVIDIA GPU instances. The core value proposition is that the compiler can analyze the full computation graph of a training step—not just individual operator calls—and apply cross-operator optimizations that the PyTorch eager execution model cannot. These include operator fusion (combining a matrix multiply, bias add, and activation function into a single CUDA kernel that never materializes the intermediate tensors), memory layout optimization (choosing row-major versus column-major strides to maximize cache line utilization in subsequent operations), and loop tiling (selecting tile sizes for matrix multiply that maximize L2 cache reuse for specific hardware).
 
 Enabling Training Compiler in SageMaker requires a single configuration change to the estimator, but the operational implications are significant. The first training step of a compiled job will be dramatically slower than subsequent steps—potentially 10–60 minutes slower for large models—because XLA or `torch.compile` is tracing the computation graph and emitting CUDA kernels during the first execution. This compilation artifact is deterministic for a given model and input shape, so if you save the compiled artifacts to S3 and restore them on subsequent runs (or on resumed spot instances), you pay the compilation cost only once.
 
@@ -369,7 +367,7 @@ The built-in rules cover three categories of failure modes. Vanishing and explod
 ```python
 from sagemaker.debugger import (
     DebuggerHookConfig,
-    TensorBoardOutput,
+    TensorBoardOutputConfig,
     Rule,
     rule_configs,
     ProfilerConfig,
@@ -441,7 +439,7 @@ SageMaker Experiments provides a structured metadata layer over training job run
 
 ```python
 # Inside train.py, running within a SageMaker training job
-from sagemaker.experiments import Run, load_run
+from sagemaker.experiments.run import Run, load_run
 
 with load_run() as run:
     # load_run() recovers the Run context from SM_TRAINING_ENV
@@ -460,13 +458,13 @@ with load_run() as run:
             save_full_checkpoint(checkpoint_dir, model, optimizer, epoch, global_step, None)
 ```
 
-Calling `load_run()` without arguments works because SageMaker injects the experiment and run identifiers into the training container environment when the job was launched with `Run.init()` from the calling notebook. The mental model is that the `Run` object is a distributed cursor into the experiment store, and all ranks can safely call `run.log_metric()` concurrently because the SDK serializes writes through a background thread rather than blocking the training loop.
+Calling `load_run()` without arguments works because SageMaker injects the experiment and run identifiers into the training container environment when the job was launched with `Run.init()` from the calling notebook. The `Run` object is a distributed cursor into the experiment store; however, `run.log_metric()` is a synchronous API call that blocks, so logging is normally restricted to rank 0 to avoid blocking the training loop on other ranks.
 
 ### Scaling Failure Modes and Mitigations
 
 The most common failure mode in distributed training at scale is the **straggler problem**: one node in a synchronous AllReduce cluster runs consistently slower than the others due to hardware heterogeneity, thermal throttling, noisy neighbor interference on shared network fabric, or uneven data preprocessing load. Because AllReduce is a blocking collective, the entire cluster's iteration time is bounded below by the slowest participant. Detecting a straggler requires comparing per-step timing across ranks; the SageMaker profiler's step timeline view makes this visible as one node's compute bar extending past the others before the synchronization point.
 
-The mitigation depends on the root cause. If the straggler is a consistently underperforming instance (a hardware defect), the correct response is to terminate the job and re-launch, since SageMaker's control plane will allocate a fresh fleet. If the straggler is data preprocessing bound (the training script's `DataLoader` workers are spending more time on augmentation than on GPU transfer), the fix is to increase `num_workers` in the `DataLoader`, pre-process data offline and store processed tensors in S3, or move augmentation onto the GPU using libraries like NVIDIA DALI. If the straggler pattern is intermittent and correlated with AllReduce timing, it may indicate network contention, and the mitigation is to adjust the NCCL `NCCL_ALGO` environment variable from `Ring` to `Tree` for the specific tensor sizes where contention occurs, or to reduce the gradient bucket size to allow more fine-grained overlap of communication and computation.
+The mitigation depends on the root cause. If the straggler is a consistently underperforming instance (a hardware defect), the correct response is to terminate the job and re-launch, since SageMaker's control plane will allocate a fresh fleet. If the straggler is data preprocessing bound (the training script's `DataLoader` workers are spending more time on augmentation than on GPU transfer), the fix is to increase `num_workers` in the `DataLoader`, pre-process data offline and store processed tensors in S3, or move augmentation onto the GPU using libraries like NVIDIA DALI. If the straggler pattern is intermittent and correlated with AllReduce timing, it may indicate network contention, and the mitigation is to adjust the NCCL `NCCL_ALGO` environment variable from `Ring` to `Tree` for the specific tensor sizes where contention occurs, or to reduce the DDP gradient bucket size (e.g., lowering `bucket_cap_mb`) to allow more fine-grained overlap of communication and computation.
 
 **NCCL timeouts** are the second most common failure class. When a collective operation does not complete within `NCCL_TIMEOUT` seconds (default 1800 seconds), all participating processes raise an `ncclInternalError`, and the entire training job terminates. NCCL timeouts are rarely caused by the collective itself; they almost always indicate that one or more processes never reached the collective entry point, typically because of a Python exception, an OOM kill, or a deadlock in custom CUDA code on that rank. The standard debugging protocol is to set `NCCL_DEBUG=INFO` and `NCCL_DEBUG_SUBSYS=ALL` in the job's environment variables to capture the NCCL communication trace in CloudWatch Logs, then identify which rank is missing from the rendezvous log. Setting `TORCH_DISTRIBUTED_DEBUG=DETAIL` additionally logs the collective call stack, making it possible to identify the specific `dist.barrier()` or `dist.all_reduce()` call that hung.
 

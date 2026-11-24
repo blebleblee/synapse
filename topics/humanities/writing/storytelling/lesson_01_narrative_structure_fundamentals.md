@@ -62,7 +62,7 @@ The employee's hands tighten. "We lost the data in the server migration. I repor
 
 "Yeah," the manager says quietly. *(Resolution: the scene ends with new understanding established)*
 
-This scene is roughly 150 words and contains five beats. Each beat shifts the psychological state of one or both characters. The scene begins with blame-deflection and ends with accountability recognized. The larger plot conflict (what to do about Patterson) remains unresolved, but the relationship dynamic has transformed.
+This scene is roughly 100 words and contains five beats. Each beat shifts the psychological state of one or both characters. The scene begins with blame-deflection and ends with accountability recognized. The larger plot conflict (what to do about Patterson) remains unresolved, but the relationship dynamic has transformed.
 
 ### The Sequence: The Unit of Escalating Pressure
 

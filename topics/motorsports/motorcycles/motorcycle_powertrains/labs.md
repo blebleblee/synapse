@@ -163,7 +163,7 @@ print(f"Measured post-lap pyrometer reading: [ENTER_MEASURED_VALUE] °C")
 print(f"Prediction error: {abs(tire_temp_c[-1] - [ENTER_MEASURED_VALUE]):.1f} °C")
 ```
 
-Refine the thermal model by incorporating additional physical effects for improved prediction accuracy. Add a radiation heat transfer term to account for infrared emission from the hot tire surface: `P_rad = epsilon * sigma * A_tire * (T_tire^4 - T_ambient^4)`, where epsilon is the tire emissivity (0.95), sigma is the Stefan-Boltzmann constant (5.67e-8 W/m²K⁴), and temperatures are expressed in Kelvin. Include a conduction heat transfer path from the tire through the wheel rim to the brake rotor acting as a heat sink: `P_cond = k_eff * (T_tire - T_rim) / L_thickness`, with effective thermal conductivity `k_eff` approximately 0.3 W/mK and tire sidewall thickness `L_thickness` of 8 millimeters. These refinements typically improve model accuracy from ±10 degrees Celsius to ±5 degrees Celsius, sufficient for predictive optimization of tire pressure and camber settings without iterative on-track testing.
+Refine the thermal model by incorporating additional physical effects for improved prediction accuracy. Add a radiation heat transfer term to account for infrared emission from the hot tire surface: `P_rad = epsilon * sigma * A_tire * (T_tire**4 - T_ambient**4)`, where epsilon is the tire emissivity (0.95), sigma is the Stefan-Boltzmann constant (5.67e-8 W/m²K⁴), and temperatures are expressed in Kelvin. Include a conduction heat transfer path from the tire through the wheel rim to the brake rotor acting as a heat sink: `P_cond = k_eff * (T_tire - T_rim) / L_thickness`, with effective thermal conductivity `k_eff` approximately 0.3 W/mK and tire sidewall thickness `L_thickness` of 8 millimeters. These refinements typically improve model accuracy from ±10 degrees Celsius to ±5 degrees Celsius, sufficient for predictive optimization of tire pressure and camber settings without iterative on-track testing.
 
 Apply the validated thermal model to predict the effect of tire pressure changes on operating temperature. Reducing cold inflation pressure from 32 psi to 31 psi decreases tire structural stiffness, increasing the internal hysteresis energy dissipation and contact patch deformation. Model this effect by scaling the slip power term by a pressure-dependent factor: `P_slip_adjusted = P_slip * (1 + 0.03 * (P_ref - P_actual))`, where `P_ref` is the baseline pressure and `P_actual` is the proposed new pressure. Re-run the thermal simulation with the adjusted slip power, observe the predicted temperature change, and verify against actual pyrometer measurements after implementing the pressure change on track. This predictive capability enables pre-session setup optimization, reducing the number of on-track test laps required to converge on optimal tire parameters and preserving tire life for race distance simulation runs.
 
@@ -213,7 +213,7 @@ The final section consolidates the empirical knowledge developed through the thr
 
 **Root Cause Candidates:**
 1. Insufficient compression damping force: Increase compression clicker by 3-4 clicks to resist squat transient.
-2. Excessive chain torque anti-squat geometry: Reduce anti-squat percentage by raising swingarm pivot or lowering countershaft sprocket height.
+2. Excessive chain torque anti-squat geometry: Reduce anti-squat percentage by lowering swingarm pivot or raising countershaft sprocket height.
 3. Rider throttle application technique too aggressive: Review onboard video, coach rider to modulate throttle more progressively over initial 10 meters of corner exit.
 
 **Verification Test:** Implement compression damping increase, regenerate histogram, verify secondary peak amplitude reduced by minimum 30 percent or peak velocity shifts below 1.0 m/s threshold.
@@ -238,7 +238,7 @@ The final section consolidates the empirical knowledge developed through the thr
 | **Powertrain** | Engine ECU Map | - | Map 3 (Wet) | Map 1 (Dry) | Map 1 (Dry) | Dry map provides 8% more peak torque |
 | | Throttle Response Mode | - | Mode B (Linear) | Mode B | Mode A (Aggressive) | Mode A tested for qualifying |
 | | Final Drive Ratio | - | 42T/15T (2.80) | 42T/15T | 43T/15T (2.87) | Ratio increase for acceleration priority |
-| | Chain Slack | mm | 28 | 28 | 30 | Increased slack to reduce driveline oscillation |
+| | Chain Slack | mm | 28 | 28 | 30 | Decreased slack to reduce driveline oscillation |
 | **Rear Suspension** | Spring Preload | mm | 8.0 | 8.0 | 9.0 | Added preload for heavier rider |
 | | Compression Damping | clicks from soft | 12 | 14 | 14 | Two clicks added after histogram analysis |
 | | Rebound Damping | clicks from soft | 10 | 10 | 11 | One click added to control extension rate |

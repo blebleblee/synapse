@@ -58,7 +58,7 @@ The abbreviation system follows standard conventions: PL for plural, POSS for po
 
 Execute a second analysis on a polysynthetic language sample to experience radically different morphological organization. Analyze this West Greenlandic sentence:
 
-**Aliikuser-suar-tuaannar-sinnaa-nngi-vip-putit**
+**Aliikuseq-suar-tuaannar-sinnaa-nngi-vip-putit**
 
 Segment the single phonological word into its constituent morphemes. The nominal root *aliikuseq* means "entertainment." The augmentative suffix *-suar* adds the meaning "big" or "great." The suffix *-tuaannar* means "only" or "merely." The verbal suffix *-sinnaa* means "can" or "be able to." The negative suffix *-nngi* negates the assertion. The indicative mood suffix *-vip* marks realis mood and interrogative illocution. The second-person singular subject suffix *-putit* cross-references the subject as "you (singular)."
 
@@ -66,13 +66,13 @@ The complete gloss reveals the sentence's internal structure:
 
 ```text
 aliikuseq-suar-tuaannar-sinnaa-nngi-vip-putit
-entertainment-big-only-can-NEG-INTR.IND-2SG
+entertainment-big-only-can-NEG-IND-2SG
 "Can't you just have some fun?" (lit. "Are you not able to only great-entertainment?")
 ```
 
 This polysynthetic construction packs an entire propositional meaning into a single phonological word through recursive morphological composition. The practitioner observes that morphological typology exists on a continuum: isolating languages like Mandarin approach one morpheme per word, agglutinative languages like Turkish clearly concatenate discrete morphemes, fusional languages like Russian merge multiple grammatical categories into portmanteau morphemes, and polysynthetic languages like West Greenlandic incorporate multiple argument positions and adjuncts within the verbal complex.
 
-The operational discipline requires documenting the morpheme inventory in a structured lexicon. Create a spreadsheet with columns for morpheme form, morphological category (root, derivational affix, inflectional affix, clitic), grammatical function, and allomorph conditions. For Turkish, document that the plural morpheme appears as *-lar* after back vowels and *-ler* after front vowels, exemplifying vowel harmony. For the possessive paradigm, document the complete set: *-ım/-im* (1SG), *-ın/-in* (2SG), *-ı/-i/-u/-ü* (3SG), *-ımız/-imiz* (1PL), *-ınız/-iniz* (2PL), *-ları/-leri* (3PL). This systematic documentation transforms intuitive parsing into reproducible analytical procedure.
+The operational discipline requires documenting the morpheme inventory in a structured lexicon. Create a spreadsheet with columns for morpheme form, morphological category (root, derivational affix, inflectional affix, clitic), grammatical function, and allomorph conditions. For Turkish, document that the plural morpheme appears as *-lar* after back vowels and *-ler* after front vowels, exemplifying vowel harmony. For the possessive paradigm, document the complete set: *-ım/-im* (1SG), *-ın/-in* (2SG), *-ı/-i/-u/-ü* (3SG), *-ımız/-imiz* (1PL), *-ınız/-iniz* (2PL), *-ları/-leri* (3PL, marks possessed noun in possessive construction). This systematic documentation transforms intuitive parsing into reproducible analytical procedure.
 
 ### Syntactic Constituency Tests and Tree Diagram Construction
 
@@ -302,7 +302,7 @@ Quantify acceptability through gradient judgments. Present speakers with a conti
 - **Moderately legal:** "spling" /splɪŋ/ (complex but legal onset /spl-/, legal coda /-ŋ/)
 - **Marginal:** "shrelm" /ʃrɛlm/ (complex onset /ʃr-/ rare in English, complex coda /-lm/ legal)
 - **Illegal:** "bnorg" /bnɔrɡ/ (illegal onset /bn-/, legal coda /-rɡ/)
-- **Highly illegal:** "pfkung" /pfkʌŋ/ (illegal onset /pf-/, illegal cluster /-fk-/)
+- **Highly illegal:** "pfkung" /pfkʌŋ/ (illegal three-consonant onset /pfk-/, legal coda /-ŋ/)
 
 Collect judgments from at least twenty native speakers. Compute mean acceptability ratings for each stimulus. Plot the ratings against a phonotactic legality index computed by summing constraint violations: zero violations for highly legal stimuli, one to two violations for marginal stimuli, three or more violations for highly illegal stimuli. The scatter plot typically reveals a strong negative correlation: as phonotactic violations increase, acceptability ratings decrease. Fit a linear regression model predicting acceptability from violation count. The regression slope quantifies the perceptual penalty associated with each phonotactic violation.
 
@@ -354,7 +354,7 @@ Construct additional garden-path structures targeting different syntactic ambigu
 **Direct-object/sentential-complement ambiguity:** "The teacher knew the solution to the problem was incorrect."  
 (Temporary parse: "The teacher knew [the solution]" reanalyzed to "The teacher knew [that the solution to the problem was incorrect]")
 
-For each garden-path type, construct a corpus of ten to fifteen examples and matched unambiguous controls. Recruit native speakers to complete the self-paced reading task. Analyze reading times using linear mixed-effects models with sentence type (garden-path vs. control) as a fixed effect and subject and item as random effects. The model estimates the magnitude of the garden-path effect, typically ranging from 100 to 300 milliseconds of additional reading time at the disambiguation point, with effects persisting into spillover regions.
+For each garden-path type, construct a corpus of twenty to forty examples and matched unambiguous controls. Recruit native speakers to complete the self-paced reading task. Analyze reading times using linear mixed-effects models with sentence type (garden-path vs. control) as a fixed effect and subject and item as random effects. The model estimates the magnitude of the garden-path effect, typically ranging from 200 to 500 milliseconds or more of additional reading time at the disambiguation point, with effects persisting into spillover regions.
 
 The operational insight concerns the architecture of the human sentence parser. Garden-path effects demonstrate that parsing is incremental: the parser commits to a single structural analysis at each point based on available evidence, rather than maintaining multiple analyses in parallel. When disambiguating evidence contradicts the committed analysis, the parser must backtrack and rebuild the structure, incurring measurable processing cost. The parser's initial commitments follow principles such as minimal attachment (attach incoming material to the current phrase with the fewest syntactic nodes) and late closure (attach incoming material to the most recent phrase), which produce efficient parsing for most sentences but occasional errors for locally ambiguous structures.
 

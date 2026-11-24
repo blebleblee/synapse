@@ -20,7 +20,7 @@ The internal architecture of Czech nominal morphology operates through a templat
 
 ### Masculine Animate Paradigm: Hard Stem **pán** "gentleman, lord"
 
-The masculine animate hard-stem declension represents the most complex paradigm due to the animacy-triggered accusative-genitive identity and the velar palatalization before front vowels in certain case suffixes. The root **pán** exhibits the velar /n/ as a hard dental, selecting hard-stem suffixes throughout.
+The masculine animate hard-stem declension represents the most complex paradigm due to the animacy-triggered accusative-genitive identity and the velar palatalization before front vowels in certain case suffixes. The root **pán** exhibits the hard dental /n/, selecting hard-stem suffixes throughout.
 
 **Singular Declension:**
 
@@ -74,7 +74,7 @@ The soft adjectival stem **jarní** "spring (adj.)" follows the soft paradigm wi
 
 ### Morphophonemic Alternations
 
-Consonant alternations triggered by front vowels and suffixation create surface complexity. The velar series /k, g, h/ (properly /k, ɡ, ɦ/) shifts to /c, z, š/ before the vocative **-e** and locative **-e/-ě** in specific declensions: **kluk** "boy" → locative **klukovi** (no alternation with **-ovi**), but **ruka** "hand" → locative **ruce** with /k/ → /c/. Dental palatalization, historically productive, leaves residual alternations in stems like **noha** "leg" → locative **noze** with /h/ → /z/.
+Consonant alternations triggered by front vowels and suffixation create surface complexity. The velar series ⟨k, h, ch⟩ (/k, ɦ, x/) shifts to ⟨c, z, š⟩ before the vocative **-e** and locative **-e/-ě** in specific declensions: **kluk** "boy" → locative **klukovi** (no alternation with **-ovi**), but **ruka** "hand" → locative **ruce** with /k/ → /c/. Dental palatalization, historically productive, leaves residual alternations in stems like **noha** "leg" → locative **noze** with /h/ → /z/.
 
 Vowel-zero alternations in consonant clusters occur in the genitive plural and occasionally in other cases. The stem **okno** "window" contains an unstable /o/ that drops in inflected forms: nominative **okno** but genitive plural **oken** with the zero-grade stem **okn-** requiring epenthetic **-e-**. Similarly, **pes** "dog" inflects with genitive singular **psa** showing zero-grade **ps-**, while the nominative inserts the epenthetic vowel.
 

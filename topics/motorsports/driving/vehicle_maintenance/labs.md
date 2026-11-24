@@ -421,7 +421,7 @@ for idx, (ax, label, channel) in enumerate(zip(axes.flat, corner_labels, velocit
     # Plot histogram with separate colors for compression vs rebound
     ax.hist(velocity_data[velocity_data >= 0], bins=bins[bins >= 0], 
             color='red', alpha=0.7, label='Compression (bump)')
-    ax.hist(velocity_data[velocity_data < 0], bins=bins[bins < 0], 
+    ax.hist(velocity_data[velocity_data < 0], bins=bins[bins <= 0], 
             color='blue', alpha=0.7, label='Rebound (droop)')
     
     ax.set_xlabel('Damper Shaft Velocity (mm/s)', fontweight='bold')
@@ -503,7 +503,7 @@ def calculate_load_transfer_distribution(df, mass_kg=650, cg_height_mm=350,
     # Calculate total lateral load transfer from lateral acceleration
     # ΔFz_total = m * ay * (h / t)
     g = 9.81  # m/s^2
-    df['LateralLoadTransferTotal'] = mass_kg * df['LatAccel'] * g * (cg_height_mm / 1000)
+    df['LateralLoadTransferTotal'] = mass_kg * df['LatAccel'] * g * (cg_height_mm / 1000) / ((track_front_mm + track_rear_mm) / 2000)
     
     # Estimate load transfer distribution from roll angle ratio
     # This is a simplified model; full analysis requires spring and ARB stiffness data
@@ -838,7 +838,7 @@ The race engineer's cognitive toolkit must compress dozens of interacting variab
 |---------|-----------|-------------------|---------------------|
 | Corner entry understeer | Front ARB too stiff | Reduce front ARB 2 blades | +0.1-0.2s per lap |
 | Corner exit oversteer | Rear ARB too stiff or diff too locked | Soften rear ARB or reduce diff preload | Improved traction, +0.15s |
-| Aero instability high-speed | Rake angle excessive | Reduce ride height front 3mm | Stable platform, +0.3s |
+| Aero instability high-speed | Rake angle excessive | Raise ride height front 3mm | Stable platform, +0.3s |
 | Brake lockup rear wheels | Brake bias too rearward | Adjust bias 2% forward | Reduced lap time variance |
 | Excessive tire wear inside edge | Camber too negative | Reduce camber 0.5° all corners | +5 lap tire life |
 | Damper bottoming on kerbs | Springs too soft or dampers too fast | Increase spring rate 10% or slow compression damping | Prevent damage, consistent platform |

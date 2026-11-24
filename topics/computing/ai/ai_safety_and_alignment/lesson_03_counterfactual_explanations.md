@@ -99,7 +99,7 @@ $$
 z^* = \arg\min_{z} \; d(p_\theta(z), x) + \lambda \cdot \mathcal{L}(f(p_\theta(z)), y')
 $$
 
-The decoder $p_\theta$ acts as a manifold projector, guaranteeing that any point in the latent space decodes to a plausible input. This is architecturally sound but couples the quality of explanations to the quality of the generative model—a brittle dependency in practice.
+The decoder $p_\theta$ acts as an approximate manifold projector: latent codes near the prior decode plausibly, but codes far from the prior or in low-density regions can decode to unrealistic or degenerate inputs, a failure mode that affects latent-space counterfactual methods in practice. This is architecturally sound but couples the quality of explanations to the quality of the generative model—a brittle dependency in practice.
 
 ### 2.3 SHAP-Based Counterfactual Approximation
 
@@ -208,7 +208,7 @@ class DPPDiversityLoss(nn.Module):
     """
     Determinantal Point Process diversity loss.
 
-    Maximizes det(K) where K_ij = exp(-||x'_i - x'_j||^2 / sigma^2).
+    Maximizes det(K) where $K_{ij} = \exp(-\|x'_i - x'_j\|^2 / (2\sigma^2))$.
     We minimize -log det(K) for numerical stability.
 
     This term ensures generated counterfactuals span structurally

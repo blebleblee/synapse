@@ -630,7 +630,7 @@ Ich habe es machen können. (I have been able to make it - with dependent verb)
 
 ### Optimization: Spaced Repetition of Principal Parts
 
-Strong verb acquisition benefits maximally from spaced repetition systems (SRS) that present principal parts at algorithmically optimized intervals. Each strong verb should be encoded as a flashcard with four fields: infinitive, preterite singular, preterite plural (to reinforce potential vowel alternations in Class III), and past participle. Cards should be grouped by ablaut class to leverage associative learning. Review intervals should expand exponentially (1 day, 3 days, 7 days, 14 days, 30 days, etc.) to optimize long-term retention. High-frequency verbs (*sein*, *haben*, *werden*, *gehen*, *kommen*, *sehen*, *geben*, *nehmen*) require additional drilling due to their ubiquity in discourse.
+Strong verb acquisition benefits maximally from spaced repetition systems (SRS) that present principal parts at algorithmically optimized intervals. Each strong verb should be encoded as a flashcard with four fields: infinitive, preterite singular, preterite plural (to reinforce the full preterite paradigm), and past participle. Cards should be grouped by ablaut class to leverage associative learning. Review intervals should expand exponentially (1 day, 3 days, 7 days, 14 days, 30 days, etc.) to optimize long-term retention. High-frequency verbs (*sein*, *haben*, *werden*, *gehen*, *kommen*, *sehen*, *geben*, *nehmen*) require additional drilling due to their ubiquity in discourse.
 
 ### Optimization: Corpus-Based Collocation Learning
 

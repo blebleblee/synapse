@@ -204,7 +204,7 @@ Execute this script by saving it as `measure_passive_properties.py` and running 
 
 The input resistance measurement relies on the linear relationship $\Delta V = I \cdot R_{\text{in}}$ holding in the subthreshold regime where voltage-gated conductances remain closed. The hyperpolarizing direction prevents sodium channel activation, ensuring the measurement captures purely passive properties. The membrane time constant governs the speed of voltage changes and determines how rapidly synaptic inputs can be integrated—neurons with short time constants (5-10 ms) respond quickly to transient inputs and act as coincidence detectors, while neurons with long time constants (20-40 ms) integrate inputs over extended windows and compute temporal averages.
 
-The exponential fit procedure deserves careful attention because it embodies the core physics of RC circuit dynamics. The membrane behaves as a parallel resistance-capacitance circuit where the capacitance stores charge on the lipid bilayer while the resistance represents ion flux through leak channels. The differential equation governing this circuit is $R_{\text{in}} C_m \frac{dV}{dt} = I - \frac{V - V_{\text{rest}}}{R_{\text{in}}}$, which yields the time constant $\tau_m = R_{\text{in}} C_m$ and predicts exponential voltage trajectories. The fit residuals provide a quantitative check on whether this simple model adequately describes the data—systematic deviations indicate the presence of voltage-dependent conductances, non-uniform cable properties, or series resistance errors.
+The exponential fit procedure deserves careful attention because it embodies the core physics of RC circuit dynamics. The membrane behaves as a parallel resistance-capacitance circuit where the capacitance stores charge on the lipid bilayer while the resistance represents ion flux through leak channels. The differential equation governing this circuit is $\tau_m \frac{dV}{dt} = I \cdot R_{\text{in}} - (V - V_{\text{rest}})$ where $\tau_m = R_{\text{in}} C_m$, which yields the time constant $\tau_m = R_{\text{in}} C_m$ and predicts exponential voltage trajectories. The fit residuals provide a quantitative check on whether this simple model adequately describes the data—systematic deviations indicate the presence of voltage-dependent conductances, non-uniform cable properties, or series resistance errors.
 
 The uncertainty analysis propagates measurement noise through the parameter extraction pipeline. The resting potential standard deviation quantifies baseline voltage fluctuations from thermal noise and spontaneous channel openings, typically 0.3-0.8 mV in well-isolated recordings. The input resistance error depends on both the voltage measurement uncertainty and the precision of the current injection, with typical errors of 5-15% in automated analysis pipelines. The time constant fit uncertainty reflects both the quality of the exponential model and the signal-to-noise ratio during the transient phase—longer averaging windows reduce noise but require slower current steps that may activate voltage-gated conductances.
 
@@ -618,7 +618,7 @@ The gating variable dynamics panel reveals the mechanistic basis of action poten
 
 Modify the model parameters to explore how conductance densities shape excitability. Increase the maximum sodium conductance to `g_Na = 180.0` mS/cm² (50% increase) and observe how the rheobase decreases, the F-I curve gain increases, and spike amplitude grows. This heightened sodium conductance makes the neuron more excitable, requiring less current to reach threshold and producing larger amplitude spikes. Conversely, increase the maximum potassium conductance to `g_K = 54.0` mS/cm² (50% increase) and observe the opposite effects—higher rheobase, reduced gain, and more pronounced afterhyperpolarization. These parameter manipulations mirror pharmacological interventions (sodium channel blockers reduce excitability while potassium channel blockers increase excitability) and developmental changes (immature neurons express lower potassium conductance densities, making them more excitable).
 
-The temperature dependence of the Hodgkin-Huxley model provides another crucial calibration parameter. The original squid giant axon experiments were performed at 6.3°C, but mammalian neurons operate at 37°C where reaction rates accelerate according to Q₁₀ relationships (typically Q₁₀ ≈ 3 for ion channel kinetics). To simulate mammalian temperatures, multiply all rate constants by $3^{(T - 6.3)/10}$ where T is the target temperature in Celsius. At 37°C, this yields approximately a 10-fold acceleration of all kinetics, dramatically shortening spike duration and refractory periods while increasing maximum firing rates from ~50 Hz in the squid axon to 200-500 Hz in fast-spiking mammalian interneurons.
+The temperature dependence of the Hodgkin-Huxley model provides another crucial calibration parameter. The original squid giant axon experiments were performed at 6.3°C, but mammalian neurons operate at 37°C where reaction rates accelerate according to Q₁₀ relationships (typically Q₁₀ ≈ 3 for ion channel kinetics). To simulate mammalian temperatures, multiply all rate constants by $3^{(T - 6.3)/10}$ where T is the target temperature in Celsius. At 37°C, this yields approximately a 30-fold acceleration of all kinetics, dramatically shortening spike duration and refractory periods while increasing maximum firing rates from ~50 Hz in the squid axon to 200-500 Hz in fast-spiking mammalian interneurons.
 
 The F-I curve gain measurement provides a single number that captures how sensitively a neuron converts synaptic current into spike output. Neurons with high gain (steep F-I curves) amplify small input differences into large rate differences, implementing a high-gain amplifier suitable for detecting weak signals. Neurons with low gain (shallow F-I curves) compress input differences into similar output rates, implementing a dynamic range compressor suitable for encoding information across wide input ranges without saturation. The gain is not a fixed property but can be modulated by neuromodulators that alter conductance densities—norepinephrine increases gain by reducing potassium conductances, while acetylcholine can reduce gain by activating hyperpolarization-activated cation currents.
 
@@ -1029,14 +1029,20 @@ h_inf = 0.60
 n_inf = 0.32
 
 # Run 100 ms at rest with no external current
-def hh_test(state, t):
+def hh_test(state, t, I_ext):
     V, m, h, n = state
-    # [implementation as in Exercise 2]
+    I_Na = g_Na * m**3 * h * (V - E_Na)
+    I_K = g_K * n**4 * (V - E_K)
+    I_L = g_L * (V - E_L)
+    dVdt = (I_ext - I_Na - I_K - I_L) / C_m
+    dmdt = alpha_m(V) * (1.0 - m) - beta_m(V) * m
+    dhdt = alpha_h(V) * (1.0 - h) - beta_h(V) * h
+    dndt = alpha_n(V) * (1.0 - n) - beta_n(V) * n
     return [dVdt, dmdt, dhdt, dndt]
 
 t_test = np.linspace(0, 100, 10000)
 state_init = [V_rest, m_inf, h_inf, n_inf]
-solution = odeint(hh_test, state_init, t_test, args=(0.0,))
+solution = odeint(hh_test, state_init, t_test, args=(0.0,))  # hh_test must have signature (state, t, I_ext)
 
 # Verify steady-state stability
 assert np.abs(solution[-1, 0] - V_rest) < 0.1, "Voltage drift at rest"
@@ -1052,7 +1058,7 @@ from scipy.signal import find_peaks
 
 # Generate known spike train
 t = np.linspace(0, 100, 10000)
-V_true = -65 + 20*np.sin(2*np.pi*10*t/1000)  # 10 Hz oscillation
+V_true = -65 + 20*np.sin(2*np.pi*10*t/100)  # 10 Hz oscillation
 spike_times_true = np.arange(5, 100, 10)  # Spikes every 10 ms
 
 # Add spikes at known times

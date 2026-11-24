@@ -60,7 +60,7 @@ flowchart LR
     apex_inside --> exit["EXIT"]
     apex_racing --> exit
     
-    straight -.-> inside
+    straight -.-> apex_inside
 ```
 
 The inside line gives the attacker geometric apex priority — they own the inside of the corner — but it carries a significant cost: the inside arc is shorter and tighter, requiring a lower mid-corner speed. The defender on the outside racing line, if they survive the entry, will have a wider radius through the corner and a superior exit trajectory. This is the essential trade in most overtaking moves: the attacker wins entry and apex but frequently concedes the exit, leaving them vulnerable to being re-passed on the following straight unless they can defend the inside position through the following complex.
@@ -69,7 +69,7 @@ This dynamic is precisely why corner sequences — Sector 2 of the Suzuka circui
 
 ### Tire Degradation Modeling
 
-A tire's functional degradation follows a characteristic curve that experienced engineers learn to read from lap time telemetry. The curve is not linear. In a typical compound's operational window, there is an initial build phase as the tire reaches its working temperature range, a performance peak where the contact patch is at optimal temperature and chemical adhesion is maximized, and then a degradation plateau that eventually transitions into a cliff — a rapid deterioration that occurs when the rubber surface has worn beyond the chemical tread layer into the carcass structure below.
+A tire's functional degradation follows a characteristic curve that experienced engineers learn to read from lap time telemetry. The curve is not linear. In a typical compound's operational window, there is an initial build phase as the tire reaches its working temperature range, a performance peak where the contact patch is at optimal temperature and chemical adhesion is maximized, and then a degradation plateau that eventually transitions into a cliff — a rapid deterioration that occurs when the rubber compound reaches critical temperature and loses structural cohesion through thermal breakdown, graining, or blistering.
 
 The lap time signature of these phases is diagnostic. During the heat build phase, lap times improve by several tenths per lap as the front and rear tires come into their operating window. During the peak performance window, lap times stabilize and the driver's confidence in the car's limit behavior is highest. During the degradation plateau, times slowly worsen — typically one to three tenths per lap — as slip angles increase and the driver compensates through reduced entry speed or delayed throttle application. The cliff is identifiable by an abrupt, non-linear lap time increase of a full second or more accompanied by severe over- or understeer that the driver can no longer manage through technique alone.
 
@@ -77,8 +77,8 @@ The lap time signature of these phases is diagnostic. During the heat build phas
 flowchart LR
     A["Lap 1\n(Baseline)"] --> B["Build Phase\n(Laps 1–5)"]
     B --> C["Peak Window\n(Laps 5–13)"]
-    C --> D["Cliff\n(Laps 13–15)"]
-    D --> E["Degradation\n(Laps 15–21)"]
+    C --> D["Degradation Plateau\n(Laps 13–19)"]
+    D --> E["Cliff\n(Laps 19–21)"]
 
     subgraph performance ["Lap Time Performance Curve"]
         A
@@ -118,7 +118,7 @@ graph TD
     K --> A
 ```
 
-The undercut and overcut are the two fundamental strategic weapons derived from this model. An undercut involves pitting earlier than a competitor to fit fresh tires and produce faster lap times on new compound, allowing the pitting car to emerge ahead of the competitor who stayed out on degraded tires. The undercut works when the lap time delta between fresh and worn tires exceeds the time lost in the pit lane. At most circuits, the pit lane costs approximately 20–24 seconds including the drive-through time and speed limiter sections, so the undercut requires a tire delta of at least that magnitude across the remaining projected laps. An overcut is the inverse: staying out on current tires while a competitor pits, extending the stint to either build a gap large enough to emerge ahead after pitting, or timing the stop to arrive on track during a phase of traffic that disrupts the competitor's new-tire attack lap.
+The undercut and overcut are the two fundamental strategic weapons derived from this model. An undercut involves pitting earlier than a competitor to fit fresh tires and produce faster lap times on new compound, allowing the pitting car to emerge ahead of the competitor who stayed out on degraded tires. The undercut works when the lap time delta between fresh and worn tires exceeds the time lost in the pit lane. At most circuits, the pit lane costs approximately 20–24 seconds including the drive-through time and speed limiter sections, so the undercut requires that the per-lap pace advantage on fresh tires, multiplied across the remaining stint laps, exceeds the pit-lane cost. An overcut is the inverse: staying out on current tires while a competitor pits, extending the stint to either build a gap large enough to emerge ahead after pitting, or timing the stop to arrive on track during a phase of traffic that disrupts the competitor's new-tire attack lap.
 
 The undercut/overcut decision is never made in isolation. It is weighed against track position value — particularly in a field where overtaking is difficult — safety car probability (which resets the strategic equation entirely), and the competitor's own tire state. If the car ahead is running identically degraded tires, an undercut can be triggered earlier than the tire delta alone suggests, because the competitor cannot respond with an attack on superior rubber.
 
@@ -132,7 +132,7 @@ The most demanding optimization problem in professional racecraft is managing pa
 
 The professional solution is *selective push laps* — identifying one to three laps per stint where full attack pace is permissible and necessary, and managing the remainder at a pace calculated to extend tire life to the next service window. These push laps are typically triggered by specific strategic events: immediately after a safety car restart when tire temperatures are uniform across the field, in the lap immediately after pitting when fresh tires can absorb full attack pace without premature degradation, or in the final two to three laps of a stint when the rubber is already past the cliff threshold and there is nothing to conserve.
 
-The parametric tool the driver and engineer use to execute this management is the target lap time — a figure transmitted by radio that represents the maximum pace the tire model permits at that stage of the stint. The driver executes this target by managing energy through the lap's highest-stress corners: primarily the high-speed transitions that combine maximum lateral load with throttle application, and the heavy-braking zones that impose peak longitudinal stress on the front tire contact patches. At circuits like Paul Ricard or the Red Bull Ring, the rear-left tire is universally the most stressed across a typical lap geometry, and that tire's degradation rate anchors the entire stint calculation.
+The parametric tool the driver and engineer use to execute this management is the target lap time — a figure transmitted by radio that represents the maximum pace the tire model permits at that stage of the stint. The driver executes this target by managing energy through the lap's highest-stress corners: primarily the high-speed transitions that combine maximum lateral load with throttle application, and the heavy-braking zones that impose peak longitudinal stress on the front tire contact patches. At circuits with a preponderance of high-load right-hand corners, such as Silverstone or Suzuka, the rear-left tire is typically the most stressed; tire stress dominance varies by circuit layout, and that tire's degradation rate anchors the entire stint calculation.
 
 ### Defensive Driving at the Limit
 

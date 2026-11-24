@@ -791,7 +791,7 @@ TIRE TUNING MATRIX - Final Configuration
 
 FRONT LEFT:
 - Camber: -2.0° (reduced from -2.5° to balance inside edge heating)
-- Cold Pressure: 28.0 psi (targets 32 psi hot)
+- Cold Pressure: 28.0 psi (targets 34–35 psi hot)
 - Temperature Target: 88-95°C across all positions
 - Measured Profile (Lap 20): Inside 92°C, Center 89°C, Outside 88°C
 - Gradient: +4°C (within target range)
@@ -985,7 +985,7 @@ Effects:
   
 Parameter: Rear Anti-Roll Bar Stiffness Increase (one position stiffer)
 Effects:
-  - Handling Balance: Increased oversteer (rear axle grip reduced)
+  - Handling Balance: Increased understeer (rear roll stiffness increases, reducing rear compliance)
   - Aero Platform: No direct effect (roll resistance, not pitch/heave)
   - Tire Loading: Increased lateral load transfer rear axle
   - Mechanical Grip: Reduced rear axle over single-wheel bumps
@@ -1146,7 +1146,7 @@ Maintain a dedicated debrief log file for each circuit, appending new session en
 
 The final component integrates vehicle setup optimization with race strategy decisions regarding pit timing, tire management, and fuel load compensation. Setup decisions directly impact stint performance: a setup optimized for qualifying pace on low fuel and fresh tires will degrade differently than a race-focused setup targeting consistent performance over a full fuel load and 30-lap tire stint.
 
-**Fuel Load Compensation:** As fuel burns off, the vehicle's weight distribution shifts rearward (fuel tank typically located aft of the driver), reducing front axle load and increasing rear axle load. This shift induces understeer as the race progresses. Compensate by setting the initial full-fuel setup with a slight oversteer bias (e.g., 48% front roll stiffness distribution instead of 50%) that neutralizes as fuel depletes. Calculate the weight distribution shift:
+**Fuel Load Compensation:** As fuel burns off, the vehicle's weight distribution shifts forward (fuel tank typically located aft of the driver, so fuel depletion removes mass from the rear), increasing front axle load and reducing rear axle load. This shift induces oversteer as the race progresses. Compensate by setting the initial full-fuel setup with a slight understeer bias (e.g., 52% front roll stiffness distribution instead of 50%) that neutralizes as fuel depletes. Calculate the weight distribution shift:
 
 ```python
 # Fuel load weight distribution calculation

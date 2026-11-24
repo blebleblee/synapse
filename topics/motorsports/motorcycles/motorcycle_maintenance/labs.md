@@ -354,6 +354,7 @@ front_accel_vert = np.gradient(susp_front_vel, time)
 rear_accel_vert = np.gradient(susp_rear_vel, time)
 
 # Reconstruct damper force from spring force + inertial force
+# Note: susp_front_filt and susp_rear_filt are computed in Exercise 1
 front_spring_force = front_spring_rate * susp_front_filt
 rear_spring_force = rear_spring_rate * susp_rear_filt
 
@@ -739,7 +740,7 @@ print(wear_df[['Tire', 'Inside_Wear_Rate_um_per_lap', 'Center_Wear_Rate_um_per_l
                'Outside_Wear_Rate_um_per_lap', 'Tire_Lifespan_Laps']].to_string(index=False))
 ```
 
-The tire lifespan projection provides critical race strategy information, enabling the pit crew to schedule tire changes and optimize compound selection for race distance. The front tire in this example exhibits inside edge wear rate 167 micrometers per lap, projecting a lifespan of 204 laps before reaching minimum legal tread depth. The rear tire exhibits higher wear rates, particularly at the inside edge with 250 micrometers per lap, projecting a lifespan of 144 laps. The limiting factor for tire set lifespan is the rear tire inside edge, dictating that the tire set requires replacement after approximately 140 laps of racing.
+The tire lifespan projection provides critical race strategy information, enabling the pit crew to schedule tire changes and optimize compound selection for race distance. The front tire in this example exhibits inside edge wear rate 17 micrometers per lap, projecting a lifespan of 204 laps before reaching minimum legal tread depth. The rear tire exhibits higher wear rates, particularly at the inside edge with 25 micrometers per lap, projecting a lifespan of 144 laps. The limiting factor for tire set lifespan is the rear tire center edge, dictating that the tire set requires replacement after approximately 114 laps of racing.
 
 Correlate tire wear rate with tire operating temperature to validate the thermal degradation model. Higher operating temperatures accelerate wear through increased compound compliance and thermal decomposition. Plot wear rate versus average tire temperature to expose the correlation and identify optimal operating temperature balancing grip and longevity.
 
@@ -777,7 +778,7 @@ correlation = np.corrcoef(wear_temps, wear_rates)[0, 1]
 print(f"\nTire wear rate vs. temperature correlation coefficient: {correlation:.3f}")
 ```
 
-The wear rate versus temperature scatter plot exposes the thermal degradation relationship. In this example, the rear tire operates at 94°C average temperature with 208 micrometers per lap wear rate, while the front tire operates at 86°C with 189 micrometers per lap wear rate. The positive correlation between temperature and wear rate validates the thermal degradation model, suggesting that temperature management through pressure optimization and suspension setup directly influences tire longevity. Reducing rear tire operating temperature by 5°C through cold pressure reduction could extend tire lifespan by 10-15%, providing significant economic benefit in racing applications where tire cost dominates operational budgets.
+The wear rate versus temperature scatter plot exposes the thermal degradation relationship. In this example, the rear tire operates at 94°C average temperature with 25 micrometers per lap wear rate, while the front tire operates at 86°C with 17 micrometers per lap wear rate. The positive correlation between temperature and wear rate validates the thermal degradation model, suggesting that temperature management through pressure optimization and suspension setup directly influences tire longevity. Reducing rear tire operating temperature by 5°C through cold pressure reduction could extend tire lifespan by 10-15%, providing significant economic benefit in racing applications where tire cost dominates operational budgets.
 
 Formulate a comprehensive tire management strategy document recording optimal cold pressures, temperature target ranges, wear rate baselines, and projected lifespan for each tire compound used during the season. Update this document after each track session, incorporating new temperature and wear measurements to refine the empirical models. The following template provides a structured format for tire management documentation.
 

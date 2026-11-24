@@ -13,13 +13,14 @@ import numpy as np
 import scipy
 from scipy.optimize import curve_fit
 from scipy.integrate import odeint
+import matplotlib
 import matplotlib.pyplot as plt
 from Bio import SeqIO
 from Bio.PDB import PDBParser
 
 print(f"NumPy: {np.__version__}")
 print(f"SciPy: {scipy.__version__}")
-print(f"Matplotlib: {plt.matplotlib.__version__}")
+print(f"Matplotlib: {matplotlib.__version__}")
 
 # Verify numerical precision
 test_array = np.linspace(0, 10, 1000)
@@ -41,7 +42,7 @@ $$v_0 = \frac{V_{\text{max}}[S]}{K_M + [S]}$$
 
 At substrate concentrations far below $K_M$, the reaction exhibits pseudo-first-order kinetics with velocity proportional to substrate concentration. At concentrations greatly exceeding $K_M$, the enzyme saturates and velocity approaches the maximum turnover limit $V_{\text{max}} = k_{\text{cat}}[E]_{\text{total}}$, where $k_{\text{cat}}$ represents the catalytic turnover number and $[E]_{\text{total}}$ denotes total enzyme concentration. The Michaelis constant $K_M$ physically represents the substrate concentration yielding half-maximal velocity, providing a measure of enzyme-substrate binding affinity under steady-state conditions.
 
-Begin by preparing a 100 mM sodium carbonate-bicarbonate buffer at pH 10.0, which maintains alkaline conditions necessary for pNP ionization and maximal spectroscopic signal. Dissolve 1.06 g sodium carbonate and 0.84 g sodium bicarbonate in 100 mL ultrapure water, verify pH via calibrated electrode, and adjust if necessary with small aliquots of 1 M NaOH or 1 M HCl. Prepare a 10 mM pNPP substrate stock solution by dissolving 55.3 mg disodium para-nitrophenyl phosphate hexahydrate in 10 mL buffer, storing at 4°C and protecting from light to prevent photochemical degradation. Prepare working substrate dilutions spanning 0.1 to 5.0 mM final concentration using serial dilution technique to minimize systematic pipetting errors.
+Begin by preparing a 100 mM sodium carbonate-bicarbonate buffer at pH 10.0, which maintains alkaline conditions necessary for pNP ionization and maximal spectroscopic signal. Dissolve 1.06 g sodium carbonate and 0.84 g sodium bicarbonate in 100 mL ultrapure water, verify pH via calibrated electrode, and adjust if necessary with small aliquots of 1 M NaOH or 1 M HCl. Prepare a 10 mM pNPP substrate stock solution by dissolving 37.1 mg disodium para-nitrophenyl phosphate hexahydrate in 10 mL buffer, storing at 4°C and protecting from light to prevent photochemical degradation. Prepare working substrate dilutions spanning 0.1 to 5.0 mM final concentration using serial dilution technique to minimize systematic pipetting errors.
 
 Reconstitute lyophilized alkaline phosphatase from bovine intestinal mucosa to 1 mg/mL in ice-cold buffer containing 1 mM MgCl₂ and 0.1 mM ZnCl₂, essential cofactors for catalytic activity. Determine precise enzyme concentration via Bradford protein assay calibrated against bovine serum albumin standards, measuring absorbance at 595 nm following Coomassie Brilliant Blue G-250 binding. Dilute the enzyme stock to 10 μg/mL working concentration, maintaining on ice throughout the experimental protocol to prevent thermal denaturation.
 
@@ -231,7 +232,7 @@ param_errors = np.sqrt(np.diag(cov_ph))
 pH_smooth = np.linspace(6.5, 11.5, 200)
 activity_smooth = ph_activity_model(pH_smooth, vmax_fit, pKa1_fit, pKa2_fit)
 
-# Calculate optimal pH (geometric mean of pKa values)
+# Calculate optimal pH (arithmetic mean of pKa values)
 pH_optimal = (pKa1_fit + pKa2_fit) / 2
 
 # Plot pH-activity profile
@@ -284,9 +285,9 @@ The Gibbs free energy of unfolding exhibits temperature dependence governed by t
 
 $$\Delta G^\circ(T) = \Delta H^\circ\left(1 - \frac{T}{T_m}\right) - \Delta C_p\left(T - T_m - T\ln\frac{T}{T_m}\right)$$
 
-where $T_m$ represents the melting temperature at which $\Delta G^\circ = 0$ and the populations of native and denatured states become equal. The heat capacity change $\Delta C_p$ reflects the increased hydration of hydrophobic residues upon unfolding, typically 5-10 cal/(mol·K) per residue for globular proteins.
+where $T_m$ represents the melting temperature at which $\Delta G^\circ = 0$ and the populations of native and denatured states become equal. The heat capacity change $\Delta C_p$ reflects the increased hydration of hydrophobic residues upon unfolding, typically 10-15 cal/(mol·K) per residue for globular proteins.
 
-Prepare protein samples for DSC analysis at 1-2 mg/mL concentration in degassed buffer, removing dissolved oxygen via vacuum filtration to prevent bubble formation during heating. Load 500 μL sample into the DSC cell, with matched buffer in the reference cell to cancel instrumental baseline contributions. Equilibrate at 20°C for 10 minutes, then scan from 20°C to 95°C at 1 K/min heating rate while recording differential power input required to maintain zero temperature difference between sample and reference cells. Execute buffer-buffer baseline scans before and after protein measurements to verify instrumental stability and enable baseline subtraction.
+Prepare protein samples for DSC analysis at 1-2 mg/mL concentration in degassed buffer, removing dissolved oxygen via vacuum with gentle stirring or helium sparging to prevent bubble formation during heating. Load 500 μL sample into the DSC cell, with matched buffer in the reference cell to cancel instrumental baseline contributions. Equilibrate at 20°C for 10 minutes, then scan from 20°C to 95°C at 1 K/min heating rate while recording differential power input required to maintain zero temperature difference between sample and reference cells. Execute buffer-buffer baseline scans before and after protein measurements to verify instrumental stability and enable baseline subtraction.
 
 The raw thermogram exhibits a sigmoidal transition with peak maximum defining the melting temperature $T_m$. Baseline-subtract and normalize the data to molar heat capacity using the protein molecular weight and concentration. Integrate the excess heat capacity curve to extract the calorimetric enthalpy $\Delta H_{\text{cal}}$:
 
@@ -735,7 +736,7 @@ Wavelength calibration: Holmium oxide filter exhibits characteristic absorption 
 
 Photometric accuracy: NIST-traceable neutral density filters with certified absorbance values at 0.3, 0.6, 1.0, and 2.0 AU. Measured values must agree within ±0.005 AU for $A < 1.0$ and ±0.010 AU for $1.0 < A < 2.0$. Execute verification quarterly.
 
-Stray light assessment: Measure apparent transmittance using cutoff filters at 340 nm (KCl solution) and 220 nm (NaI solution). Stray light contribution must remain below 0.05% ($A > 3.3$) for UV-Vis instruments and below 0.01% for research-grade spectrophotometers.
+Stray light assessment: Measure apparent transmittance using cutoff filters at 340 nm (NaNO₂ solution) and 220 nm (KI solution). Stray light contribution must remain below 0.05% ($A > 3.3$) for UV-Vis instruments and below 0.01% for research-grade spectrophotometers.
 
 Baseline stability: Monitor absorbance drift at 600 nm with water-filled cuvettes for 30 minutes. Total drift must not exceed 0.001 AU/hour at constant temperature. Excessive drift indicates dirty optics, temperature fluctuations, or failing light source requiring maintenance intervention.
 
@@ -747,7 +748,7 @@ Standard buffer recipes (50 mM, 25°C):
 - Tris pH 8.0: 0.606 g Tris base per 100 mL, adjust with HCl
 - CHES pH 9.5: 1.035 g CHES per 100 mL, adjust with NaOH
 
-Temperature coefficient warning: Tris exhibits large ΔpKa/ΔT = -0.028 pH/°C. A Tris buffer adjusted to pH 8.0 at 25°C shifts to pH 7.4 at 45°C. Use Good's buffers (HEPES, MES, PIPES) for temperature-variable experiments with ΔpKa/ΔT < -0.015 pH/°C.
+Temperature coefficient warning: Tris exhibits large ΔpKa/ΔT = -0.028 pH/°C. A Tris buffer adjusted to pH 8.0 at 25°C shifts to pH 7.4 at 45°C. Use Good's buffers (HEPES, MES, PIPES) for temperature-variable experiments with |ΔpKa/ΔT| < 0.015 pH/°C.
 
 pH meter three-point calibration: Use pH 4.00, 7.00, and 10.00 standards. Electrode slope must fall between 92-102% of theoretical (59.16 mV/pH unit at 25°C). Offset at pH 7.00 must remain within ±0.05 pH units. Replace electrode if calibration fails acceptance criteria.
 

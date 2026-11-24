@@ -43,7 +43,7 @@ Practice vowel reduction through progressive word-length drills that isolate eac
 **Disyllabic Reduction Drills—Stress Position Alternation:**
 - **го́род** [ˈɡorət] 'city'—Stress on first syllable; second-syllable /o/ reduces to [ə]. Practice maintaining clear [o] in stressed position while executing full schwa reduction in final syllable.
 - **города́** [ɡərɐˈda] 'cities' (genitive singular)—Stress shifts to final syllable; first-syllable /o/ reduces to [ə], second-syllable /o/ reduces to pre-tonic [ɐ]. Execute three-level vowel quality hierarchy in single word.
-- **во́ды** [ˈvodɨ] 'waters'—Initial stressed /o/ maintains full quality; final /y/ remains relatively stable.
+- **во́ды** [ˈvodɨ] 'waters'—Initial stressed /o/ maintains full quality; final /ɨ/ remains relatively stable.
 - **вода́** [vɐˈda] 'water'—Initial /o/ reduces to pre-tonic [ɐ]; final /a/ receives stress and full quality.
 
 **Trisyllabic and Quadrisyllabic Reduction Cascades:**
@@ -114,10 +114,10 @@ The operational logic governing aspect selection follows predictable semantic pa
 Establish aspect selection automaticity through contextualized transformation drilling. Present base sentences with aspectual environment cues; practitioner selects and produces the correct aspectual variant. Begin with the high-frequency aspectual pair **читать** (imperfective) / **прочитать** (perfective) 'to read':
 
 **Imperfective Context Drill Set—читать:**
-1. **Я читаю книгу.** [ja ˈtʃitəjʊ ˈknʲiɡʊ] 'I am reading a book.'—Ongoing action in progress at speech moment; imperfective required.
-2. **Я всегда читаю перед сном.** [ja fsʲɪɡˈda ˈtʃitəjʊ ˈpʲerʲɪt snom] 'I always read before sleep.'—Habitual action; imperfective required.
+1. **Я читаю книгу.** [ja tʃɪˈtajʊ ˈknʲiɡʊ] 'I am reading a book.'—Ongoing action in progress at speech moment; imperfective required.
+2. **Я всегда читаю перед сном.** [ja fsʲɪɡˈda tʃɪˈtajʊ ˈpʲerʲɪt snom] 'I always read before sleep.'—Habitual action; imperfective required.
 3. **Я умею читать по-русски.** [ja ʊˈmʲejʊ tʃɪˈtatʲ pə-ˈruskʲɪ] 'I can read in Russian.'—General ability statement; imperfective required.
-4. **Когда я читал, он смотрел телевизор.** [kɐɡˈda ja ˈtʃital on smɐˈtrʲel tʲɪlʲɪˈvʲizər] 'When I was reading, he was watching TV.'—Simultaneous ongoing actions; both imperfective.
+4. **Когда я читал, он смотрел телевизор.** [kɐɡˈda ja tʃɪˈtal on smɐˈtrʲel tʲɪlʲɪˈvʲizər] 'When I was reading, he was watching TV.'—Simultaneous ongoing actions; both imperfective.
 
 **Perfective Context Drill Set—прочитать:**
 1. **Я прочитал всю книгу.** [ja prətʃɪˈtal fsʲʊ ˈknʲiɡʊ] 'I read the entire book (and finished it).'—Completed action with result; perfective required.
@@ -287,10 +287,10 @@ Present thirty inflection prompts with one-second maximum latency, approximating
 Analyze error patterns across speed tiers using error taxonomy spreadsheet. Categorize errors into systematic error types:
 
 **Error Type 1: Case Substitution—Genitive/Accusative Confusion**
-High-frequency error in speed-compressed conditions: substituting Genitive for Accusative in animate masculine nouns. Example error: producing **студента** (Genitive) instead of **студента** (Accusative)—note that these forms are identical, but error manifests in context where Nominative should be maintained for inanimate usage or where Accusative should differ from Genitive.
+High-frequency error in speed-compressed conditions: substituting Genitive for Accusative in inanimate nouns. Example error: producing **книги** (Genitive) instead of **книгу** (Accusative)—learner applies Genitive ending to direct objects, particularly under time pressure.
 
 **Error Type 2: Stem Alternation Failure**
-Verbs with consonant alternations in conjugation (e.g., **писать** 'write': пишу, пишешь with /s/ → /ʃ/ alternation) show stem alternation failures under time pressure, producing incorrect *пишу forms or inconsistent application.
+Verbs with consonant alternations in conjugation (e.g., **писать** 'write': пишу, пишешь with /s/ → /ʃ/ alternation) show stem alternation failures under time pressure, producing incorrect *писаю forms (overgeneralized regular endings without the consonant alternation) or inconsistent application.
 
 **Error Type 3: Stress Pattern Errors**
 Mobile stress patterns (stress shifting across paradigm, as in **окно́/о́кна** 'window') fail under compression, with learners defaulting to fixed stress on a single syllable position.
@@ -330,7 +330,7 @@ Audio examples targeting consonant reduction:
 Drill ten cluster-reduced utterances; verify transcription accuracy. Common errors: over-interpretation of reduced clusters (hearing phantom segments), failure to apply voicing assimilation rules when reconstructing underlying forms, confusion of reduced verb forms with unrelated homophones.
 
 **Adversarial Tier 4: Authentic Colloquial Register with Dialectal Features**
-Present audio excerpts from authentic informal conversations exhibiting regional dialectal features common in colloquial Moscow speech: fricative /ɡ/ replacing standard plosive [ɡ] in southern-influenced speech, soft /tʲ/ and /dʲ/ affrication (realized as [tsʲ] and [dzʲ]), and prosodic patterns with irregular stress placement in discourse particles.
+Present audio excerpts from authentic informal conversations exhibiting regional dialectal features common in colloquial Moscow speech: fricative /ɣ/ replacing standard plosive /ɡ/ in southern-influenced speech, soft /tʲ/ and /dʲ/ affrication (realized as [tsʲ] and [dzʲ]), and prosodic patterns with irregular stress placement in discourse particles.
 
 Audio examples with dialectal and register features:
 - Fricative /ɣ/ realization: **город** [ˈɣorət] instead of standard [ˈɡorət] 'city'

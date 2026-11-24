@@ -40,7 +40,7 @@ At constant carbon number:
 - Alkanes (saturated) have lowest potential energy but lowest reactivity
 - Alkenes (one π bond) have moderate potential energy and moderate reactivity
 - Alkynes (two π bonds) have higher potential energy and higher reactivity
-- Aromatics have exceptional thermodynamic stability despite unsaturation (resonance stabilization energy: 150-200 kJ/mol for benzene)
+- Aromatics have exceptional thermodynamic stability despite unsaturation (resonance stabilization energy: ~150 kJ/mol for benzene)
 
 ### 1.2 Information-Theoretic Perspective
 
@@ -235,7 +235,7 @@ $$R_2C=CR_2 > R_2C=CHR > R_2C=CH_2 > RCH=CHR > RCH=CH_2 > CH_2=CH_2$$
 
 **Hyperconjugation model**: σ electrons from C-H bonds adjacent to C=C donate into π* orbital, stabilizing the alkene.
 
-**Thermodynamic data** (ΔH°ᵥₐₚ for hydrogenation to alkane):
+**Thermodynamic data** (ΔH° for hydrogenation to alkane):
 - Ethene: -136 kJ/mol
 - Propene: -126 kJ/mol
 - But-2-ene: -115 kJ/mol (trans), -120 kJ/mol (cis)
@@ -305,7 +305,7 @@ C≡C bond components:
 
 **Consequence of high s-character:**
 - **C≡C-H bond**: More acidic (pKₐ ≈ 25) than sp² C-H (pKₐ ≈ 44) or sp³ C-H (pKₐ ≈ 50)
-- **Electronegativity**: sp carbon (44% s) > sp² (33% s) > sp³ (25% s)
+- **Electronegativity**: sp carbon (50% s) > sp² (33% s) > sp³ (25% s)
 
 **Nomenclature**: Suffix -yne, number position of triple bond
 
@@ -341,7 +341,7 @@ Similar to alkenes but generally less reactive (π electrons held more tightly d
 
 3. **Hydration** (H₂O/H⁺/HgSO₄)
    ```text
-   RC≡CH + H₂O/H⁺ → RCH₂CHO (via enol tautomerization)
+   RC≡CH + H₂O/H⁺/HgSO₄ → RCOCH₃ (via enol tautomerization to methyl ketone)
    ```
 
 4. **Halogenation** (2 equiv X₂)
@@ -382,7 +382,7 @@ Six π electrons fill three bonding MOs → exceptional stability
 Determined by comparing:
 - Experimental heat of hydrogenation of benzene: -208 kJ/mol
 - Predicted (3 × cyclohexene): -360 kJ/mol
-- Difference: 152 kJ/mol (stabilization)
+- Difference: ~150 kJ/mol (stabilization)
 
 **Nomenclature Mechanics**
 
@@ -731,7 +731,7 @@ Major product: 2-methylbut-2-ene
 Example: Methylcyclohexene
 
 Markovnikov → 1-methylcyclohexanol (3°)
-Anti-Markovnikov → (1-methylcyclohexyl)methanol (1°)
+Anti-Markovnikov → trans-2-methylcyclohexan-1-ol (2°)
 ```
 
 **Strategy 2: Chemoselective Reduction**
@@ -768,7 +768,7 @@ Anti-Markovnikov → (1-methylcyclohexyl)methanol (1°)
 - Want para relationship
 
 **Correct sequence**:
-1. Chlorinate first (activating conditions)
+1. Chlorinate first
 2. Sulfonate (will go ortho/para to Cl, para predominates)
 
 **Incorrect sequence**:
@@ -786,7 +786,7 @@ CₙHₓ compared to CₙH₂ₙ₊₂:
 **Pattern 2: Reactivity prediction from structure**
 
 ```text
-Alkane < Aromatic < Alkyne < Alkene
+Alkane < Alkyne < Aromatic < Alkene
 (increasing reactivity toward electrophiles)
 
 Exception: Aromatic undergoes substitution preferentially

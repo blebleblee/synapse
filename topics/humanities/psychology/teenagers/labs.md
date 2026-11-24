@@ -72,13 +72,13 @@ Present the subject with the following items, each rated on a 5-point Likert sca
 Calculate subscale scores by reverse-coding negatively worded items (items 2, 3, 4, 5, 6, 8, 9, 10, 15, 17, 18 are reverse-coded; change 1→5, 2→4, 3→3, 4→2, 5→1) and summing within domains:
 
 - Nonacceptance of Emotional Responses (items 4, 5): After reverse-coding: 2 + 3 = 5
-- Difficulties Engaging in Goal-Directed Behavior (items 2, 3, 15): After reverse-coding: 3 + 3 + 3 = 9
+- Difficulties Engaging in Goal-Directed Behavior (items 2, 15): After reverse-coding: 3 + 3 = 6
 - Impulse Control Difficulties (items 3, 17): After reverse-coding: 3 + 4 = 7
 - Lack of Emotional Awareness (items 1, 7, 14): 3 + 4 + 4 = 11
 - Limited Access to Emotion Regulation Strategies (items 11, 13, 16): 4 + 4 + 4 = 12
 - Rumination and Catastrophizing (items 6, 9, 18): After reverse-coding: 4 + 2 + 4 = 10
 
-Total DERS-18 Score = 5 + 9 + 7 + 11 + 12 + 10 = 54
+Total DERS-18 Score = 5 + 6 + 7 + 11 + 12 + 10 = 51
 
 Interpret this score against normative adolescent data. Mean DERS-18 scores for typically developing 15–17-year-olds range from 45–58, with clinical concerns typically flagged above 70. Subject_001's score of 54 places her in the normative range with slight elevation in goal-directed behavior difficulties—consistent with age-expected regulation challenges without clinical dysregulation.
 
@@ -200,4 +200,4 @@ Create a Behavioral Risk Inventory using both self-report and behavioral history
 | 2 | Recklessness | I do things without thinking about the consequences | Rarely |
 | 3 | Substance Experimentation | I have tried alcohol | Sometimes |
 | 4 | Substance Escalation | I have tried drugs other than alcohol or marijuana | Never |
-| 5 | Peer-Influenced Risk | My friends encourage me to take risks |
+| 5 | Peer-Influenced Risk | My friends encourage me to take risks | Sometimes |

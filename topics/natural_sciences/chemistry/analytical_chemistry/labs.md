@@ -154,9 +154,9 @@ C_base = 0.1000  # concentration of NaOH (M)
 
 # Gran function calculations
 # Pre-equivalence: G1 = (V0 + V) * 10^pH
-# Post-equivalence: G2 = (V0 + V) * 10^(-pH)
+# Post-equivalence: G2 = (V0 + V) * 10^(pH - 14)
 G1 = (V0 + V_added) * 10**pH
-G2 = (V0 + V_added) * 10**(-pH)
+G2 = (V0 + V_added) * 10**(pH - 14)
 
 # Identify pre-equivalence region (pH < 6) and post-equivalence region (pH > 9)
 pre_eq_mask = pH < 6.0
@@ -364,8 +364,8 @@ ax1.text(0.05, 0.95, f'y = {slope_wt:.2f}x + {intercept_wt:.2f}\nR² = {r_square
 ax2 = axes[0, 1]
 ax2.loglog(concentrations, peak_area_mean, 'o', color='darkgreen', markersize=8, label='Experimental')
 ax2.loglog(concentrations, peak_area_pred_wt, 'r-', linewidth=2, label='Fit')
-ax2.axhline(LOD * slope_wt, color='orange', linestyle='--', linewidth=1.5, label=f'LOD = {LOD:.3f} μg/mL')
-ax2.axhline(LOQ * slope_wt, color='purple', linestyle='--', linewidth=1.5, label=f'LOQ = {LOQ:.3f} μg/mL')
+ax2.axhline(intercept_wt + slope_wt * LOD, color='orange', linestyle='--', linewidth=1.5, label=f'LOD = {LOD:.3f} μg/mL')
+ax2.axhline(intercept_wt + slope_wt * LOQ, color='purple', linestyle='--', linewidth=1.5, label=f'LOQ = {LOQ:.3f} μg/mL')
 ax2.set_xlabel('Concentration (μg/mL)', fontsize=11, fontweight='bold')
 ax2.set_ylabel('Peak Area (mAU·s)', fontsize=11, fontweight='bold')
 ax2.set_title('HPLC Calibration Curve (Log-Log Scale)', fontsize=13, fontweight='bold')

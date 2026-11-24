@@ -131,7 +131,7 @@ Inanimate objects resist DOM except when pragmatically promoted to topical or af
 *Prefiero el té al café.*  
 "I prefer tea to coffee."
 
-The abstract nation *país*, though inanimate, receives DOM when constructed as an object of emotional attachment, while the beverages *té* and *café* appear bare, even in a verb of preference. The construction *prefiero X a Y* idiomatically employs *a* to mark the dispreferred alternative, creating a surface ambiguity with DOM that native speakers resolve through semantic plausibility and collocational frequency.
+The abstract nation *país*, though inanimate, receives DOM when constructed as an object of emotional attachment, while the preferred beverage *té* appears unmarked; the *a* before *café* (contracted in *al*) is not DOM but the preposition the construction uses for the dispreferred alternative. The construction *prefiero X a Y* idiomatically employs *a* to mark the dispreferred alternative, creating a surface ambiguity with DOM that native speakers resolve through semantic plausibility and collocational frequency.
 
 ### Politeness Systems: The Tú/Usted Pronominal Distinction
 
@@ -307,7 +307,7 @@ The presupposition that María left survives negation, distinguishing presupposi
 
 B's response, conspicuously weak given the expectation of positive information, implicates that the oldest child's situation is poor (though not criminally so) and that the other children's situations may be even worse. The hearer derives this inference not from the literal semantics but from the assumption that B would have provided more positive information if available, and the strategic understatement signals troubles too severe to state directly.
 
-Spanish deploys conventional implicatures through scalar expressions and negative polarity items. The particle *hasta* ("even") triggers a scalar implicature:
+Spanish deploys conversational implicatures through scalar expressions and negative polarity items. The particle *hasta* ("even") triggers a scalar implicature:
 
 *Hasta Juan aprobó el examen.*  
 "Even Juan passed the exam."

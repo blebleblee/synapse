@@ -26,9 +26,9 @@ Validate the Beer-Lambert law relationship between optical density and cell conc
 
 Perform direct microscopic cell enumeration to convert optical density into absolute cell concentration. At OD₆₀₀ = 0.6, dilute the culture 1:1000 in sterile saline (10 µL culture + 990 µL saline in two serial 1:10 steps). Load 10 µL into a Neubauer hemocytometer chamber with 0.1 mm depth and 0.0025 mm² counting grid squares. Under 400× magnification, count individual cells in 25 small squares of the central grid. Calculate cell concentration as:
 
-$$N = \frac{\text{cells counted}}{25 \text{ squares}} \times 25 \times 10^4 \times \text{dilution factor} = \frac{\text{cells counted}}{25} \times 2.5 \times 10^8 \text{ cells/mL}$$
+$$N = \frac{\text{cells counted}}{25} \times 10^4 \times \text{dilution factor} \text{ cells/mL}$$
 
-For example, counting 180 cells across 25 squares yields N = (180/25) × 2.5 × 10⁸ = 1.8 × 10⁹ cells/mL at OD₆₀₀ = 0.6, establishing the empirical conversion factor: 1.0 OD₆₀₀ unit ≈ 3 × 10⁹ cells/mL for *E. coli* in this optical path length.
+For example, counting 180 cells across 25 squares at 1:10,000 dilution yields N = (180/25) × 10⁴ × 10⁴ = 7.2 × 10⁸ cells/mL at OD₆₀₀ = 0.6, establishing the empirical conversion factor: 1.0 OD₆₀₀ unit ≈ 1.2 × 10⁹ cells/mL for *E. coli* in this optical path length.
 
 Analyze growth kinetics computationally by fitting the exponential growth model to optical density time series data. The bacterial population in exponential phase follows:
 
@@ -271,7 +271,7 @@ Typical *E. coli* activation energy ranges from 60–75 kJ/mol, reflecting the t
 
 Microbial growth rate exhibits saturable dependence on limiting nutrient concentration, following Monod kinetics analogous to enzyme-substrate Michaelis-Menten relationships. Construct a glucose-limitation calibration curve to extract the half-saturation constant K_s, representing the substrate concentration at half-maximal growth rate.
 
-Prepare a chemically defined minimal medium containing essential salts (KH₂PO₄, Na₂HPO₄, MgSO₄, NH₄Cl) and trace elements, but omitting glucose carbon source. Filter-sterilize and aliquot into six 50 mL volumes. Prepare a sterile 20% (w/v) glucose stock solution and add to each medium aliquot to achieve final concentrations: 0.01%, 0.02%, 0.05%, 0.10%, 0.20%, and 0.50% glucose (equivalent to 0.56 mM, 1.11 mM, 2.78 mM, 5.55 mM, 11.1 mM, 27.8 mM). Inoculate each medium 1:100 with an *E. coli* culture pre-adapted to minimal medium by 24-hour prior growth under identical conditions, ensuring cells possess the enzymatic machinery for glucose utilization without lag-phase enzyme induction delays.
+Prepare a chemically defined minimal medium containing essential salts (KH₂PO₄, Na₂HPO₄, MgSO₄, NH₄Cl) and trace elements, but omitting glucose carbon source. Filter-sterilize and aliquot into six 50 mL volumes. Prepare a sterile 20% (w/v) glucose stock solution and add to each medium aliquot to achieve final concentrations: 0.01%, 0.02%, 0.05%, 0.10%, 0.20%, and 0.50% glucose (equivalent to 0.56 mM, 1.11 mM, 2.78 mM, 5.55 mM, 11.1 mM, 27.8 mM). Inoculate each medium 1:100 with an *E. coli* culture pre-adapted to minimal medium by 24-hour prior growth under identical conditions (starting density ∼10⁷ cells/mL), ensuring cells possess the enzymatic machinery for glucose utilization without lag-phase enzyme induction delays.
 
 Monitor growth in each glucose concentration through OD₆₀₀ measurement every 30 minutes over 12 hours at 37°C with shaking. Extract specific growth rate μ from the exponential phase of each curve. The Monod equation predicts:
 
@@ -365,7 +365,7 @@ Typical *E. coli* K_s values for glucose range from 0.5–3 mM, indicating high-
 
 **Antibiotic Inhibition: Minimum Inhibitory Concentration Determination**
 
-Quantify the bacteriostatic effect of ampicillin on *E. coli* growth by measuring the minimum inhibitory concentration (MIC) through a dose-response curve. Prepare a two-fold dilution series of ampicillin sodium salt in sterile water: 128, 64, 32, 16, 8, 4, 2, 1, 0.5 µg/mL. Inoculate 96-well microtiter plates with 200 µL per well containing nutrient broth, ampicillin at the designated concentration, and 1:100 diluted *E. coli* overnight culture (approximately 10⁶ cells/mL inoculum). Include positive control wells (no antibiotic) and negative control wells (sterile media only). Incubate plates at 37°C in a microplate reader with continuous orbital shaking, measuring OD₆₀₀ every 15 minutes for 18 hours.
+Quantify the bacteriostatic effect of ampicillin on *E. coli* growth by measuring the minimum inhibitory concentration (MIC) through a dose-response curve. Prepare a two-fold dilution series of ampicillin sodium salt in sterile water: 128, 64, 32, 16, 8, 4, 2, 1, 0.5 µg/mL. Inoculate 96-well microtiter plates with 200 µL per well containing nutrient broth, ampicillin at the designated concentration, and 1:100 diluted *E. coli* overnight culture (approximately 10⁷ cells/mL inoculum). Include positive control wells (no antibiotic) and negative control wells (sterile media only). Incubate plates at 37°C in a microplate reader with continuous orbital shaking, measuring OD₆₀₀ every 15 minutes for 18 hours.
 
 Analyze inhibition curves by calculating fractional growth relative to untreated control. Define fractional growth as the ratio of maximum OD₆₀₀ reached in antibiotic-treated wells to the maximum OD₆₀₀ in control wells. Fit a four-parameter logistic (4PL) dose-response model:
 
@@ -519,7 +519,7 @@ Prepare nutrient broth media supplemented with NaCl to achieve final concentrati
 
 $$a_w \approx 1 - 0.035 \times \text{molality}$$
 
-where molality = (g NaCl / 58.44 g/mol) / (kg water). Inoculate each medium 1:100 with an *E. coli* overnight culture grown in standard 0.5% NaCl broth and monitor OD₆₀₀ every 30 minutes for 16 hours. The extended lag phase at high osmolarity reflects the time required for compatible solute (trehalose, proline) accumulation to restore cytoplasmic osmotic balance.
+where molality = (g NaCl / 58.44 g/mol) / (kg water). Inoculate each medium 1:100 with an *E. coli* overnight culture (∼10⁹ cells/mL) grown in standard 0.5% NaCl broth to achieve starting density ∼10⁷ cells/mL, and monitor OD₆₀₀ every 30 minutes for 16 hours. The extended lag phase at high osmolarity reflects the time required for compatible solute (trehalose, proline) accumulation to restore cytoplasmic osmotic balance.
 
 Measure cell morphology changes under osmotic stress via microscopy. At 4 hours post-inoculation, prepare wet mount slides from each NaCl concentration and image cells under 1000× phase contrast microscopy. Measure cell length and width using calibrated image analysis software, calculating cell volume assuming cylindrical geometry with hemispherical caps:
 
@@ -722,13 +722,11 @@ plt.savefig('replicate_variability_analysis.png', dpi=300, bbox_inches='tight')
 plt.show()
 
 # Uncertainty budget analysis
-variance_tech = sigma_tech**2
-variance_bio = mu_fitted.var()
-variance_total = variance_tech + variance_bio
-print(f"\nVariance Decomposition:")
-print(f"Technical (measurement) variance: {variance_tech:.6f} (OD units²)")
-print(f"Biological variance: {variance_bio:.6f} (h⁻²)")
-print(f"Biological contribution: {(variance_bio / variance_total) * 100:.1f}%")
+print(f"\nUncertainty Sources:")
+print(f"Technical (measurement) noise: σ_OD = {sigma_tech:.6f} OD units")
+print(f"Biological growth rate variability: {(mu_fitted.std() / mu_fitted.mean()) * 100:.1f}% CV")
+print(f"Biological variance (growth rate): {mu_fitted.var():.6f} h⁻²")
+print(f"Growth rate standard error: {mu_fitted.std() / np.sqrt(n_replicates):.4f} h⁻¹")
 ```
 
 Biological variability in growth rate typically exhibits 4–6% coefficient of variation for *E. coli* cultures derived from a single clone, reflecting stochastic gene expression and cell-cycle asynchrony within the population. Technical measurement error contributes < 1% CV for calibrated spectrophotometers, making biological variation the dominant uncertainty source. Statistical power analysis reveals that detecting a 10% difference in growth rate between two conditions requires n ≥ 8 replicates per group to achieve 80% power at α = 0.05 significance, assuming CV ≈ 5%.

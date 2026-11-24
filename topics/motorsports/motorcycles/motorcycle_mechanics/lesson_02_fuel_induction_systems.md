@@ -46,7 +46,7 @@ Closed-loop fueling correction relies on wideband oxygen sensors (lambda sensors
 
 Intake manifold pressure wave dynamics influence both carburetor and fuel injection systems through the time-varying boundary condition imposed by valve events. When the intake valve opens, a rarefaction wave propagates upstream into the intake runner at the speed of sound, approximately 340 meters per second in ambient air. This wave reflects from the open end of the intake (or from the throttle body in a closed-throttle condition), returning as a compression wave that arrives back at the valve after a time delay determined by runner length. If the reflected compression wave arrives while the valve remains open, it forces additional charge into the cylinder, increasing volumetric efficiency. The optimal runner length for a given engine speed is:
 
-    L_opt = (c × 60) / (4 × N × n)
+    L_opt = (c × 60) / (2 × N × n)
 
 where L_opt is the runner length in meters, c is the speed of sound, N is the engine speed in RPM, and n is the harmonic order (typically 1, 3, or 5 for naturally aspirated four-stroke engines). This relationship reveals the inverse dependency between optimal runner length and engine speed: longer runners tune for lower RPM, shorter runners for higher RPM. Production motorcycles compromise by selecting a runner length that provides good volumetric efficiency across the usable power band, accepting reduced efficiency at the extremes. Racing applications may employ variable-length systems with pneumatically actuated valves that switch between long and short runner configurations based on RPM, but the added weight and complexity limit adoption to premier-class machinery.
 

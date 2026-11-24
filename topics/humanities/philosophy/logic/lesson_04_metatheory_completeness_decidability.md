@@ -82,7 +82,7 @@ The practical implication is stark: **you cannot write a finite algorithm that c
 │  - Semi-decision procedure: Resolution             │
 │  - Termination: Not guaranteed                     │
 │                                                     │
-│  Horn Clauses (restricted first-order):            │
+│  Horn Clauses (propositional):                     │
 │  - Satisfiability: Decidable (linear)              │
 │  - Algorithm: Forward chaining / SLD resolution    │
 │                                                     │
@@ -106,7 +106,7 @@ A critical skill for practitioners is recognizing when to apply which logical sy
 
 **Use restricted fragments of first-order logic** (Horn clauses, description logics, guarded fragments) when you can sacrifice expressivity for decidability. Description logics, for instance, form the foundation of semantic web ontologies (OWL, RDF). They restrict quantification in ways that preserve decidability while supporting practical reasoning over large knowledge bases.
 
-**Use second-order logic or infinitary logic** when first-order logic provably cannot express what you need. Examples include capturing the categoricity of Peano arithmetic (which requires quantification over sets of naturals) or expressing certain topological or cardinality properties. Understand that you lose completeness and must develop custom reasoning procedures. This is rare in applied philosophy but sometimes necessary for foundational work.
+**Use second-order logic or infinitary logic** when first-order logic provably cannot express what you need. Examples include capturing the categoricity of the second-order Peano axioms (which requires second-order quantification over all subsets of the naturals) or expressing certain topological or cardinality properties. Understand that you lose completeness and must develop custom reasoning procedures. This is rare in applied philosophy but sometimes necessary for foundational work.
 
 ### Canonical Failure Modes and Mitigation
 

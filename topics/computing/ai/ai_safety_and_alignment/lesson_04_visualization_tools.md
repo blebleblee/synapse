@@ -112,9 +112,9 @@ def analyze_weight_matrix_svd(model_name: str = "gpt2", layer: int = 0) -> None:
 
     # SVD of the composed W_out @ W_in (the full MLP linear map, ignoring nonlinearity)
     composed = W_out @ W_in.T  # (d_mlp, d_mlp) intermediate; actual: (d_model, d_model)
-    # Correct composition: input -> W_in^T -> hidden -> W_out^T -> output
+    # Correct composition: input @ W_in @ W_out
     # Full linear approximation: d_model -> d_model
-    W_full = W_in.T @ W_out  # shape: (d_model, d_model) — projects input to output space
+    W_full = W_in @ W_out  # shape: (d_model, d_model) — projects input to output space
     
     U, S, Vh = torch.linalg.svd(W_full, full_matrices=False)
 
@@ -195,7 +195,8 @@ def integrated_gradients(
     input_ids = input_ids.to(device)
 
     if baseline_ids is None:
-        # Use padding token (id=50256 for GPT-2) as the uninformative baseline
+        # Use end-of-text token (50256) or token 0 as uninformative baseline
+        # GPT-2 has no pad token, so pad_token_id is None and defaults to 0
         baseline_ids = torch.full_like(input_ids, model.tokenizer.pad_token_id or 0)
 
     # Get baseline and input embeddings
@@ -209,14 +210,14 @@ def integrated_gradients(
     for step in range(1, n_steps + 1):
         alpha = step / n_steps
         interp_embeds = (baseline_embeds + alpha * (input_embeds - baseline_embeds))
-        interp_embeds = interp_embeds.unsqueeze(0).requires_grad_(True)  # (1, T, d_model)
+        interp_embeds = interp_embeds.unsqueeze(0).detach().requires_grad_(True)  # (1, T, d_model)
 
-        # Forward pass injecting the interpolated embeddings directly
-        # bypass_embed=True passes embeddings directly, skipping the standard W_E lookup
+        # Forward pass injecting the interpolated embeddings directly via hook
         logits = model.run_with_cache(
-            interp_embeds,
-            prepend_bos=False,
-        )[0]  # (1, T, vocab_size)
+            input_ids,  # pass the original tokens
+            names_filter=lambda n: "logits" in n,
+            fwd_hooks=[("hook_embed", lambda act, hook: interp_embeds)],
+        )["logits"]  # (1, T, vocab_size)
 
         target_logit = logits[0, target_position, target_token_id]
         target_logit.backward()
@@ -438,7 +439,7 @@ class SparseAutoencoder(nn.Module):
         self.W_enc = nn.Parameter(torch.empty(d_model, n_features))
         self.b_enc = nn.Parameter(torch.zeros(n_features))
 
-        # Decoder: n_features -> d_model (columns are feature directions)
+        # Decoder: n_features -> d_model (rows are feature directions)
         self.W_dec = nn.Parameter(torch.empty(n_features, d_model))
         self.b_dec = nn.Parameter(torch.zeros(d_model))
 
@@ -606,9 +607,9 @@ class GradCAM:
         self,
         input_tensor: torch.Tensor,  # (1, C, H, W)
         target_class: Optional[int] = None,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, int]:
         """
-        Returns GradCAM heatmap of shape (H, W), normalized to [0, 1].
+        Returns (heatmap, predicted_class) where heatmap is shape (H, W), normalized to [0, 1].
         If target_class is None, uses argmax of model output.
         """
         self.model.eval()
@@ -774,7 +775,7 @@ The ring buffer prevents OOM by never materializing all activations simultaneous
 
 **Baseline sensitivity in Integrated Gradients**: The choice of baseline x' fundamentally changes the attribution. The zero embedding baseline, the pad token baseline, and a Gaussian noise baseline produce systematically different attributions because they define different "uninformative" counterfactuals. There is no universally correct baseline—the choice should be motivated by the question being asked. For counterfactual questions ("what would the model have predicted without the subject entity?"), the mask-token baseline is most appropriate.
 
-**Attention head dropout at inference**: Some models apply attention dropout at inference with certain framework configurations. This introduces stochasticity into attention patterns, causing attention-based attribution methods to produce different results on repeated runs of the same input. Interpretability experiments should always set `model.eval()` and ensure `torch.backends.cudnn.deterministic = True`.
+**Non-deterministic operations at inference**: Attention patterns can vary across runs due to non-deterministic GPU kernels (not dropout, which is disabled in eval mode). Interpretability experiments should always set `model.eval()` and ensure `torch.backends.cudnn.deterministic = True`.
 
 **Residual stream outlier dimensions**: Kovaleva et al. (2021) and Sun et al. (2024) independently identified "outlier dimensions"—a small set of residual stream dimensions (typically 1–10 out of 768 or 4096) with activation magnitudes 100× larger than other dimensions—that dominate cosine similarity computations and distort probing classifiers. SAE training must normalize activations before encoding (the b_dec centering step in the SAE implementation above handles this) or use separate LayerNorm on the input.
 
@@ -853,12 +854,13 @@ def run_causal_tracing(
     clean_prompt: str = "The Eiffel Tower is located in the city of",
     corrupted_prompt: str = "The Golden Gate Bridge is located in the city of",
     target_token: str = " Paris",
-) -> np.ndarray:
+) -> tuple[np.ndarray, list[str]]:
     """
     Run causal tracing: identify which (layer, position) components
     are causally responsible for predicting target_token.
     
-    Returns restoration_scores: (n_layers, seq_len) numpy array.
+    Returns (restoration_scores, token_labels): restoration_scores is (n_layers, seq_len) numpy array;
+        token_labels is list of token strings.
     """
     model = HookedTransformer.from_pretrained(model_name)
     model.eval()

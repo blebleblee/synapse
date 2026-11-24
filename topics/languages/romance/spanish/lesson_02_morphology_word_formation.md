@@ -36,7 +36,7 @@ First person: *habl-a-mos* (root + thematic *-a-* + *-mos* agreement)
 Second person: *habl-á-is* (root + thematic *-á-* + *-is* agreement)  
 Third person: *habl-a-n* (root + thematic *-a-* + *-n* agreement)
 
-The present tense carries minimal overt marking; the thematic vowel itself often serves as the primary tense indicator. First person singular exhibits a distinctive zero thematic vowel with direct suffixation of *-o*. Stress assignment in Spanish verbs follows a bipartite rule: in present tense forms, stress falls on the root for singular persons and third person plural (*háblo*, *háblas*, *hábla*, *háblan*), but migrates to the first suffix vowel for first and second person plural (*hablámos*, *habláis*). This stress migration directly triggers the stem alternations discussed subsequently.
+The present tense carries minimal overt marking; the thematic vowel itself often serves as the primary tense indicator. First person singular exhibits a distinctive zero thematic vowel with direct suffixation of *-o*. Stress assignment in Spanish verbs follows a bipartite rule: in present tense forms, stress falls on the root for singular persons and third person plural (*hablo*, *hablas*, *habla*, *hablan*), but migrates to the first suffix vowel for first and second person plural (*hablamos*, *habláis*). This stress migration directly triggers the stem alternations discussed subsequently.
 
 The imperfect indicative, which encodes unbounded past-time situations—habitual actions, background states, ongoing processes—employs the TAM markers *-ba-* for first conjugation verbs and *-ía-* for second and third conjugation verbs. Examine *hablar* in the imperfect:
 

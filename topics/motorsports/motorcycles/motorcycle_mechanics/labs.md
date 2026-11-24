@@ -67,7 +67,7 @@ Parallel computation for rear shock.
 Computes the magnitude of the combined acceleration vector and normalizes it against an assumed maximum tire grip limit of 1.4 G, expressing the result as a percentage of available friction circle capacity.
 
 **Roll Angle (degrees):**  
-`atan('Lateral G' / 9.81) * 180 / pi()`  
+`atan('Lateral G') * 180 / pi()`  
 Estimates motorcycle roll angle from lateral acceleration, assuming the accelerometer mounts at the chassis centerline and that roll occurs about an axis through the contact patches.
 
 **Throttle Rate of Change (%/s):**  
@@ -122,13 +122,13 @@ Interpret the temperature distribution across the tire width. An ideal front tir
 
 Rear tire temperature interpretation differs due to the tire's dual role: supporting lean angle cornering forces and transmitting longitudinal drive torque. A rear tire operating optimally exhibits a relatively uniform temperature distribution across the tread width when measured immediately post-apex, with a modest 5-10°C increase at the center reflecting drive torque slip. Pronounced center overheating—exceeding 20°C above edge temperatures—indicates wheel spin during corner exit acceleration, either from excessive throttle application or insufficient rear suspension squat allowing the tire to break loose. The solution involves either rider coaching (smoother throttle modulation) or mechanical tuning (softer rear compression damping to allow more rapid squat response, increasing rear contact patch load during initial throttle application).
 
-Correlate measured temperatures against telemetry-logged tire surface temperature sensors, if equipped. High-end race teams embed thermocouples 1-2mm beneath the tire tread surface, logging continuous temperature traces synchronized with telemetry. Import these traces into MoTeC and overlay them against lap distance. Tire temperature should stabilize within 2-3 laps post-session start, reaching operational range (typically 80-100°C for slick race tires, 60-80°C for DOT street-legal track tires). If temperature fails to stabilize—exhibiting continuous rise throughout the session—suspect inadequate tire pressure allowing excessive carcass flexing and hysteretic heat generation. Increase cold pressure by 1-2 psi and re-test.
+Correlate measured temperatures against telemetry-logged tire surface temperature sensors, if equipped. High-end race teams embed thermocouples 1-2mm beneath the tire tread surface, logging continuous temperature traces synchronized with telemetry. Import these traces into MoTeC and overlay them against lap distance. Tire temperature should stabilize within 2-3 laps post-session start, reaching operational range (typically 90-110°C for slick race tires, 70-90°C for DOT street-legal track tires). If temperature fails to stabilize—exhibiting continuous rise throughout the session—suspect inadequate tire pressure allowing excessive carcass flexing and hysteretic heat generation. Increase cold pressure by 1-2 psi and re-test.
 
 Construct a slip angle estimation math channel to diagnose tire overwork. Slip angle, the angular difference between the tire's direction of travel and its heading, correlates directly with lateral force generation and thermal energy dissipation. In MoTeC, approximate slip angle as:
 
 **Front Slip Angle Estimate (degrees):**  
-`atan(('Lateral G' * 9.81 * 1.2) / (pow('GPS Speed (km/h)' / 3.6, 2) / 0.6)) * 180 / pi()`  
-This simplified formula assumes front axle weight distribution (1.2 representing front mass proportion), wheelbase (0.6 meters, a typical sportbike dimension), and converts lateral acceleration into slip angle via single-track vehicle dynamics. The estimate omits steering angle input due to sensor unavailability on most club-level data loggers, introducing modest error but sufficient for diagnostic trends.
+`atan(('Lateral G' * 9.81 * 1.2) / (pow('GPS Speed (km/h)' / 3.6, 2) / 1.4)) * 180 / pi()`  
+This simplified formula assumes front axle weight distribution (1.2 representing front mass proportion), wheelbase (1.4 meters, a typical sportbike dimension), and converts lateral acceleration into slip angle via single-track vehicle dynamics. The estimate omits steering angle input due to sensor unavailability on most club-level data loggers, introducing modest error but sufficient for diagnostic trends.
 
 Plot estimated front slip angle against tire temperature. If slip angles consistently exceed 8-10 degrees during mid-corner phases coincident with high tire temperatures, the front tire operates beyond its optimal slip angle range, generating excessive heat through tread scrub rather than efficient grip. The solution diverges based on root cause: if the rider carries excessive corner entry speed forcing high slip angles, coaching emphasizes earlier braking and lower minimum speeds. If slip angles arise despite conservative entry speeds, suspect insufficient front tire pressure causing carcass collapse and contact patch distortion, artificially inflating apparent slip angle.
 
