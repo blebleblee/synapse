@@ -356,8 +356,12 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - Method, cost and the first 26 courses (329 findings): `.agent/reports/review_focused_2026-11-23.md`. Owner 2026-11-24: continue on aerolink `claude-opus-5-5` until its credit ($150) runs out; public courses first. Reports only; **fixing needs the owner** (each fix costs credit). Free first step: the lint warnings `PYTHON_SYNTAX_ERROR` / `MISSING_IMPORT`.
 - Thin public decks (under 6 cards): regenerated 2026-11-24 (2 courses, 12 cards each).
 
-### Queued translations are lost on server restart
-- Candidate (not verified as a problem for the owner yet): the queue lives in memory. Persisting pending jobs would make restarts safe.
+### FIND-82: Queued Translations Were Lost on Server Restart
+- **Status:** **COMPLETED** (2026-11-24). Unfinished jobs (queued or running, not being stopped) are written to `.cache/translation_queue.json` on every change and queued again at start-up; a running job starts over from its first section. A corrupt file is ignored. Tests: `tests/test_translation_jobs.py`.
+
+### FIND-83: Releases Could Be Published From Unmerged Work or on Red CI
+- **Status:** **COMPLETED** (2026-11-24). `scripts/publish_all_releases.py` (app and `--curriculum`) now refuses unless the tree is committed, `HEAD` is `gitea/main` and CI passed on that commit (FIND-76: v1.3.2 went out on a red run). Tests: `tests/test_publish_curriculum.py`.
+- **Decided (owner 2026-11-24):** no publishing from CI. Installers are built on the owner's Mac, which cannot run CI jobs (a Windows machine exists but does not cover macOS), so releases stay local behind this gate.
 
 ## Next Candidates (not yet verified)
 
