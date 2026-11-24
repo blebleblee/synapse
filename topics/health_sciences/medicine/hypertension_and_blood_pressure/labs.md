@@ -199,9 +199,9 @@ Now create a summary analysis block below the data (starting approximately row 3
 =(AVERAGEIF(E2:E24,"Awake",B2:B24)-AVERAGEIF(E2:E24,"Asleep",B2:B24))/AVERAGEIF(E2:E24,"Awake",B2:B24)*100
 ```
 
-**Morning Surge SBP** (defined as the difference between the mean SBP in the 2 hours after waking and the mean sleep SBP). Using the dataset above, the morning surge window is 06:30–07:30 (rows 21–23):
+**Morning Surge SBP** (defined as the difference between the mean SBP in the 2 hours after waking and the mean sleep SBP). Using the dataset above, the morning surge window is 06:30–07:30 (rows 22–24):
 ```text
-=AVERAGE(B21:B23)-AVERAGEIF(E2:E24,"Asleep",B2:B24)
+=AVERAGE(B22:B24)-AVERAGEIF(E2:E24,"Asleep",B2:B24)
 ```
 
 ### 2.3 Interpreting the Output

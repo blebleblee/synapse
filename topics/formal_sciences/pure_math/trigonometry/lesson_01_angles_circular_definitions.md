@@ -100,7 +100,7 @@ $$\sin\theta = \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n+1)!} \theta^{2n+1} = \theta
 
 $$\cos\theta = \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n)!} \theta^{2n} = 1 - \frac{\theta^2}{2!} + \frac{\theta^4}{4!} - \frac{\theta^6}{6!} + \cdots$$
 
-These series reveal the analytic structure of the trigonometric functions as entire functions on $\mathbb{C}$, with the alternating signs reflecting the oscillatory nature. The tangent series, known as the Gregory-Leibniz expansion, involves Bernoulli numbers and converges only for $|\theta| < \frac{\pi}{2}$:
+These series reveal the analytic structure of the trigonometric functions as entire functions on $\mathbb{C}$, with the alternating signs reflecting the oscillatory nature. The Taylor series for tangent involves Bernoulli numbers and converges only for $|\theta| < \frac{\pi}{2}$:
 
 $$\tan\theta = \theta + \frac{\theta^3}{3} + \frac{2\theta^5}{15} + \frac{17\theta^7}{315} + \cdots$$
 

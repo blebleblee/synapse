@@ -33,7 +33,7 @@ Do not attempt Exercise 1 until your levain satisfies all three peak indicators 
 
 This first exercise constructs a 78% hydration open-crumb country loaf using a 100% white bread flour base. Every subsequent exercise will deviate from this baseline in controlled ways, so your first priority here is to execute this protocol without improvisation. Document everything. This is the control condition.
 
-**Full Formula — 900 g Final Dough Weight**
+**Full Formula — 1000 g Final Dough Weight**
 
 | Ingredient | Grams | Baker's % |
 |---|---|---|

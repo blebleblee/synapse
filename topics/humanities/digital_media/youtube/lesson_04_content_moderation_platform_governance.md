@@ -96,7 +96,7 @@ A second failure mode is **context collapse across platforms**. YouTube's modera
 
 ### Optimization for Striking and Content Restoration
 
-Creators facing strikes must understand the mechanics of the 90-day rolling window. A strike issued on January 1 expires on March 31. A second strike issued on January 15 expires on April 15. If a creator appeals the first strike successfully between January 1 and March 30, that strike is removed from the count, resetting the 90-day clock for the second strike.
+Creators facing strikes must understand the mechanics of the 90-day rolling window. A strike issued on January 1 expires on March 31. A second strike issued on January 15 expires on April 15. If a creator appeals the first strike successfully between January 1 and March 30, that strike is removed from the count, but the second strike continues its independent 90-day expiration from January 15.
 
 ## Conclusion
 

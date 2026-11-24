@@ -73,7 +73,7 @@ This formula evaluates waist circumference against sex-specific cut-offs, flags 
 +MIN(1,((C2="M")*(M2<1.0)+(C2="F")*(M2<1.3)))
 ```
 
-The expected MetSyn_Criteria_Count results are: PT-001 = 4, PT-002 = 3, PT-003 = 5, PT-004 = 0, PT-005 = 3. In the R column (MetSyn_Diagnosis), enter `=IF(Q2>=3,"YES","NO")`. PT-001, PT-002, PT-003, and PT-005 all meet criteria.
+The expected MetSyn_Criteria_Count results are: PT-001 = 5, PT-002 = 3, PT-003 = 5, PT-004 = 0, PT-005 = 3. In the R column (MetSyn_Diagnosis), enter `=IF(Q2>=3,"YES","NO")`. PT-001, PT-002, PT-003, and PT-005 all meet criteria.
 
 In the S column (DM_Status), apply the following tiered classification:
 

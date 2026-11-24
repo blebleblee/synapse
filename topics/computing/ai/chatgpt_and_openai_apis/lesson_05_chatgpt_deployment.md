@@ -718,7 +718,7 @@ End-to-end latency in a ChatGPT integration has three primary components:
 
 ### 6.2 Prompt Caching
 
-As of late 2023, the OpenAI API provides automatic **prompt caching** for prompts exceeding 1024 tokens. If the prefix of a prompt matches a recently processed request, the KV-cache (key-value cache from the transformer's attention layers) is reused, reducing TTFT and billing for the cached prefix portion. This is not a semantic cache — it requires exact token-level prefix matching. The implication for system design: keep your system prompt identical across requests and place it at the front of the message array so it benefits from caching. Dynamic content (conversation history, RAG chunks) should be appended after the stable prefix.
+As of late 2024, the OpenAI API provides automatic **prompt caching** for prompts exceeding 1024 tokens. If the prefix of a prompt matches a recently processed request, the KV-cache (key-value cache from the transformer's attention layers) is reused, reducing TTFT and billing for the cached prefix portion. This is not a semantic cache — it requires exact token-level prefix matching. The implication for system design: keep your system prompt identical across requests and place it at the front of the message array so it benefits from caching. Dynamic content (conversation history, RAG chunks) should be appended after the stable prefix.
 
 ### 6.3 Failure Modes and Mitigations
 

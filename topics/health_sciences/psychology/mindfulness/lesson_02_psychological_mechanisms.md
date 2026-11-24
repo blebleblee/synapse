@@ -4,7 +4,7 @@
 
 ### 1.1 Foundational Architecture of Conscious Experience
 
-Human consciousness operates as a distributed processing system with limited attentional bandwidth (approximately 126 bits/second of conscious processing capacity, as quantified by Csikszentmihalyi). The brain's default mode network (DMN) continuously generates self-referential narratives, consuming roughly 60-80% of the brain's energy expenditure during wakeful rest states. This creates a fundamental tension: most conscious processing is allocated to internally-generated simulations rather than direct sensory input.
+Human consciousness operates as a distributed processing system with limited attentional bandwidth (approximately 126 bits/second of conscious processing capacity, based on information-theoretic models of neural bandwidth). The brain's default mode network (DMN) continuously generates self-referential narratives, consuming roughly 60-80% of the brain's energy expenditure during wakeful rest states. This creates a fundamental tension: most conscious processing is allocated to internally-generated simulations rather than direct sensory input.
 
 **First Principle**: Attention is the currency of consciousness. Where attention flows, neural plasticity follows through Hebbian mechanisms ("neurons that fire together, wire together"). The directional flow of attention is the primary variable determining both immediate phenomenological experience and long-term structural brain changes.
 

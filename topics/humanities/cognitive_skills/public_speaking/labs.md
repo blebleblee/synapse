@@ -94,7 +94,7 @@ Analyze spatial positioning and movement patterns. Mark your starting position a
 
 Execute a gesture-enhanced delivery. Pre-script five critical moments requiring emphatic gestures: opening thesis statement, first key statistic, transition to counterargument, most important recommendation, final call to action. Choreograph specific gestures: open palm presentation for welcoming thesis, numerical finger counting for statistics sequence, bisecting hand chop separating old approach from new approach, forward pointing gesture for audience action step. Rehearse until gestures feel natural rather than mechanical.
 
-Record the enhanced version and compare gesture frequency, variety, and synchronization metrics. Well-executed gestural communication increases audience retention by 30-40% according to educational psychology research studying multimodal learning. The visual cortex processes gestural information 60,000 times faster than text parsing, meaning audiences extract structural understanding from body language even before processing verbal content.
+Record the enhanced version and compare gesture frequency, variety, and synchronization metrics. Well-executed gestural communication increases audience retention by 30-40% according to educational psychology research studying multimodal learning. The visual cortex processes gestural information through parallel pathways that engage semantic comprehension faster than sequential text parsing, enabling audiences to extract structural understanding from body language concurrent with verbal content processing.
 
 ### Exercise 2C: Audience Interaction and Adaptive Feedback Response
 
@@ -148,7 +148,7 @@ Add reputational stakes. Film the session and announce it will be shared with pr
 
 Deliver your speech under these compounded stressors. Notice the physiological symptoms: trembling hands, voice wavering, rapid shallow breathing, racing thoughts, muscle tension. These autonomic responses cannot be eliminated, but they can be managed through cognitive reframing and somatic techniques.
 
-Deploy pre-speech stress inoculation. Immediately before starting, execute tactical breathing: 4-second inhale through nose, 7-second hold, 8-second exhale through mouth, repeated 3 times. This manually engages the parasympathetic nervous system, counteracting stress-induced sympathetic activation. Perform power posing: stand in an expansive posture (chest open, hands on hips or arms raised) for 90 seconds. Research indicates this raises testosterone and lowers cortisol, increasing confidence.
+Deploy pre-speech stress inoculation. Immediately before starting, execute tactical breathing: 4-second inhale through nose, 7-second hold, 8-second exhale through mouth, repeated 3 times. This manually engages the parasympathetic nervous system, counteracting stress-induced sympathetic activation. Perform power posing: stand in an expansive posture (chest open, hands on hips or arms raised) for 90 seconds. Some practitioners report this reduces subjective anxiety; however, the proposed hormonal mechanisms (testosterone elevation, cortisol reduction) have not replicated reliably in controlled studies.
 
 During delivery, implement the "external focus" technique. Stress drives internal focus—speakers become hyperaware of trembling hands, cracking voice, forgotten words. Deliberately redirect attention outward: focus on specific audience members' eyes, the texture of the wall behind them, the sensation of your feet grounded to the floor. This breaks the internal feedback loop amplifying anxiety.
 

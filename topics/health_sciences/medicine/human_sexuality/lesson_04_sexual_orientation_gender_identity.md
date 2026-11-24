@@ -57,7 +57,7 @@ graph TB
         S["Affirming Environment &<br/>Social Support"] --> T["Resilience & Well-Being"]
     end
     
-    G -.Influence.-> D
+    D -.Influence.-> G
     N --> I
     O --> I
     J --> U["Integrated Sexual &<br/>Gender Identity"]

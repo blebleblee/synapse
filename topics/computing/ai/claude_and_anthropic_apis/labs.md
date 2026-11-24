@@ -597,14 +597,14 @@ from rich.table import Table
 client = anthropic.Anthropic()
 console = Console()
 
-MODEL = "claude-haiku-3-5"  # Use Haiku for benchmarking; lower cost, meaningful signal
+MODEL = "claude-3-5-haiku-latest"  # Use Haiku for benchmarking; lower cost, meaningful signal
 
 # Anthropic published pricing (USD per million tokens, mid-2025).
 # Fetch current rates from https://www.anthropic.com/pricing before production use.
 PRICING = {
-    "claude-haiku-3-5":    {"input": 0.25,  "output": 1.25},
+    "claude-3-5-haiku-latest": {"input": 0.80, "output": 4.00},
     "claude-sonnet-4-5":   {"input": 3.00,  "output": 15.00},
-    "claude-opus-4-5":     {"input": 15.00, "output": 75.00},
+    "claude-opus-4-5":     {"input": 5.00, "output": 25.00},
 }
 
 
@@ -855,7 +855,7 @@ RETRYABLE_ERRORS = (
     wait=wait_exponential_jitter(initial=1, max=60, jitter=2),
     stop=stop_after_attempt(6),
     before_sleep=before_sleep_log(logger, logging.WARNING),
-    reraise=True,
+    reraise=False,
 )
 async def call_claude_with_retry(
     messages: list[dict],
@@ -929,7 +929,7 @@ async def process_batch(
                 results[idx] = {"status": "unexpected_error", "error": str(e)}
 
     tasks = [asyncio.create_task(process_one(i, p)) for i, p in enumerate(prompts)]
-    await asyncio.gather(*tasks, return_exceptions=True)
+    await asyncio.gather(*tasks)
     return results
 
 
@@ -949,12 +949,12 @@ def inspect_rate_limit_headers(response: httpx.Response) -> dict:
       x-ratelimit-reset-tokens       : ISO-8601 reset time for tokens
     """
     return {
-        "limit_rpm":        response.headers.get("x-ratelimit-limit-requests"),
-        "remaining_rpm":    response.headers.get("x-ratelimit-remaining-requests"),
-        "limit_tpm":        response.headers.get("x-ratelimit-limit-tokens"),
-        "remaining_tpm":    response.headers.get("x-ratelimit-remaining-tokens"),
-        "reset_requests":   response.headers.get("x-ratelimit-reset-requests"),
-        "reset_tokens":     response.headers.get("x-ratelimit-reset-tokens"),
+        "limit_rpm":        response.headers.get("anthropic-ratelimit-requests-limit"),
+        "remaining_rpm":    response.headers.get("anthropic-ratelimit-requests-remaining"),
+        "limit_tpm":        response.headers.get("anthropic-ratelimit-tokens-limit"),
+        "remaining_tpm":    response.headers.get("anthropic-ratelimit-tokens-remaining"),
+        "reset_requests":   response.headers.get("anthropic-ratelimit-requests-reset"),
+        "reset_tokens":     response.headers.get("anthropic-ratelimit-tokens-reset"),
     }
 
 
@@ -1340,7 +1340,8 @@ if __name__ == "__main__":
 | `stream.text_stream` | Generator of `str` deltas from a streaming response. |
 | `stream.get_final_message()` | Returns the fully assembled `Message` after streaming. |
 | `anthropic.RateLimitError` | HTTP 429 — retryable with backoff. |
-| `anthropic.InternalServerError` | HTTP 500/529 — retryable with backoff. |
+| `anthropic.InternalServerError` | HTTP 500 — retryable with backoff. |
+| `anthropic.OverloadedError` | HTTP 529 — retryable with backoff. |
 | `anthropic.AuthenticationError` | HTTP 401 — non-retryable, check key. |
 | `anthropic.UnprocessableEntityError` | HTTP 422 — non-retryable, fix request schema. |
 

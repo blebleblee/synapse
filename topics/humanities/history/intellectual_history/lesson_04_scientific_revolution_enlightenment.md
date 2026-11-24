@@ -132,7 +132,7 @@ flowchart LR
         end
         
         subgraph physics["Physics"]
-            P1["1590s: Galileo inclined plane"] --> P2["1650s: Descartes mechanism"]
+            P1["1590s: Galileo inclined plane"] --> P2["1644: Descartes Principia Philosophiae"]
             P2 --> P3["1687: Principia"]
         end
         

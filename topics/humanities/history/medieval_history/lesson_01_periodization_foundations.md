@@ -66,11 +66,13 @@ Year | Western Europe        | Byzantine Empire      | Islamic World         | T
 750  | Carolingian Rise     | Iconoclasm Crisis    | Abbasid Consolidation| An Lushan Rebellion
 800  | Charlemagne Crowned  | Iconoclasm Resolved  | Harun al-Rashid Peak | Tang Restoration
 850  | Carolingian Decline  | Macedonian Dynasty   | Abbasid Fragmentation| Late Tang Warlordism
-900  | Viking Invasions     | Byzantine Expansion  | Regional Dynasties   | Song Founding
+900  | Viking Invasions     | Byzantine Expansion  | Regional Dynasties   | Late Tang Warlordism
+960  | Capetian France Rise | Byzantine Expansion  | Regional Dynasties   | Song Founding
 1000 | Capetian France      | Basil II Conquests   | Fatimid-Seljuk Rise  | Song Commercial Peak
 1100 | First Crusade        | Komnenian Restoration| Crusader States      | Song Military Pressure
 1200 | Innocent III Papacy  | Fourth Crusade Trauma| Ayyubid Egypt        | Mongol Invasions Begin
-1250 | Mendicant Orders     | Palaiologan Renaissance| Mamluk Sultanate   | Mongol Yuan Dynasty
+1250 | Mendicant Orders     | Palaiologan Renaissance| Mamluk Sultanate   | Mongol Invasions Peak
+1271 | Sicilian Vespers     | Palaiologan Consolidation| Mamluk Egypt      | Yuan Dynasty Founded
 ```
 
 This correlation architecture reveals how historians construct synthetic narratives spanning incompatible regional frameworks. The concept of a unified "medieval world" emerges only through such artificial synchronic mapping, obscuring how different civilizations experienced non-synchronous rhythms of efflorescence and decline.

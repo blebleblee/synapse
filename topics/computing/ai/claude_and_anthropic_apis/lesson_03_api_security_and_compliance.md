@@ -88,7 +88,7 @@ The critical architectural decision here is that **your Anthropic API key never 
 
 ### Authentication and Authorization Architecture
 
-Anthropic's API uses bearer tokens: `Authorization: x-api-key <KEY>`. There is no built-in OAuth 2.0 or JWT-based flow as of 2025—authentication is entirely key-based. The implication is that **all scoping and authorization is the responsibility of the calling application**.
+Anthropic's API uses an `x-api-key` header for authentication: `x-api-key: <KEY>`. There is no built-in OAuth 2.0 or JWT-based flow as of 2025—authentication is entirely key-based. The implication is that **all scoping and authorization is the responsibility of the calling application**.
 
 A production system should implement a two-tier key architecture:
 
@@ -410,7 +410,7 @@ def build_prompt_secure(user_message: str, context: str) -> dict:
 
 ### PII Detection and Output Filtering
 
-Responses from the model must pass through a DLP filter before being returned to callers. The following demonstrates a production-grade PII scrubber using Microsoft Presidio, which Anthropic itself recommends in its documentation for handling sensitive use cases:
+Responses from the model must pass through a DLP filter before being returned to callers. The following demonstrates a production-grade PII scrubber using Microsoft Presidio, an open-source library for PII detection and redaction:
 
 ```python
 from presidio_analyzer import AnalyzerEngine
@@ -505,7 +505,7 @@ sequenceDiagram
 
 The audit log entry must be append-only (WORM — Write Once Read Many). In practice this means:
 
-- **AWS**: CloudWatch Logs with log group resource policy preventing deletion + S3 with Object Lock
+- **AWS**: CloudWatch Logs exported to S3 with Object Lock enabled
 - **GCP**: Cloud Logging with Log Sink to a locked GCS bucket  
 - **Self-hosted**: Kafka topic with retention policy, consuming to a write-once store
 
@@ -937,12 +937,13 @@ The `stop_reason` field is the primary diagnostic signal for model-level failure
 | `max_tokens` | Output truncated at `max_tokens` | Increase `max_tokens` or use continuation logic |
 | `stop_sequence` | Hit a configured stop sequence | Expected if stop sequences are configured |
 | `tool_use` | Model is invoking a tool | Extract `tool_use` block and dispatch tool call |
+| `refusal` | Model declined the request for safety reasons | Treat as a declined operation and inform the user |
 
-There is no `stop_reason` for a content refusal. When Claude declines a request, it returns `stop_reason: end_turn` with a natural-language refusal in the response text. Applications that need to detect refusals must classify the response text, not inspect `stop_reason`.
+When Claude declines a request for safety reasons, it returns `stop_reason: refusal`. Applications can detect refusals by checking this field, which is the primary signal (rather than relying on text classification).
 
 ### Context Window Management
 
-Claude 3.x models support context windows of up to 200,000 tokens (claude-opus-4-5, claude-sonnet-4-5). Managing this window correctly in a multi-turn conversation requires a principled truncation strategy:
+Claude models such as claude-opus-4-5 and claude-sonnet-4-5 support context windows of up to 200,000 tokens. Managing this window correctly in a multi-turn conversation requires a principled truncation strategy:
 
 ```python
 from dataclasses import dataclass, field
@@ -1069,7 +1070,7 @@ The following summarizes the security and operational controls required before e
 
 **Compliance**
 - Audit log of every API request/response written to append-only store
-- Log retention policy aligned with applicable regulation (minimum 1 year for SOC 2)
+- Log retention policy aligned with applicable regulation and audit requirements (e.g., six years for HIPAA documentation; GDPR sets no fixed period, only that data is kept no longer than necessary)
 - BAA signed with Anthropic for any deployment processing PHI
 - Data residency requirements verified against Anthropic's infrastructure region documentation
 

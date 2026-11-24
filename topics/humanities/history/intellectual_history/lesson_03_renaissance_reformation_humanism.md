@@ -71,7 +71,7 @@ B may be scribal substitution; C may be paraphrase.
 
 **Historical contextualization** meant considering what was known about a text's provenance, the historical circumstances of its composition, and whether its content aligned with established historical facts. A biblical passage claiming to reference events unknown to contemporary secular historians warranted scrutiny; a classical text containing anachronistic references to later historical events suggested later authorship or interpolation.
 
-**Apparatus preparation** involved creating visible, transparent documentation of textual decisions. An editor preparing a text would include footnotes or marginal annotations indicating which readings appeared in which manuscripts, what emendations were made, and why. This transparency allowed later scholars to examine the editor's reasoning and revise conclusions as new evidence emerged. The apparatus became the apparatus became the intellectual commons—the shared foundation upon which subsequent textual work could build.
+**Apparatus preparation** involved creating visible, transparent documentation of textual decisions. An editor preparing a text would include footnotes or marginal annotations indicating which readings appeared in which manuscripts, what emendations were made, and why. This transparency allowed later scholars to examine the editor's reasoning and revise conclusions as new evidence emerged. The apparatus became the intellectual commons—the shared foundation upon which subsequent textual work could build.
 
 **Institutional and Theological Architecture of Authority Reconstruction**
 

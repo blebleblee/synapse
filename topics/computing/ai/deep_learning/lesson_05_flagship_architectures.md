@@ -6,13 +6,13 @@ The flagship architectures of ResNet, Inception, and U-Net have become cornersto
 
 One invariant that underlies these architectures is the concept of feature pyramid networks. By progressively downsampling input data, feature pyramid networks enable the extraction of multi-scale features, which are essential for tasks such as object detection and segmentation. This invariant is a direct consequence of the hierarchical representation principle, where each layer refines the feature representation by capturing more abstract and context-dependent patterns.
 
-Another invariant is the use of residual connections. Residual connections, first introduced in ResNet, enable the direct flow of information between layers, allowing the network to learn more complex and non-linear relationships between features. This invariant has been adopted in various forms across multiple architectures, including Inception and U-Net.
+Another invariant is the use of residual connections. Residual connections, first introduced in ResNet, enable the direct flow of information between layers, allowing the network to learn more complex and non-linear relationships between features. This invariant has been adopted in various forms across multiple architectures, including Inception, though U-Net employs concatenation skip connections instead.
 
 ## Core Architecture & Mechanics
 
 ### ResNet
 
-ResNet is a pioneering architecture that introduced the concept of residual connections. At its core, ResNet is a feedforward network with multiple residual blocks, each consisting of two convolutional layers with a shortcut connection. The residual block can be represented as follows:
+ResNet is a pioneering architecture that introduced the concept of residual connections. At its core, ResNet is a feedforward network with multiple residual blocks, each consisting of two convolutional layers (or three for bottleneck variants) with a shortcut connection. The residual block can be represented as follows:
 
 ```mermaid
 graph TD

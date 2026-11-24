@@ -92,7 +92,7 @@ If $c < b$, this contradicts $c = \sup S$. Therefore $c = b$, and $b \in S$, mea
 
 For the converse, suppose $K \subseteq \mathbb{R}$ is compact. If $K$ were unbounded, the open cover $\{(-n, n)\}_{n \in \mathbb{N}}$ would have no finite subcover, since any finite subcollection is bounded. If $K$ were not closed, it would omit some limit point $x_0$. The open sets $U_n = \{x \in \mathbb{R} : |x - x_0| > 1/n\}$ cover $K$ (since $x_0 \notin K$), but no finite subcollection covers $K$ (since $x_0$ is a limit point of $K$, points of $K$ lie within $1/n$ of $x_0$ for every $n$). Therefore, compactness implies closed and bounded. $\blacksquare$
 
-The Heine-Borel theorem fails dramatically in infinite-dimensional spaces. The closed unit ball in an infinite-dimensional Banach space is closed and bounded but never compact — the sequence $(e_n)$ of standard basis vectors satisfies $\|e_m - e_n\| = \sqrt{2}$ for $m \neq n$, admitting no convergent subsequence. This signals that compactness is a genuinely topological invariant, not reducible to metric notions of size.
+The Heine-Borel theorem fails dramatically in infinite-dimensional spaces. The closed unit ball in an infinite-dimensional Banach space is closed and bounded but never compact — in $\ell^2$, the sequence $(e_n)$ of standard basis vectors satisfies $\|e_m - e_n\| = \sqrt{2}$ for $m \neq n$, admitting no convergent subsequence. This signals that compactness is a genuinely topological invariant, not reducible to metric notions of size.
 
 ### Sequential Compactness and Limit Point Compactness
 
@@ -180,10 +180,10 @@ flowchart LR
     subgraph connectedness_col ["Connectedness"]
         N1["✔ Preserved"]
         N2["✘ Not Preserved"]
-        N3["✔ Preserved"]
+        N3["✘ Not Preserved"]
         N4["✔ Preserved"]
         N5["✔ Preserved"]
-        N6["✘ Not Preserved"]
+        N6["✔ Preserved"]
         N7["✔ Preserved"]
     end
 
@@ -266,7 +266,7 @@ One of the most practically useful results in metric space topology is a consequ
 
 **Lemma 3.9 (Lebesgue Number Lemma).** Let $\{U_\alpha\}$ be an open cover of a compact metric space $(X, d)$. There exists $\lambda > 0$ (the *Lebesgue number* of the cover) such that every subset of $X$ with diameter less than $\lambda$ is contained in some $U_\alpha$.
 
-*Proof.* For each $x \in X$, since $\{U_\alpha\}$ covers $x$, some $U_{\alpha(x)}$ contains $x$, and since $U_{\alpha(x)}$ is open, there exists $r(x) > 0$ with $B(x, r(x)) \subseteq U_{\alpha(x)}$. The function $x \mapsto r(x)$ may not be continuous directly, but consider the function $f: X \to \mathbb{R}$ defined by $f(x) = \sup\{r > 0 : B(x, r) \subseteq U_\alpha \text{ for some } \alpha\}$. This function is continuous (by a triangle inequality argument) and positive everywhere on $X$. Since $X$ is compact, $f$ attains its minimum $\lambda = \min_{x \in X} f(x) > 0$. Any set $A$ with $\text{diam}(A) < \lambda$ has, for any $a \in A$, the entire $A \subseteq B(a, \lambda) \subseteq B(a, f(a)) \subseteq U_{\alpha(a)}$. $\blacksquare$
+*Proof.* For each $x \in X$, since $\{U_\alpha\}$ covers $x$, some $U_{\alpha(x)}$ contains $x$, and since $U_{\alpha(x)}$ is open, there exists $r(x) > 0$ with $B(x, r(x)) \subseteq U_{\alpha(x)}$. The function $x \mapsto r(x)$ may not be continuous directly, but consider the function $f: X \to \mathbb{R}$ defined by $f(x) = \sup\{r > 0 : B(x, r) \subseteq U_\alpha \text{ for some } \alpha\}$. This function is continuous (by a triangle inequality argument) and positive everywhere on $X$. Since $X$ is compact, $f$ attains its minimum $\lambda = \min_{x \in X} f(x) > 0$. Let $A$ be nonempty with $\text{diam}(A) < \lambda$ and pick any $a \in A$. Then $A \subseteq B(a, r)$ for some $r < \lambda \le f(a)$, and by the definition of $f$ the ball $B(a, r)$ lies inside a single $U_\alpha$. $\blacksquare$
 
 The Lebesgue number lemma is indispensable in the proof that continuous maps from compact metric spaces are uniformly continuous, and in the construction of covering spaces in algebraic topology (where it ensures that any path can be lifted in finitely many steps, each lying within an evenly covered open set).
 
@@ -348,7 +348,7 @@ The topology of connectedness and compactness is unusually rich in counterexampl
 
 The *long line* (the one-point compactification of the first uncountable ordinal $\omega_1$ with the order topology) is compact and connected but not second-countable, illustrating that the sequential characterizations of compactness fail without countability assumptions.
 
-The *Cantor set* $C \subseteq [0,1]$ — the intersection of nested closed sets obtained by iteratively removing middle thirds — is compact (as a closed subset of $[0,1]$), totally disconnected (every connected component is a single point), and perfect (every point is a limit point), yet homeomorphic to the product $\{0,1\}^{\mathbb{N}}$ with the product topology. Remarkably, every compact metrizable space is a continuous image of the Cantor set (the Alexandroff-Hausdorff theorem), making $C$ in some sense the "universal" compact metrizable space. This universality is the topological substrate of many constructions in descriptive set theory and in the theory of continuous functions.
+The *Cantor set* $C \subseteq [0,1]$ — the intersection of nested closed sets obtained by iteratively removing open middle thirds — is compact (as a closed subset of $[0,1]$), totally disconnected (every connected component is a single point), and perfect (every point is a limit point), yet homeomorphic to the product $\{0,1\}^{\mathbb{N}}$ with the product topology. Remarkably, every compact metrizable space is a continuous image of the Cantor set (the Alexandroff-Hausdorff theorem), making $C$ in some sense the "universal" compact metrizable space. This universality is the topological substrate of many constructions in descriptive set theory and in the theory of continuous functions.
 
 The *Warsaw circle* — a quotient of the topologist's sine curve $S$ that closes the gap between the endpoint of the sine curve and the base of the vertical segment — is compact and connected but not locally path-connected, hence not path-connected. It is often used in algebraic topology to demonstrate that the fundamental group and singular homology of a compact connected space can fail to detect the full topology when local connectivity is absent.
 

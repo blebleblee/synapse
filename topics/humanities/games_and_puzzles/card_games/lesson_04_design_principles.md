@@ -60,7 +60,7 @@ The diagram below illustrates how the five core systems interact:
 │         ↓              ↓              ↓                       │
 │    Play Decisions  Resource    Card Interaction              │
 │    (When to cast)  Allocation  (Synergies, emergent          │
-│                    (Which spell combinations)                │
+│                    (Which spell  combinations)               │
 │                     to prioritize)                           │
 │         │              │              │                       │
 │         └──────────────┬──────────────┘                       │

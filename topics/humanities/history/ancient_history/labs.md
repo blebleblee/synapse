@@ -71,7 +71,7 @@ Run sensitivity analysis. In your *Disruption Scenarios* tab, create a scenario 
 
 Plot these scenarios on a line graph with X-axis = *Disruption Severity (%)* and Y-axis = *Population Supportable*. The graph visually demonstrates fragility: Rome's food supply operated near carrying capacity with minimal buffer. A 30% disruption triggers famine conditions affecting one-third of the population—precisely what the sources describe under Claudius.
 
-Cross-validate with historical price data. The wheat price inscriptions from Roman Egypt (P.Oxy. papyri) show price spikes in the 40s-50s CE. Normal wheat price: 8 drachmas per *artaba* (a volume measure ≈ 38 liters). Crisis years: 16-24 drachmas per artaba (200-300% inflation). Input this into your model: if grain supply drops to 70% of requirement, basic economics predicts price increases of 150-300% (demand remains constant, supply shrank). Your model's prediction matches the papyrological evidence, validating the demographic pressure hypothesis.
+Cross-validate with historical price data. The wheat price inscriptions from Roman Egypt (P.Oxy. papyri) show price spikes in the 40s-50s CE. Normal wheat price: 8 drachmas per *artaba* (a volume measure ≈ 38 liters). Crisis years: 16-24 drachmas per artaba (100-200% inflation). Input this into your model: if grain supply drops to 70% of requirement, basic economics predicts price increases of 150-300% (demand remains constant, supply shrank). Your model's prediction matches the papyrological evidence, validating the demographic pressure hypothesis.
 
 Extend the model to test military mobilization claims. Polybius (*Histories* 2.24) states Rome mobilized 700,000 infantry and 70,000 cavalry in 225 BCE to face the Gallic invasion. Construct a population pyramid: if Rome's total citizen population (including women, children, elderly) was approximately 3,000,000, then males aged 17-45 (military eligible) comprise roughly 20-25% = 600,000-750,000. Mobilizing 770,000 requires nearly total conscription of all military-age males. Create a spreadsheet column: *Mobilization Rate (%)* vs. *Economic Sustainability*. At 100% mobilization, agriculture collapses (no field workers), crafts industries halt (no artisans), and famine follows within one harvest cycle (6 months). Conclusion: Polybius's figures are either total theoretical strength (including allies, non-citizens, and naval personnel spread across all Italian territories) or rhetorically inflated. Document this: "Polybius's mobilization figures exceed demographic feasibility for sustained campaigning, suggesting either coalition forces (Roman + allied states) or propagandistic exaggeration."
 
@@ -230,7 +230,7 @@ Assign explicit numerical confidence to all historical claims using this standar
 
 - **0.80-0.94 (High Confidence)**: Contemporary inscription, official document, or monumental evidence. Example: construction date of the Pantheon (Hadrianic brick stamps).
 
-- **0.60-0.79 (Probable)**: Single reliable source written within 1-2 generations, or multiple later sources agreeing. Example: specific battle tactics at Cannae (Polybius, 50 years post-event).
+- **0.60-0.79 (Probable)**: Single reliable source written within 1-2 generations, or multiple later sources agreeing. Example: specific battle tactics at Cannae (Polybius, 70 years post-event).
 
 - **0.40-0.59 (Plausible)**: Late sources or single source with known biases, but no contradictory evidence. Example: Nero fiddling during Rome's fire (Suetonius, 150 years post-event, no corroboration).
 

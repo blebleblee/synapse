@@ -33,11 +33,11 @@ July 1997: Thailand floats baht → 50% depreciation
     ↓
 August: Indonesia rupiah collapses → 80% depreciation
     ↓
-October: Hong Kong stock market crash → 23% single-day drop
+October: Hong Kong stock market crash → 10% single-day drop
     ↓
 November: South Korea crisis → IMF bailout ($57 billion)
     ↓
-January 1998: Indonesia political crisis → Suharto resignation
+May 1998: Indonesia political crisis → Suharto resignation
     ↓
 August 1998: Russia default → LTCM hedge fund collapse
     ↓
@@ -93,7 +93,7 @@ The security architecture established after September 11, 2001, represented the 
 
 The National Security Agency's post-9/11 programs, revealed by Edward Snowden in 2013, demonstrated the technical implementation of mass surveillance at unprecedented scale. The PRISM program compelled major Internet companies to provide direct access to user communications. Upstream collection tapped fiber-optic cables carrying Internet backbone traffic, capturing billions of daily communications. The telephony metadata program collected records of every phone call made in the United States, creating a comprehensive social network graph of the entire population. These programs operated under secret legal interpretations by the Foreign Intelligence Surveillance Court that stretched statutory language far beyond its apparent meaning, creating a parallel legal system with minimal transparency or accountability.
 
-The climate politics architecture centered on the United Nations Framework Convention on Climate Change process, which produced successive negotiating rounds attempting to forge binding emissions reduction commitments. The Kyoto Protocol of 1997 required developed nations to reduce emissions by an average of 5% below 1990 levels by 2012, while exempting developing nations including China and India. The United States signed but never ratified the agreement; Canada withdrew in 2011 after failing to meet its targets. The protocol's market mechanisms—emissions trading, clean development mechanism offsets, joint implementation projects—created new financial instruments but failed to bend the global emissions curve.
+The climate politics architecture centered on the United Nations Framework Convention on Climate Change process, which produced successive negotiating rounds attempting to forge binding emissions reduction commitments. The Kyoto Protocol of 1997 required developed nations to reduce emissions by an average of 5% below 1990 levels over the 2008-2012 commitment period, while exempting developing nations including China and India. The United States signed but never ratified the agreement; Canada withdrew in 2011 after failing to meet its targets. The protocol's market mechanisms—emissions trading, clean development mechanism offsets, joint implementation projects—created new financial instruments but failed to bend the global emissions curve.
 
 ```text
 Global Carbon Emissions Trajectory 1990-2020
@@ -164,7 +164,7 @@ Market Dynamics (2003-2007):
 Trigger Events (2007-2008):
 - Housing prices peak and decline (2006-2007)
 - Subprime delinquencies spike (2007)
-- Bear Stearns hedge funds collapse (June 2007)
+- Bear Stearns hedge funds collapse (July 2007)
 - Interbank lending freezes (August 2007)
 - Lehman Brothers bankruptcy (September 15, 2008)
     ↓

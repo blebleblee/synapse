@@ -20,7 +20,7 @@ The architectural invariants that govern every interaction are:
 
 ### Tokenization in Depth
 
-OpenAI's tokenizer for GPT-3.5 and GPT-4 family models is `cl100k_base`, a Byte-Pair Encoding (BPE) tokenizer with a vocabulary of 100,277 tokens. BPE works by:
+GPT-3.5 and GPT-4 family models use the `cl100k_base` tokenizer (~100k vocabulary), while GPT-4o and later models use `o200k_base` (~200k vocabulary). Both are Byte-Pair Encoding (BPE) algorithms. BPE works by:
 
 1. Starting with a vocabulary of individual bytes (256 tokens).
 2. Iteratively merging the most frequent adjacent byte-pair in the training corpus into a new token.
@@ -226,7 +226,7 @@ client = OpenAI(
     max_retries=0,         # We manage retries ourselves via tenacity
 )
 
-ENCODING = tiktoken.get_encoding("cl100k_base")
+ENCODING = tiktoken.encoding_for_model(MODEL)
 MODEL = "gpt-4o"
 
 
@@ -453,7 +453,7 @@ TOOLS = [
                         "description": "Temperature unit.",
                     },
                 },
-                "required": ["location"],
+                "required": ["location", "unit"],
                 "additionalProperties": False,
             },
             "strict": True,  # Enforces schema adherence (Structured Outputs)
@@ -712,7 +712,7 @@ def retry_with_backoff(fn, *args, max_attempts: int = 8, base_delay: float = 1.0
             if attempt == max_attempts - 1:
                 raise
             # Respect Retry-After header if present
-            retry_after = getattr(e, "retry_after", None)
+            retry_after = e.response.headers.get("retry-after")
             if retry_after:
                 sleep_time = float(retry_after)
             else:

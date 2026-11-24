@@ -40,10 +40,10 @@ flowchart LR
         E["Eikasia (Imagination)"]
     end
 
-    F["Forms (Noetic)"]     --- N["Nous (Intellection)"]
-    M["Mathematical"]       --- D["Dianoia (Reasoning)"]
-    V["Visible Objects"]    --- P["Pistis (Belief)"]
-    I["Images / Shadows"]   --- E["Eikasia (Imagination)"]
+    F["Forms (Noetic)"] --- N
+    M["Mathematical"] --- D
+    V["Visible Objects"] --- P
+    I["Images / Shadows"] --- E
 ```
 
 The practitioner's task is to train the mind to ascend this ladder. Aesthetic experience, in Plato's system, is explicitly an engine for this ascent. When we encounter something beautiful in the sensible world—say, a mathematically proportioned temple—our immediate sensory experience (eikasia) can be refined into belief about its proportions (pistis), which can then be elevated to discursive reasoning about mathematical ratios (dianoia), and ultimately to direct intellectual apprehension of Beauty itself as a Form (nous). The sensible object is a stepping stone, not the destination.

@@ -8,7 +8,7 @@ The primary goal of optimization in neural networks is to minimize the loss func
 
 Gradient descent is one of the most widely used optimization techniques, based on the principle of steepest descent. It involves iteratively moving the model's parameters in the direction of the negative gradient of the loss function. This process continues until convergence, where the model's parameters are optimized to minimize the loss function.
 
-However, gradient descent has limitations, primarily its tendency to get stuck in local minima, optimizing for a specific subset of the data rather than the entire dataset. To address this, various gradient descent variants have been developed, including stochastic gradient descent (SGD), momentum-based gradient descent, and Nesterov accelerated gradient descent.
+However, gradient descent has limitations, primarily its tendency to get stuck in local minima and saddle points, and the computational expense of using the full dataset for each update. To address this, various gradient descent variants have been developed, including stochastic gradient descent (SGD), momentum-based gradient descent, and Nesterov accelerated gradient descent.
 
 SGD is a popular variant that involves randomly sampling the data at each iteration, reducing computational overhead and potentially speeding up convergence. However, it can lead to oscillations in the model's parameters, negatively impacting the training process.
 

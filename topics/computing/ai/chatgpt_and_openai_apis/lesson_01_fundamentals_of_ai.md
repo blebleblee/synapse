@@ -47,7 +47,7 @@ Modern language models do not process words or characters—they process **token
 **Why tokens matter**:
 1. **Vocabulary efficiency**: English has ~170,000 words, but GPT models use ~50,000-100,000 tokens covering multiple languages
 2. **Handling rare words**: "antidisestablishmentarianism" becomes ["anti", "dis", "establish", "ment", "arian", "ism"]
-3. **Mathematical constraint**: Context window limits (4K, 8K, 32K, 128K tokens) define the maximum information the model can process simultaneously
+3. **Mathematical constraint**: Context window limits (which vary by model and can exceed 128K tokens) define the maximum information the model can process simultaneously
 
 **Token counting invariants**:
 - English: ~1 token per 4 characters (~0.75 words)
@@ -129,7 +129,7 @@ Output Logits → Sampling → Generated Token
 **Key parameters**:
 - **GPT-3.5 (ChatGPT)**: ~175B parameters, 96 layers, 12,288 embedding dimension
 - **GPT-4**: Estimated 1.8T parameters (sparse mixture-of-experts), exact architecture undisclosed
-- **Context window**: 4K-128K tokens depending on variant
+- **Context window**: Varies by model; ranges from 4K to 128K+ tokens
 
 ### 2.2 The Forward Pass: From Text to Probability Distribution
 
@@ -282,7 +282,7 @@ The model sees the pattern and continues it. **This is the fundamental mechanism
 
 ### 2.6 Context Window Management: The Bounded Memory Problem
 
-**Hard constraint**: Models have finite context windows (4K, 8K, 16K, 32K, 128K tokens). Once exceeded, the API returns an error.
+**Hard constraint**: Models have finite context windows that vary by model (commonly 4K to 128K+ tokens). Once exceeded, the API returns an error.
 
 **Token accounting**:
 ```text
@@ -313,7 +313,7 @@ Total tokens = System message + Σ(User messages) + Σ(Assistant messages) + Gen
    - Pros: Preserves important context
    - Cons: Additional complexity and API calls
 
-**Cost-context tradeoff**: Larger contexts are exponentially more expensive
+**Cost-context tradeoff**: Larger contexts are proportionally more expensive
 - 4K context: baseline cost
 - 128K context: 32× input token cost for equivalent length
 
@@ -393,7 +393,7 @@ def exponential_backoff_retry(func, max_retries=5):
     for attempt in range(max_retries):
         try:
             return func()
-        except RateLimitError:
+        except openai.error.RateLimitError:
             if attempt == max_retries - 1:
                 raise
             wait_time = (2 ** attempt) + random.uniform(0, 1)
@@ -495,7 +495,7 @@ Daily cost = 10,000 × ((1,500 × $0.03) + (500 × $0.06)) / 1,000
    
    **Solution**: Input sanitization, content filtering
 
-3. **Server errors (503, 529)**:
+3. **Server errors (500, 502, 503, 504)**:
    - OpenAI infrastructure overload
    - **Solution**: Exponential backoff, retry with jitter
 

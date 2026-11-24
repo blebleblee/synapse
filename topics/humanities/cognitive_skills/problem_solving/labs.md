@@ -120,7 +120,7 @@ Complete your tree by decomposing "Operational Efficiency Degradation" into MECE
 
 **Complete Tree Validation and Intervention Mapping:**
 
-You now possess a complete three-level MECE decomposition tree with thirteen terminal nodes (four supply, four demand, four operational, plus one root). Perform final validation:
+You now possess a complete three-level MECE decomposition tree with thirteen nodes total—one root and twelve terminal nodes (four supply, four demand, four operational). Perform final validation:
 
 **Cross-Category Independence Test**: Select random node pairs across different first-level branches and verify they represent independent causal mechanisms. Example: "Geometric bottleneck" (supply) and "Modal shift from transit" (demand) are logically independent—addressing one does not inherently address the other.
 
@@ -191,7 +191,7 @@ For subsequent time periods (t = 1 to 24), implement the following update equati
 
 **Utilization Update**: Utilization(t) = (Arrival_Rate(t) × 0.25) / Capacity(t).
 
-**Wait Time Update**: Wait_Time(t) = 0.25 / (1 − Utilization(t)) if Utilization(t) < 0.95, else 10.0. This implements non-linear queuing behavior—wait times explode as utilization approaches capacity limits.
+**Wait Time Update**: Wait_Time(t) = 0.25 / (1 - Utilization(t)) if Utilization(t) < 0.95, else 10.0. This implements non-linear queuing behavior—wait times explode as utilization approaches capacity limits.
 
 **Baseline Simulation:**
 

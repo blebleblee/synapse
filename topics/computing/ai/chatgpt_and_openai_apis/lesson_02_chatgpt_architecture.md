@@ -116,7 +116,7 @@ graph LR
     end
 ```
 
-The trade-off is memory: the KV cache stores $2 \times N_{\text{layers}} \times N_{\text{heads}} \times d_k \times \text{seq\_len}$ floating-point values per request. For a model with 96 layers, 96 heads, $d_k=128$, and a 128K context window, this can exceed 10 GB per request in FP16.
+The trade-off is memory: the KV cache stores $2 \times N_{\text{layers}} \times N_{\text{heads}} \times d_k \times \text{seq\_len}$ floating-point values per request. For a model with 96 layers, 96 heads, $d_k=128$, and a 128K context window, this can exceed 600 GB per request in FP16.
 
 ### Multi-Head Attention Implementation
 
@@ -169,7 +169,8 @@ class MultiHeadSelfAttention(torch.nn.Module):
         scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
         # Apply causal mask over the full key length (past + current)
         total_len = k.size(-2)
-        mask = self.causal_mask[:, :, :S, :total_len].to(x.device)
+        past_len = total_len - S
+        mask = self.causal_mask[:, :, past_len:past_len + S, :total_len].to(x.device)
         scores = scores.masked_fill(mask == 0, float("-inf"))
 
         attn_weights = F.softmax(scores, dim=-1)

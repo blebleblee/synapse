@@ -344,10 +344,6 @@ func streamCompletion(prompt string) error {
 		}
 
 		data := strings.TrimPrefix(line, "data: ")
-		if data == "[DONE]" {
-			break
-		}
-
 		// We only care about content_block_delta events
 		var event struct {
 			Type string `json:"type"`
@@ -550,7 +546,7 @@ As of mid-2025, Anthropic's production models have the following context windows
 |---|---|---|
 | claude-opus-4-5 | 200,000 tokens | 32,000 |
 | claude-sonnet-4-5 | 200,000 tokens | 64,000 |
-| claude-haiku-3-5 | 200,000 tokens | 8,192 |
+| claude-3-5-haiku-20241022 | 200,000 tokens | 8,192 |
 
 A "token" in Claude's BPE vocabulary is roughly 3–4 characters of English text, or approximately 0.75 words. 1,000 tokens ≈ 750 words. Code is typically more token-dense than prose.
 
@@ -601,7 +597,7 @@ def summarize_history_block(messages: list[dict]) -> dict:
         if isinstance(m["content"], str)
     )
     response = client.messages.create(
-        model="claude-haiku-3-5",
+        model="claude-3-5-haiku-20241022",
         max_tokens=512,
         messages=[{
             "role": "user",
@@ -727,7 +723,7 @@ from typing import Sequence
 
 async def process_batch(
     prompts: Sequence[str],
-    model: str = "claude-haiku-3-5",
+    model: str = "claude-3-5-haiku-20241022",
     max_concurrent: int = 5,  # Tune based on your rate limit tier
     max_tokens: int = 512,
 ) -> list[str]:
@@ -896,7 +892,7 @@ client = anthropic.Anthropic()
 def safe_complete(prompt: str) -> str | None:
     try:
         response = client.messages.create(
-            model="claude-haiku-3-5",
+            model="claude-3-5-haiku-20241022",
             max_tokens=256,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -1050,14 +1046,14 @@ client = anthropic.Anthropic()
 def submit_batch(prompts: list[str]) -> str:
     """Submits a batch job. Returns the batch ID for polling."""
     requests = [
-        anthropic.types.message_create_params.MessageCreateParamsNonStreaming(
-            custom_id=f"item-{i}",
-            params={
-                "model": "claude-haiku-3-5",
+        {
+            "custom_id": f"item-{i}",
+            "params": {
+                "model": "claude-3-5-haiku-20241022",
                 "max_tokens": 256,
                 "messages": [{"role": "user", "content": p}],
             }
-        )
+        }
         for i, p in enumerate(prompts)
     ]
 

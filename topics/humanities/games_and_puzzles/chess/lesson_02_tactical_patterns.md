@@ -19,18 +19,18 @@ The **fork** represents the most elementary tactical motif: a single piece simul
 ```text
 Royal Fork Example Position:
 
-8  . . . . k . . .
-7  . . . . . . . .
+8  . . . . . . . .
+7  . . . . k . . .
 6  . . . . . . . .
 5  . . . N . . . .
 4  . . . . . . . .
-3  . . . . Q . . .
+3  . . . . q . . .
 2  . . . . . . . .
-1  . . . . K . . .
+1  . . . . . . K .
 
   a b c d e f g h
 
-White knight on d5 attacks both Black king on e8 and Black queen on e3.
+White knight on d5 attacks both Black king on e7 and Black queen on e3.
 Black must move the king; White captures the queen on the next move.
 ```
 
@@ -64,19 +64,19 @@ The **skewer** reverses the pin's geometry: a high-value piece stands in front o
 ```text
 Skewer with Check Pattern:
 
-8  r . . . k . . .
-7  . . . . . . . .
+8  . . . . r . . .
+7  . . . k . . . .
 6  . . . . . . . .
 5  . . . . . . . .
-4  . . . . . . . .
+4  B . . . . . . .
 3  . . . . . . . .
 2  . . . . . . . .
-1  . B . . K . . .
+1  . . . . K . . .
 
   a b c d e f g h
 
-White bishop on b1 delivers check to Black king on e8.
-Black rook on a8 stands behind the king on the same diagonal.
+White bishop on a4 delivers check to Black king on d7.
+Black rook on e8 stands behind the king on the same diagonal.
 King must move; White captures the rook next move.
 ```
 
@@ -89,18 +89,18 @@ Discovered Check Architecture:
 
 8  . . . . k . . .
 7  . . . . . . . .
-6  . . . q . . . .
-5  . . . N . . . .
+6  . . q . . . . .
+5  . . . . N . . .
 4  . . . . . . . .
 3  . . . . . . . .
 2  . . . . . . . .
-1  . . . R . . K .
+1  . . . . R . K .
 
   a b c d e f g h
 
-White rook on d1 aims at Black king on e8.
-White knight on d5 blocks the discovered check.
-Knight moves (e.g., Nxe6 capturing Black queen) unveils check.
+White rook on e1 aims at Black king on e8.
+White knight on e5 blocks the discovered check.
+Knight moves (e.g., Nxc6 capturing Black queen) unveils check.
 Black must respond to check; cannot recapture the knight.
 White wins the queen.
 ```
