@@ -141,6 +141,19 @@ class HierarchicalOrchestrator:
     # Dependency Resolution                                                #
     # ------------------------------------------------------------------ #
 
+    def _fail_downstream(self, failed_task_id: str) -> None:
+        """Fail every task that (transitively) depends on a failed task,
+        so the run loop's all-terminal check can still be reached."""
+        failed = {failed_task_id}
+        changed = True
+        while changed:
+            changed = False
+            for task in self._tasks.values():
+                if task.status == TaskStatus.PENDING and task.dependencies & failed:
+                    task.status = TaskStatus.FAILED
+                    failed.add(task.task_id)
+                    changed = True
+
     def _resolve_downstream(self, completed_task_id: str) -> None:
         """Promote tasks whose dependencies are now fully satisfied."""
         for task in self._tasks.values():
@@ -213,6 +226,7 @@ class HierarchicalOrchestrator:
                     task.status = TaskStatus.FAILED
                     print(f"[ORCHESTRATOR] Task {task.task_id} failed after "
                           f"{task.max_retries} retries: {exc}")
+                    self._fail_downstream(task.task_id)
 
     async def run(self) -> None:
         """Main scheduling loop: drain the ready queue against available agents."""
@@ -225,6 +239,9 @@ class HierarchicalOrchestrator:
                     task = heapq.heappop(self._ready_queue)
                     agent = self._select_agent(task.capability_required)
                     if agent is not None:
+                        # Reserve the slot now, or every task in this batch
+                        # could pick the same agent
+                        agent.active_tasks.add(task.task_id)
                         dispatch_batch.append((task, agent))
                     else:
                         temp_heap.append(task)
@@ -290,7 +307,7 @@ Market-based allocation extends the CNP concept by introducing formal auction me
 
 **Combinatorial auctions** address this by allowing agents to submit bundle bids that express package pricing across multiple tasks. The allocator then solves the **winner determination problem** — finding the allocation of bundles to agents that maximizes total utility subject to each task being assigned exactly once. Unfortunately, the winner determination problem is NP-complete in the general case, which makes exact combinatorial auctions impractical at scale. In production swarms, this is typically addressed through two pragmatic approximations: restricting bundle size (agents may bid on packages of at most $k$ tasks, where $k$ is small, commonly 2 or 3), or using greedy iterative auctions that sequentially award the highest-scoring bid in each round and remove awarded tasks from subsequent rounds.
 
-The theoretically principled solution is the **Vickrey-Clarke-Groves (VCG) mechanism**, which guarantees truthful bidding as a dominant strategy — agents maximize their expected payoff by reporting their true execution costs rather than strategically shading bids. VCG works by paying each winning agent not what it bid, but the opportunity cost its participation imposed on others: the difference between the total social welfare achievable without that agent and the welfare achieved with it. This eliminates the incentive to underbid (take on tasks cheaply and then fail or deliver low quality) because the payment is decoupled from the bid itself. For multi-agent systems where agents are autonomously optimizing their own execution portfolio, VCG's incentive compatibility property is architecturally important — it means the allocation mechanism is robust to self-interested agents operating under incomplete information.
+The theoretically principled solution is the **Vickrey-Clarke-Groves (VCG) mechanism**, which guarantees truthful bidding as a dominant strategy — agents maximize their expected payoff by reporting their true execution costs rather than strategically shading bids. VCG works by paying each winning agent not what it bid, but the opportunity cost its participation imposed on others: the welfare the other agents would get in the best allocation without that agent, minus the welfare the other agents get in the chosen allocation. This eliminates the incentive to underbid (take on tasks cheaply and then fail or deliver low quality) because the payment is decoupled from the bid itself. For multi-agent systems where agents are autonomously optimizing their own execution portfolio, VCG's incentive compatibility property is architecturally important — it means the allocation mechanism is robust to self-interested agents operating under incomplete information.
 
 The practical limitation of VCG at swarm scale is computational: computing the counterfactual social welfare without each winning agent requires solving the winner determination problem repeatedly, once per winner. For swarms of tens of agents executing hundreds of concurrent tasks, this remains tractable. At the scale of large multi-agent pipelines with thousands of micro-tasks, approximate VCG variants or simpler scoring functions become necessary.
 
@@ -349,7 +366,7 @@ class AuctionAllocator:
     async def run_auction(
         self,
         task: AuctionTask,
-        broadcast_cfp: Any,          # Callable: async (task_id, capability) -> None
+        broadcast_cfp: Any,          # Callable: async (task_id, capability, payload) -> None
         notify_award: Any,           # Callable: async (agent_id, task_id) -> None
         notify_reject: Any,          # Callable: async (agent_id, task_id) -> None
     ) -> Optional[str]:
@@ -424,7 +441,7 @@ The mitigation has two parts. First, implement **capability-indexed backpressure
 ```python
 import asyncio
 from collections import defaultdict
-from typing import DefaultDict, List
+from typing import DefaultDict, List, Optional
 
 
 class BackpressureOrchestrator(HierarchicalOrchestrator):
@@ -481,6 +498,9 @@ class BackpressureOrchestrator(HierarchicalOrchestrator):
                     task = heapq.heappop(self._ready_queue)
                     agent = self._select_agent(task.capability_required)
                     if agent is not None:
+                        # Reserve the slot now, or every task in this batch
+                        # could pick the same agent
+                        agent.active_tasks.add(task.task_id)
                         dispatch_batch.append((task, agent))
                     else:
                         # Park rather than re-queue — eliminates thrash

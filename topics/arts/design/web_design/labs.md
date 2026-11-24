@@ -709,13 +709,9 @@ Take screenshots of all three variants side-by-side. They should maintain visual
 
 **Step 5: Convert to Components and Create Instances**
 
-In Figma, select the desktop card (`Card – Article – Base`) and right-click "Create component." This becomes your main component.
+In Figma, select the desktop card (`Card – Article – Base`) and right-click "Create component." Do the same for the tablet and mobile cards.
 
-Right-click again and select "Create component set." You will be prompted to name the base; keep it `Card – Article`. Figma will recognize this as a main component.
-
-Now, right-click on the tablet card and select "Create component" as well. In the design panel, Select the desktop, tablet, and mobile card components together and choose "Combine as variants" (then set the property to Breakpoint with values desktop/tablet/mobile). of `Card – Article` with property "Breakpoint: tablet."
-
-Do the same for mobile: "Breakpoint: mobile."
+Select all three components together and choose **Combine as variants** in the design panel. Figma creates one component set; name it `Card – Article`, rename its property to `Breakpoint`, and give the three variants the values `desktop`, `tablet` and `mobile`.
 
 You now have one `Card – Article` component with three breakpoint variants. When you drag an instance of `Card – Article` onto your page, you can toggle between variants in the design panel.
 
@@ -1050,7 +1046,7 @@ Use this rubric to evaluate your work after Exercise 3. Grade yourself on a scal
 - **2 (Weak):** Grayscale loses meaningful information. Some red/green confusion possible.
 - **1 (Failing):** Critical information is color-only; grayscale renders the page unusable.
 
-**Common Fix:** Export a grayscale version of your page (Use Colors → Desaturate in GIMP, or Image → Adjustments → Desaturate in Photoshop., or Desaturate the exported PNG in an image editor (or apply a grayscale filter) instead of relying on Figma export settings.). Check that all UI elements (buttons, form states, alerts) are still distinguishable. Add icons or text labels to color-dependent UI (e.g., status indicators).
+**Common Fix:** Export your page as a PNG and desaturate it in an image editor (Colors → Desaturate in GIMP, Image → Adjustments → Desaturate in Photoshop); Figma's export has no grayscale option. Check that all UI elements (buttons, form states, alerts) are still distinguishable. Add icons or text labels to color-dependent UI (e.g., status indicators).
 
 ---
 
@@ -1164,7 +1160,7 @@ Use this rubric to evaluate your work after Exercise 3. Grade yourself on a scal
 
 **Mistake 2: Poor Contrast (Failing WCAG AA)**
 - Symptoms: Light gray text (#999999) on white background; unreadable in brightness-challenged environments.
-- Fix: Use a contrast-checking plugin (e.g. Stark or Contrast) or an external WCAG contrast tool to verify the 4.5:1 ratio. All body text must be 4.5:1+. Use Gray-900 or Gray-700 for body on light backgrounds.
+- Fix: Check the ratio with a contrast-checking plugin (e.g. Stark) or an external WCAG contrast tool. All body text must be 4.5:1+. Use Gray-900 or Gray-700 for body on light backgrounds.
 
 **Mistake 3: Unresponsive Images**
 - Symptoms: Hero image is 1200px wide; on mobile, it's cropped or causes horizontal scroll.

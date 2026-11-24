@@ -105,8 +105,10 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 import numpy as np
+from dotenv import load_dotenv
 from openai import OpenAI
 
+load_dotenv()  # reads OPENAI_API_KEY from a .env file if present
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # ---------------------------------------------------------------------------
@@ -227,7 +229,7 @@ def python_exec(code: str) -> str:
 def rule_based_score(episode: Episode, ground_truth: str | None) -> float:
     """
     Fast, deterministic scoring layer.
-    Returns 1.0 for perfect, 0.0 for complete failure, 0.5 for partial.
+    Returns 1.0 for perfect, 0.0 for complete failure, 0.7 for partial.
     """
     # Hard failure: any tool call raised an exception
     if any(not step.success for step in episode.steps):
@@ -473,7 +475,7 @@ if __name__ == "__main__":
         ),
         max_episodes=4,
         success_threshold=0.9,
-        ground_truth="13.95%",
+        ground_truth="13.96%",
         memory=mem,
     )
 
@@ -536,7 +538,7 @@ The architectural implication is important: the same model serves as both actor 
 
 ### 3.3 Tree-of-Thought Reflection
 
-Yao et al. (2023) extend chain-of-thought into a tree search over partial solutions. Reflection here operates at the node-evaluation level: after generating a partial reasoning step, the model *evaluates* each node (via self-scoring: "Is this step promising? Rate 1–10") and uses beam search or Monte Carlo Tree Search (MCTS) to prune the search tree.
+Yao et al. (2023) extend chain-of-thought into a tree search over partial solutions. Reflection here operates at the node-evaluation level: after generating a partial reasoning step, the model *evaluates* each node (via self-scoring: "Is this step promising? Rate 1–10") and uses breadth-first or depth-first search, with the LLM's own evaluation of each state, to prune the search tree.
 
 ```mermaid
 graph TD

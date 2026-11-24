@@ -57,7 +57,7 @@ AlphaGo exemplifies autonomous reflection through its integration of deep learni
 
 ### Architectural Components
 
-AlphaGo's architecture consists of three primary neural networks operating within a reflective MCTS framework:
+AlphaGo's architecture consists of two deep neural networks (policy and value) plus a fast linear rollout policy operating within a reflective MCTS framework:
 
 **Policy network** $p_\sigma$: A deep convolutional neural network that maps board position $s$ to a probability distribution over legal moves $\pi(a|s)$. The policy network underwent supervised learning on expert human games, then reinforcement learning through self-play, achieving approximately 57% prediction accuracy on professional game moves.
 
@@ -901,7 +901,7 @@ Reflection introduces overhead through meta-level computation. In MCTS, simulati
 
 **Optimization strategies**:
 
-**Adaptive reflection depth**: Modulate reflection intensity based on uncertainty. Allocate more compute to high-stakes or high-uncertainty decisions. For example, AlphaGo Zero used fewer simulations for obvious moves, concentrating search on complex positions.
+**Adaptive reflection depth**: Modulate reflection intensity based on uncertainty. Allocate more compute to high-stakes or high-uncertainty decisions. For example, later engines such as KataGo spend fewer playouts on obvious moves and concentrate search on complex positions (AlphaGo Zero used a fixed 1,600 simulations per move).
 
 **Batched reflection**: When multiple agents or parallel threads require reflection, batch LLM inference requests to amortize latency and exploit GPU parallelism. A batch of 32 agents querying an LLM simultaneously achieves nearly 32× throughput compared to sequential processing.
 
@@ -942,7 +942,7 @@ impl MCTSNode {
         self.children.iter().enumerate()
             .map(|(idx, child)| {
                 let child = child.lock().unwrap();
-                let adjusted_visits = child.visit_count - child.virtual_loss;
+                let adjusted_visits = child.visit_count + child.virtual_loss;
                 let q_value = if adjusted_visits > 0 {
                     child.total_value / (adjusted_visits as f32)
                 } else {
@@ -1031,7 +1031,7 @@ fn simulate_rollout(_state: &GameState) -> f32 { 0.5 }
 
 *Mitigation*: Enforce reflection depth limits and time budgets. Use monotonic improvement checks—if reflection hasn't improved the object-level solution after N iterations, force execution.
 
-**Overfitting to self-play**: Systems like AlphaGo trained exclusively through self-play may develop brittle strategies that exploit quirks of the opponent model rather than discovering robust principles.
+**Overfitting to self-play**: Systems like AlphaGo Zero, trained exclusively through self-play may develop brittle strategies that exploit quirks of the opponent model rather than discovering robust principles.
 
 *Mitigation*: Inject diversity through stochastic exploration, opponent randomization, or periodic training against external agents (humans or other algorithms).
 

@@ -292,19 +292,19 @@ Keep the RH triad voiced at least an octave above the LH shell. If you stack the
 ```
 Run this in all twelve keys. This is the actual comping vocabulary you'll use behind a soloist on a standard — static ii-V-I with a colored V chord.
 
-### "All the Things You Are" bridge — modal interchange in the wild
+### "All the Things You Are" bridge — moving key centers in the wild
 
-Original key Ab major, bridge (measures 17–24):
+Original key Ab major, bridge (measures 17–24), moving to G major and then E major:
 ```text
-The bridge of 'All the Things You Are' begins with Am7 | D7 | Gmaj7 | Gmaj7 | (in the original key of Ab, modulating to G major and then E major).
-| Abmaj7 | Abmaj7 | Am7  | D7  |   (Am7-D7 is a ii-V into G major)
+| Am7    | D7     | Gmaj7  | Gmaj7  |
+| F#m7   | B7     | Emaj7  | C7#5   |
 ```
-Transposed to C major for practice:
+Transposed to C major for practice (everything up a major 3rd):
 ```text
-| Cmaj7  | Cmaj7  | Fm7  | Bb7 |
-| Ebmaj7 | Ebmaj7 | Em7  | A7  |
+| C#m7   | F#7    | Bmaj7  | Bmaj7  |
+| Bbm7   | Eb7    | Abmaj7 | E7#5   |
 ```
-Learn this transposition — the pattern of "borrow iv, then pivot via a secondary ii-V" recurs constantly in standards and is worth having under your hands independent of the specific tune.
+The bridge leaves the home key with a ii-V into a new key a half step below the tonic, repeats the move a major 3rd lower, and the augmented dominant at the end pulls back to the vi chord (Am7 in C, Fm7 in Ab) that opens the last A section. Learn the pattern "ii-V into a new key, then into another" — it recurs constantly in standards and is worth having under your hands independent of the specific tune.
 
 ### Diagram
 

@@ -73,7 +73,7 @@ sequenceDiagram
 
 ## Exercise 1: Building an MCP Server with Custom Tools
 
-The first exercise builds an MCP server that exposes two tools: a weather lookup and a database query. The server uses the `mcp` Python SDK with the FastMCP high-level API, which handles JSON-RPC framing, capability negotiation, and the stdio transport automatically.
+The first exercise builds an MCP server that exposes two tools: a weather lookup and a safe arithmetic calculator. The server uses the `mcp` Python SDK with the FastMCP high-level API, which handles JSON-RPC framing, capability negotiation, and the stdio transport automatically.
 
 ### Implementation
 
@@ -82,6 +82,7 @@ The first exercise builds an MCP server that exposes two tools: a weather lookup
 
 from mcp.server.fastmcp import FastMCP
 import json
+import urllib.parse
 import urllib.request
 from typing import Any
 
@@ -151,6 +152,7 @@ def calculate(expression: str) -> str:
         ast.Sub: operator.sub,
         ast.Mult: operator.mul,
         ast.Div: operator.truediv,
+        ast.FloorDiv: operator.floordiv,
         ast.USub: operator.neg,
         ast.UAdd: operator.pos,
         ast.Pow: operator.pow,
@@ -283,7 +285,7 @@ async def run_benchmark(server_script: str, iterations: int = 20) -> None:
                 content = result.content[0]
                 if hasattr(content, "text"):
                     returned = content.text
-                    expected = str(eval(expr.replace("//", "/").replace("**", "^")))
+                    expected = str(eval(expr))
                     # eval here is safe: inputs are our own controlled test cases
                     status = "OK" if returned.strip() == expected.strip() else "MISMATCH"
                 else:
@@ -578,6 +580,7 @@ async def get_weather(city: str) -> str:
         JSON string with weather data or error.
     """
     try:
+        import urllib.parse
         import urllib.request
 
         # Server-side input validation
@@ -729,6 +732,7 @@ def batch_weather(cities: list[str]) -> str:
             continue
 
         try:
+            import urllib.parse
             import urllib.request
 
             geocode_url = (

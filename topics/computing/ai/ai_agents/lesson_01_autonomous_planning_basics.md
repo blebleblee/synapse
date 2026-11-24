@@ -105,9 +105,9 @@ function A_STAR(s₀, G, h):
 
 ### Concrete Example: Grid Navigation
 
-Consider a 5×5 grid where an agent can move in four cardinal directions (cost 1 per move) from \(S = (0, 0)\) to \(G = (4, 4)\). Obstacles occupy cells \((2, 1)\), \((2, 2)\), and \((2, 3)\).
+Consider a 5×5 grid where an agent can move in four cardinal directions (cost 1 per move) from \(S = (0, 4)\) to \(G = (4, 0)\). Obstacles occupy cells \((1, 2)\), \((2, 2)\), and \((3, 2)\), a wall across the middle row.
 
-**Heuristic**: Manhattan distance \(h(x, y) = |x - 4| + |y - 4|\).
+**Heuristic**: Manhattan distance to the goal, \(h(x, y) = |x - 4| + |y|\).
 
 **State Space Visualization**:
 
@@ -164,7 +164,7 @@ flowchart TD
     style R2C3 fill:#212121,color:#fff,stroke:#000
 ```
 
-A* begins at \(S = (0, 4)\) with \(g = 0\), \(h = 8\), \(f = 8\). The algorithm expands states with the lowest \(f\)-value, systematically exploring paths around the obstacle wall. The optimal plan involves moving right to \((1, 4)\), then down to \((1, 0)\), then right to \((4, 0)\), and finally up to \((4, 4)\)—a total cost of 12.
+A* begins at \(S = (0, 4)\) with \(g = 0\), \(h = 8\), \(f = 8\). The algorithm expands states with the lowest \(f\)-value, systematically exploring paths around the obstacle wall. The wall leaves two gaps, at \(x = 0\) and \(x = 4\); an optimal plan moves down column 0 to \((0, 0)\) and then right to \((4, 0)\) (going right along the top row and then down column 4 costs the same)—a total cost of 8, equal to \(h(S)\), because neither route needs a detour.
 
 ### Mermaid Diagram: A* Search Tree
 
@@ -185,7 +185,7 @@ graph TD
     C1 -->|"→"| D1["(4,4)<br/>g=4 h=4 f=8"]
     C1 -->|"↓"| D2["(3,3)<br/>g=4 h=4 f=8"]
     
-    D2 -->|"..."| G["G(4,4)<br/>GOAL"]
+    D2 -->|"..."| G["G(4,0)<br/>GOAL"]
     
     style S fill:#e1f5ff,stroke:#0066cc,stroke-width:2px,color:#0f172a
     style G fill:#d4edda,stroke:#28a745,stroke-width:3px,color:#0f172a
@@ -286,11 +286,11 @@ fn a_star(start: State, goal: State, obstacles: &HashSet<State>) -> Option<Vec<S
 
 fn main() {
     let start = State { x: 0, y: 4 };
-    let goal = State { x: 4, y: 4 };
+    let goal = State { x: 4, y: 0 };
     let obstacles: HashSet<State> = [
-        State { x: 2, y: 1 },
+        State { x: 1, y: 2 },
         State { x: 2, y: 2 },
-        State { x: 2, y: 3 },
+        State { x: 3, y: 2 },
     ].iter().cloned().collect();
     
     if let Some(path) = a_star(start, goal, &obstacles) {

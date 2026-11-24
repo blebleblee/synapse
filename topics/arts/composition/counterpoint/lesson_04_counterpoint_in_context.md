@@ -199,7 +199,7 @@ CP:  D4 — E4     F4 — E4     D4 — C4
 
 Same weak/strong logic as 2nd species, but now you have four quarter notes per CF whole note, with beats 1 and 3 carrying more weight than 2 and 4. New device: the **cambiata** (changing-note figure) — a licensed exception that lets you leave a dissonance by skip instead of step.
 
-**Cambiata shape:** step down, skip down a 3rd, step up. Example in C major: **E–D–B–C**. The dissonant note is the second one (D, if approached as a passing tone) — actually the licensed dissonance sits on the note left by skip (the second note of the figure), which resolves the tension retroactively once the line steps back up., which resolves the tension retroactively once the line steps back up. Practice this shape in isolation on your instrument until it's automatic:
+**Cambiata shape:** step down, skip down a 3rd, step up. Example in C major: **E–D–B–C**. The licensed dissonance is the second note (D), the note left by skip, which resolves the tension retroactively once the line steps back up. Practice this shape in isolation on your instrument until it's automatic:
 
 ```text
 Quarter notes: E4 – D4 – B3 – C4   (over a sustained C or similar CF note)

@@ -236,8 +236,9 @@ class AgentSupervisor:
         if self.state == AgentState.TERMINATED:
             return
         
+        previous = self.state.value
         self.state = AgentState.DRAINING
-        self._emit_state_transition(self.state.value, "draining")
+        self._emit_state_transition(previous, "draining")
         
         try:
             # Flush message queue
@@ -254,8 +255,9 @@ class AgentSupervisor:
     
     async def terminate(self) -> None:
         """Hard termination, release all resources."""
+        previous = self.state.value
         self.state = AgentState.TERMINATED
-        self._emit_state_transition(self.state.value, "terminated")
+        self._emit_state_transition(previous, "terminated")
         
         # Cancel all background tasks
         if self._resource_monitor_task:
@@ -407,12 +409,17 @@ class MessageBus:
         content: dict,
         metadata: Optional[dict] = None,
         parent_message_id: Optional[str] = None,
-        priority: int = 0
+        priority: int = 0,
+        idempotency_key: Optional[str] = None
     ) -> str:
-        """Publish message to specific recipient."""
+        """Publish message to specific recipient.
+
+        For exactly-once delivery the caller passes a stable idempotency_key
+        (the same key when it re-sends the same logical message); a fresh
+        UUID can never match an earlier delivery.
+        """
         
-        # Generate unique message ID
-        message_id = f"{sender_id}:{uuid.uuid4().hex}"
+        message_id = f"{sender_id}:{idempotency_key or uuid.uuid4().hex}"
         
         # Assign monotonic sequence number per sender
         sequence_number = self._sequence_numbers[sender_id]
@@ -634,6 +641,7 @@ class SwarmOrchestrator:
         
         # Swarm registry (swarm_id -> SwarmState)
         self._swarms: Dict[str, SwarmState] = {}
+        self._agent_seq: Dict[str, int] = {}  # last agent number per swarm
         
         # Desired state specifications (swarm_id -> SwarmSpec)
         self._desired_specs: Dict[str, SwarmSpec] = {}
@@ -700,7 +708,7 @@ class SwarmOrchestrator:
         await self._configure_topology(swarm_id)
         
         # Emit reconciliation event
-        self._emit_reconciliation_event(swarm_id, current_agent_count, desired_agent_count)
+        self._emit_reconciliation_event(swarm_id, len(state.active_agents), desired_agent_count)
     
     async def _spawn_agents(self, swarm_id: str, count: int) -> None:
         """Spawn new agents in swarm."""
@@ -719,7 +727,10 @@ class SwarmOrchestrator:
         )
         
         for _ in range(count):
-            agent_id = f"{swarm_id}:agent:{len(state.active_agents)}"
+            # A per-swarm counter: deriving the id from len(active_agents)
+            # reuses ids after a scale-down
+            self._agent_seq[swarm_id] = self._agent_seq.get(swarm_id, 0) + 1
+            agent_id = f"{swarm_id}:agent:{self._agent_seq[swarm_id]}"
             
             # Create agent supervisor
             supervisor = AgentSupervisor(
@@ -1433,7 +1444,7 @@ Cascading failures represent the most destructive failure pattern where a single
 
 Debugging distributed agent systems demands specialized tooling that reconstructs causal relationships across asynchronous message exchanges and correlates failures with resource state. Production debugging workflows begin with trace reconstruction where engineers query the observability stack for all events and messages involving a particular task, using message parent IDs to build directed acyclic graphs showing information flow. Trace visualization tools render these graphs highlighting critical paths showing which agent sequences dominated latency, bottleneck analysis identifying agents whose slow responses blocked downstream work, and failure attribution showing which agent initiated error chains. Interactive replay systems allow engineers to reconstruct exact agent state at any point in execution by applying event logs to checkpoint snapshots, enabling hypothesis testing about failure causes through what-if analysis that modifies historical decisions and projects alternative outcomes.
 
-The final operational challenge lies in cost management where uncontrolled token consumption can generate five-figure bills during development and six-figure bills in production. Cost attribution mechanisms track token expenditure at per-agent, per-task, and per-customer granularities, exposing optimization opportunities through marginal cost analysis that identifies which agent roles or reasoning strategies consume disproportionate resources relative to their value contributions. Cost optimization strategies include implementing token budget markets where agents bid for inference capacity based on their estimated value contribution, caching inference results in content-addressed stores where agents check for semantically equivalent prior queries before invoking expensive APIs, and pruning speculative reasoning branches using lightweight discriminator models that predict which exploration paths warrant expensive verification.
+The final operational challenge lies in cost management where uncontrolled token consumption can generate five-figure bills during development and six-figure bills in production. Cost attribution mechanisms track token expenditure at per-agent, per-task, and per-customer granularities, exposing optimization opportunities through marginal cost analysis that identifies which agent roles or reasoning strategies consume disproportionate resources relative to their value contributions. Cost optimization strategies include implementing token budget markets where agents bid for inference capacity based on their estimated value contribution, caching inference results in content-addressed stores that return a cached answer when a query repeats exactly (finding semantically equivalent queries needs a semantic cache keyed by embeddings) before invoking expensive APIs, and pruning speculative reasoning branches using lightweight discriminator models that predict which exploration paths warrant expensive verification.
 
 ```python
 # Cost tracking and optimization system

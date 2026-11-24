@@ -185,7 +185,7 @@ Fingering: A-string 3rd fret (C, index), D-string open (D), D-string 2nd fret (E
   E A D G B e
   x 3 2 0 1 0
 ```
-x = mute/don't play, 3 = A-string 3rd fret (ring), 2 = D-string 2nd fret (middle), 0 = open G, 1 = B-string 1st fret (index), 0 = open high e., 0 = open high e.
+x = mute/don't play, 3 = A-string 3rd fret (ring), 2 = D-string 2nd fret (middle), 0 = open G, 1 = B-string 1st fret (index), 0 = open high e.
 
 **Technique shorthand you must recognize instantly when sight-reading a riff:**
 

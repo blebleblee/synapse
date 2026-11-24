@@ -469,7 +469,7 @@ Re-check Upper/Lower: P5, m6, P5, M3, P5 — still parallel fifths between bars 
 
 ### Lab B: Suspension Chain in Minor
 
-CF (A Aeolian): `A – B – C – B – A`. Write fourth species above the CF to target a 7–6 suspension, or change the target to a 2–3 suspension if writing below the CF. and a 4–3 at bar 4. Check your chain against the validator logic in §9 by hand-tracing each prepare/suspend/resolve triplet.
+CF (A Aeolian): `A – B – C – B – A`. Write fourth species above the CF, targeting a 7–6 suspension at bar 2 and a 4–3 at bar 4 (a voice below the CF would give 2–3 suspensions instead). Check your chain against the validator logic in §9 by hand-tracing each prepare/suspend/resolve triplet.
 
 ### Lab C: Florid Counterpoint with Imitation
 

@@ -80,7 +80,7 @@ Double Bass (unis.):  A2 tremolo, pp → ff over 4 bars
 |---|---|---|---|
 | Flute | C4 → C7 (D7 for advanced players) | Concert pitch | Low (C4–C5): breathy, intimate, easily covered by other instruments; mid (C#5–C6): clear, singing, the workhorse register; high (C#6+): bright, piercing, cuts through full orchestra |
 | Oboe | Bb3 → A6 | Concert pitch | Low (Bb3–Eb4): reedy, dark, slightly difficult to control softly; mid (E4–G5): the signature plaintive oboe color, best for exposed melody; high (Ab5+): thin, pinched, strained — use sparingly |
-| Bb Clarinet | E3 → C7 | Sounds a major 2nd lower than written | Chalumeau (E3–Bb4): warm, hollow, rich; Change to: Throat tones (G4–Bb4): weak and stuffy, avoid exposing melodically; clarion (B4–C6): brilliant, the clarinet's 'singing' register. |
+| Bb Clarinet | E3 → C7 | Sounds a major 2nd lower than written | Chalumeau (E3–Bb4): warm, hollow, rich; throat tones (G4–Bb4): weak and stuffy, avoid exposing melodically; clarion (B4–C6): brilliant, the clarinet's "singing" register |
 | Bassoon | Bb1 → Eb5 | Concert pitch | Low (Bb1–Bb2): growling — comic in fast rhythms, ominous when sustained; tenor (C3–Eb4): vocal, exposed-melody register; high (E4+): reedy, effortful, strained above F4 |
 
 #### Articulation & Tonguing
