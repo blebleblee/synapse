@@ -91,7 +91,7 @@ In a single staff, **Voice 1 always carries stems up, Voice 2 always stems down*
 
 This chorale fragment is a I–V⁶–vi–V progression in D. Before moving on, check it against the two cardinal part-writing rules — this is the actual music-theory content notation exists to serve:
 
-- **No parallel 5ths/8ths between any two voices.** Soprano D5→C♯5 against Bass D2→E3: that's an octave moving to a 13th (compound 6th), no parallel motion — clean., no parallel motion — clean.
+- **No parallel 5ths/8ths between any two voices.** Soprano D5→C♯5 against Bass D2→E3: that's an octave moving to a 13th (compound 6th), no parallel motion — clean.
 - **Leading tone (C♯) resolves up to D** when it's in an outer voice, unless it's in an inner voice and can resolve down by common practice (frequently relaxed in alto/tenor). Here C♯5 in the soprano at beat 2 should resolve to D at the final cadence, not downward — confirm your final soprano note lands on D5 or A5, not C♯ hanging unresolved.
 
 **MuseScore plugin check:** install **"Voice Checker"** (Plugins → Manage Plugins) to flag parallel 5ths/octaves automatically — use it as a second pass, not a crutch; you should be able to spot these by eye first.

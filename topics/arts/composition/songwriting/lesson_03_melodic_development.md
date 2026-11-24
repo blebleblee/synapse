@@ -278,7 +278,7 @@ The verse ("Now I've heard there was a secret chord...") sits in a comfortable m
 
 ### 7.2 *Someone Like You* (Adele) — The Octave Leap as Climax
 
-The verse stays mid-register and mostly stepwise (intimate, conversational). The chorus's defining moment is a leap from a low 1̂ up to a high 1̂ an octave above — the single largest registral jump in the song, placed exactly at the emotional peak of the lyric ("Never mind, I'll find someone like you"). This is Rule 3 from Section 1 in action: a leap this large momentarily breaks the sense of "one smooth voice," and that break *is* the catharsis — the melody itself enacts the emotional rupture the lyric describes. The bridge builds dynamic intensity using a contrasting chord progression while remaining in the same key, rather than modulating. (transposition as escalation, Section 3.1), so the listener recognizes the tune but perceives it as more intense.
+The verse stays mid-register and mostly stepwise (intimate, conversational). The chorus's defining moment is a leap from a low 1̂ up to a high 1̂ an octave above — the single largest registral jump in the song, placed exactly at the emotional peak of the lyric ("Never mind, I'll find someone like you"). This is Rule 3 from Section 1 in action: a leap this large momentarily breaks the sense of "one smooth voice," and that break *is* the catharsis — the melody itself enacts the emotional rupture the lyric describes. The bridge builds dynamic intensity using a contrasting chord progression while remaining in the same key, rather than modulating, so the listener recognizes the tune but perceives it as more intense.
 
 ### 7.3 *Yesterday* (The Beatles) — Restraint as the Hook
 

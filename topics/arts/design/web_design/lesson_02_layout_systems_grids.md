@@ -193,7 +193,7 @@ flowchart TD
     GridItem --> Card4
 ```
 
-Subgrid, introduced in CSS Grid Level 2, permits nested grids to inherit parent grid tracks rather than defining independent column structures. This ensures perfect alignment between parent and child grid items—sidebar content aligns exactly with main content columns despite being in separate containers. Subgrid is supported in all modern browsers, so it can be used wherever nested alignment with parent tracks is needed, with a fallback only for legacy engines., but where available, it eliminates the need for complex column calculations in nested layouts.
+Subgrid, introduced in CSS Grid Level 2, permits nested grids to inherit parent grid tracks rather than defining independent column structures. This ensures perfect alignment between parent and child grid items—sidebar content aligns exactly with main content columns despite being in separate containers. Subgrid is supported in all modern browsers, so it can be used wherever nested alignment with parent tracks is needed, with a fallback only for legacy engines; it eliminates the need for complex column calculations in nested layouts.
 
 ```css
 .main-content {

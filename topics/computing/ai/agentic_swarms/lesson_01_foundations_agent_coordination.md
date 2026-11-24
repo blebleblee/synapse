@@ -20,7 +20,7 @@ Coordination mechanisms build atop communication primitives to solve higher-leve
 
 Task allocation in agent swarms resembles job scheduling in distributed computing clusters but operates at semantic granularity. When a user query requires gathering information from multiple sources, synthesizing findings, and generating a response, the swarm must decompose this workflow into subtasks and assign them to agents with appropriate capabilities. Market-based allocation treats tasks as goods that agents bid on, with bids representing expected cost or quality. This approach handles heterogeneous agent capabilities naturally—a specialized retrieval agent bids higher for information gathering tasks—but requires careful mechanism design to prevent strategic bidding or monopolization. Hierarchical allocation designates manager agents that decompose problems and distribute subtasks, trading coordination overhead for simpler agent logic. Emergent allocation avoids explicit assignment entirely, allowing agents to self-organize by claiming unclaimed tasks based on local heuristics.
 
-Consensus protocols ensure that agents reach agreement on shared state despite message delays and agent failures. The classic solution from distributed systems theory is Raft, which designates a leader that proposes state updates and requires acknowledgment from a majority quorum before committing changes. Adapting Raft to agent swarms requires careful consideration of what constitutes consensus scope—do agents need to agree on every tool invocation result, or only on high-level plan commitments? Lightweight consensus mechanisms like vector clocks and conflict-free replicated data types (CRDTs) provide weaker guarantees but avoid synchronous coordination. A CRDT-backed shared memory allows agents to merge concurrent updates automatically, ensuring eventual consistency without blocking.
+Consensus protocols ensure that agents reach agreement on shared state despite message delays and agent failures. The classic solution from distributed systems theory is Raft, which designates a leader that proposes state updates and requires acknowledgment from a majority quorum before committing changes. Adapting Raft to agent swarms requires careful consideration of what constitutes consensus scope—do agents need to agree on every tool invocation result, or only on high-level plan commitments? Lightweight coordination mechanisms like vector clocks and conflict-free replicated data types (CRDTs) provide weaker guarantees but avoid synchronous coordination. A CRDT-backed shared memory allows agents to merge concurrent updates automatically, ensuring eventual consistency without blocking.
 
 The state consistency spectrum ranges from strong consistency, where all agents observe identical state at all times, to eventual consistency, where agents tolerate temporary divergence but converge given sufficient quiescence. Strong consistency requires coordination protocols that serialize operations, introducing latency and reducing availability. Eventual consistency maximizes autonomy but complicates reasoning about correctness. Production agent swarms typically adopt causal consistency, where operations respect cause-effect relationships—if Agent A's action causally depends on Agent B's prior action, all agents observe them in that order—but concurrent independent actions may be observed in different orders by different agents. Causal consistency strikes a pragmatic balance, preserving intuitive semantics while permitting asynchronous execution.
 
@@ -95,7 +95,8 @@ import asyncio
 import time
 
 class MessageBus:
-    def __init__(self, transport):
+    def __init__(self, agent_id: str, transport):
+        self.agent_id = agent_id
         self.transport = transport
         self.subscriptions = defaultdict(list)
         self.pending_responses = {}
@@ -360,7 +361,8 @@ class CoordinationControlPlane:
                 
             await self.state.db.update(
                 f"lock.{lock_name}",
-                value={"expires_at": time.time_ns() + int(ttl_sec * 1e9)},
+                # Write the whole record: dropping "holder" would break the next check
+                value={**lock_record, "expires_at": time.time_ns() + int(ttl_sec * 1e9)},
                 ttl_seconds=ttl_sec
             )
 ```
@@ -420,6 +422,9 @@ class OptimizedAgentRuntime(AgentRuntime):
         while not self.state.is_terminal():
             # Wait for triggering event or observation window
             trigger = await self._wait_for_trigger()
+            if isinstance(trigger, Observation):
+                # The event that woke us is new information too
+                self.pending_observations.append(trigger)
             
             # Accumulate any additional pending observations
             await self._collect_pending_observations()
@@ -438,7 +443,7 @@ class OptimizedAgentRuntime(AgentRuntime):
                 
                 self.last_reasoning_time = time.time()
                 
-    async def _wait_for_trigger(self) -> TriggerType:
+    async def _wait_for_trigger(self) -> "TriggerType | Observation":
         """Wait for message, tool completion, or observation window timeout"""
         timeout = self.observation_window_ms / 1000.0
         elapsed = time.time() - self.last_reasoning_time
@@ -552,8 +557,8 @@ Communication overhead scales with message size and frequency. Agents exchanging
 
 ```python
 class CompressedMessageBus(MessageBus):
-    def __init__(self, transport, compression_threshold_bytes: int = 1024):
-        super().__init__(transport)
+    def __init__(self, agent_id: str, transport, compression_threshold_bytes: int = 1024):
+        super().__init__(agent_id, transport)
         self.compression_threshold = compression_threshold_bytes
         
     async def send(self, to_agent: str, message: Message):
@@ -594,7 +599,7 @@ class CompressedMessageBus(MessageBus):
 
 Adaptive compression dynamically enables compression only when the size reduction justifies the CPU cost. Small messages send uncompressed to avoid overhead. The compression threshold and minimum savings ratio tune the tradeoff for specific deployment environments—high-bandwidth low-CPU environments set high thresholds, while bandwidth-constrained environments compress aggressively.
 
-Failure modes in agent swarms arise from both individual agent failures and coordination breakdowns. An agent crash during task execution leaves the task in claimed state until the lease expires. The lease timeout must be short enough to avoid long recovery times but long enough to accommodate legitimate processing delays. Typical production systems use 1-5 minute leases with 20-30 second renewal intervals, providing ~3 renewal opportunities before expiration.
+Failure modes in agent swarms arise from both individual agent failures and coordination breakdowns. An agent crash during task execution leaves the task in claimed state until the lease expires. The lease timeout must be short enough to avoid long recovery times but long enough to accommodate legitimate processing delays. Typical production systems use 1-5 minute leases with 20-30 second renewal intervals, providing at least 2 renewal opportunities before expiration (about 10 for a 5-minute lease renewed every 30 seconds).
 
 ```python
 class ResilientTaskQueue(CoordinationControlPlane):
@@ -771,8 +776,8 @@ Observability infrastructure provides visibility into agent swarm behavior for d
 
 ```python
 class TracedMessageBus(MessageBus):
-    def __init__(self, transport, tracer):
-        super().__init__(transport)
+    def __init__(self, agent_id: str, transport, tracer):
+        super().__init__(agent_id, transport)
         self.tracer = tracer
         
     async def send(self, to_agent: str, message: Message):
@@ -808,24 +813,24 @@ Metrics collection quantifies swarm health and resource utilization. Key metrics
 ```python
 class MetricsCollector:
     def __init__(self, prometheus_client):
-        self.prom = prometheus_client
+        self.prom = prometheus_client  # the prometheus_client module
         
         # Define metrics
-        self.task_duration = self.prom.histogram(
+        self.task_duration = self.prom.Histogram(
             "agent_task_duration_seconds",
             "Time to complete tasks",
             buckets=[0.1, 0.5, 1.0, 5.0, 10.0, 30.0, 60.0]
         )
-        self.message_count = self.prom.counter(
+        self.message_count = self.prom.Counter(
             "agent_messages_total",
             "Total messages sent",
-            labels=["from_agent", "to_agent", "message_type"]
+            labelnames=["from_agent", "to_agent", "message_type"]
         )
-        self.active_agents = self.prom.gauge(
+        self.active_agents = self.prom.Gauge(
             "agent_active_count",
             "Number of active agent instances"
         )
-        self.queue_depth = self.prom.gauge(
+        self.queue_depth = self.prom.Gauge(
             "agent_task_queue_depth",
             "Number of pending tasks"
         )
@@ -834,11 +839,11 @@ class MetricsCollector:
         self.task_duration.observe(duration_sec)
         
     def record_message_sent(self, from_agent: str, to_agent: str, msg_type: str):
-        self.message_count.inc(labels={
-            "from_agent": from_agent,
-            "to_agent": to_agent,
-            "message_type": msg_type
-        })
+        self.message_count.labels(
+            from_agent=from_agent,
+            to_agent=to_agent,
+            message_type=msg_type,
+        ).inc()
 ```
 
 Alert rules trigger notifications when metrics exceed thresholds. High task queue depth with low agent utilization indicates a coordination bottleneck rather than capacity constraint. High error rates on specific message types reveal protocol incompatibilities or malformed messages. Effective alerting separates actionable signal from normal operational variance, escalating only when intervention is required.

@@ -240,7 +240,7 @@ Compare the three options and select one based on:
 
 Interior spaces are strengthened when their proportions follow a coherent system. You will design using a **modular grid** based on the Golden Section (1 : 1.618).
 
-Your room is approximately 5.0 m × 5.5 m (Your room is approximately 5.0 m × 5.5 m (giving a floor area of 27.5 m², which is roughly square to slightly rectangular).). Use this grid:
+Your room is approximately 5.0 m × 5.5 m (a floor area of 27.5 m², roughly square to slightly rectangular). Use this grid:
 
 - **Module width**: 500 mm (a human-scale unit; 2.5 modules = 1250 mm, typical seating depth).
 - **Grid interval**: 500 mm lines across the entire floor.

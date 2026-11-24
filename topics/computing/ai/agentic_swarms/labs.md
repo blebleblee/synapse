@@ -25,7 +25,7 @@ pip install pytest==8.0.0 pytest-asyncio==0.23.4
 pip install pydantic==2.6.1 tiktoken==0.6.0 tqdm==4.66.1
 ```
 
-Verify the installation by checking PyTorch CUDA availability and the Transformers library version. Execute the following diagnostic script to confirm GPU acceleration is functional and that the transformer model registry is accessible:
+Verify the installation by checking PyTorch CUDA availability and the Transformers library version. Execute the following diagnostic script to confirm GPU acceleration is functional and that the Transformers library is installed:
 
 ```python
 import torch
@@ -190,7 +190,7 @@ class BaseAgent(ABC):
         }
 ```
 
-This base abstraction establishes several critical design patterns for production agent systems. The `Message` dataclass provides immutable conversation entries with timestamp metadata for causal analysis of agent interactions. The `AgentConfig` dataclass centralizes sampling hyperparameters and enables systematic parameter sweeps during tuning experiments. The token counting infrastructure using tiktoken provides accurate context window tracking that matches the model's actual tokenization, preventing truncation errors during inference.
+This base abstraction establishes several critical design patterns for production agent systems. The `Message` dataclass provides conversation entries with timestamp metadata for causal analysis of agent interactions. The `AgentConfig` dataclass centralizes sampling hyperparameters and enables systematic parameter sweeps during tuning experiments. The token counting infrastructure using tiktoken provides accurate context window tracking that approximates the token count (exact only for OpenAI models that use `cl100k_base`), preventing truncation errors during inference.
 
 ### OpenAI-Compatible Agent Implementation
 
@@ -386,7 +386,7 @@ class LocalAgent(BaseAgent):
             torch.cuda.empty_cache()
 ```
 
-The local agent implementation demonstrates several optimization techniques for production deployment. The automatic mixed precision with bfloat16 reduces memory footprint by fifty percent while maintaining numerical stability across most model architectures. The device mapping with `device_map="auto"` enables automatic tensor parallelism across multiple GPUs when available, allowing practitioners to run models exceeding single-GPU VRAM capacity. The prompt formatting method abstracts the model-specific template conventions, ensuring compatibility across different base models that may use ChatML, Llama-2, or Mistral prompt formats.
+The local agent implementation demonstrates several optimization techniques for production deployment. The automatic mixed precision with bfloat16 reduces memory footprint by fifty percent while maintaining numerical stability across most model architectures. `device_map="auto"` shards the model layer by layer across the available GPUs (offloading to CPU or disk if needed), allowing practitioners to run models exceeding single-GPU VRAM capacity. The prompt formatting method abstracts the model-specific template conventions, ensuring compatibility across different base models that may use ChatML, Llama-2, or Mistral prompt formats.
 
 ### Swarm Orchestration Runtime
 
@@ -1020,7 +1020,7 @@ class SwarmEvaluator:
         )
 ```
 
-This evaluation framework implements both intrinsic output quality metrics and extrinsic efficiency metrics. The semantic similarity using sentence embeddings provides a learned measure of answer relevance when reference solutions exist, while the coherence and information density heuristics assess structural quality independent of ground truth. The efficiency score captures the Pareto tradeoff between solution quality and computational cost, enabling identification of configurations that achieve acceptable quality with minimal resource consumption.
+This evaluation framework implements both intrinsic output quality metrics and extrinsic efficiency metrics. The semantic similarity using sentence embeddings provides a learned measure of answer relevance when reference solutions exist, while the coherence and information density heuristics assess structural quality independent of ground truth. The overall score, which combines the quality score with this efficiency score, captures the Pareto tradeoff between solution quality and computational cost, enabling identification of configurations that achieve acceptable quality with minimal resource consumption.
 
 ### Benchmark Task Suite
 
@@ -1399,7 +1399,7 @@ if __name__ == "__main__":
     run_parameter_sweep()
 ```
 
-Execute the parameter sweep to collect empirical performance data across the hyperparameter grid. This evaluation campaign will consume approximately 500-1000 API requests depending on early termination from convergence, so monitor usage and costs:
+Execute the parameter sweep to collect empirical performance data across the hyperparameter grid. This evaluation campaign will run roughly 500-1000 experiments, each making several API calls (expect several thousand requests in total) depending on early termination from convergence depending on early termination from convergence, so monitor usage and costs:
 
 ```bash
 python eval/parameter_sweep.py
@@ -1443,7 +1443,9 @@ plt.close()
 print("Tradeoff plot saved to experiments/sweep_results/quality_efficiency_tradeoff.png")
 
 # Identify Pareto frontier
-df_sorted = df.sort(["efficiency", "quality_score"], descending=[False, False])
+# Walk from the most efficient configuration down; a point is on the frontier
+# when it beats the quality of every more efficient point.
+df_sorted = df.sort(["efficiency", "quality_score"], descending=[True, True])
 pareto_indices = []
 max_quality = -float('inf')
 
@@ -1607,7 +1609,7 @@ class DefensiveSwarm(Swarm):
     
     def __init__(self, config: SwarmConfig, agents: List[BaseAgent]):
         super().__init__(config, agents)
-        self.message_hashes: Set[str] = set()
+        self.message_counts: Dict[str, int] = {}
         self.max_message_repetitions = 3
         self.min_output_length = 50
         self.max_output_length = 10000
@@ -1627,16 +1629,14 @@ class DefensiveSwarm(Swarm):
         """Detect if message is part of a repetition loop."""
         msg_hash = self.compute_message_hash(message)
         
-        if msg_hash in self.message_hashes:
-            return True
+        count = self.message_counts.get(msg_hash, 0) + 1
+        self.message_counts[msg_hash] = count
         
-        self.message_hashes.add(msg_hash)
+        # Forget old hashes if the table grows too large
+        if len(self.message_counts) > 100:
+            self.message_counts = {msg_hash: count}
         
-        # Clear old hashes if set grows too large
-        if len(self.message_hashes) > 100:
-            self.message_hashes.clear()
-        
-        return False
+        return count > self.max_message_repetitions
     
     def detect_prompt_injection(self, prompt: str) -> bool:
         """Detect potential prompt injection attempts."""
@@ -1801,6 +1801,7 @@ Execute your specialized role and provide your output."""
                                 "reason": validation_msg,
                                 "retry": retry_count
                             })
+                            agent_output = None  # never accept output that failed validation
                             retry_count += 1
                             continue
                         

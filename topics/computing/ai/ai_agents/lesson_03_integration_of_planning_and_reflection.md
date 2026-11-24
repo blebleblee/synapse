@@ -203,10 +203,10 @@ The hybrid approach uses symbolic planning as a "fast path" for well-understood 
 The heuristic function $h(s)$ in the A\* component is updated by the reflection module as follows. After each plan is executed, the reflection module computes the **heuristic error**:
 
 $$
-\epsilon_h(s) = |h(s) - g^*(s)|
+\epsilon_h(s) = |h(s) - h^*(s)|
 $$
 
-where $g^*(s)$ is the actual cost incurred from state $s$. A weighted history of these errors, decayed exponentially by recency, is used to adjust $h$ for similar states in future planning cycles. This is an online variant of the **learning real-time A\* (LRTA\*)** algorithm (Korf, 1990).
+where $h^*(s)$ is the true optimal cost-to-go from $s$. A weighted history of these errors, decayed exponentially by recency, is used to adjust $h$ for similar states in future planning cycles. This is an online variant of the **learning real-time A\* (LRTA\*)** algorithm (Korf, 1990).
 
 ```python
 import heapq
@@ -265,7 +265,7 @@ def astar_with_learned_heuristic(
 
 ### 2.3 Monte Carlo Tree Search with Reflection Bias
 
-For lookahead planning under uncertainty, MCTS is the standard approach. The reflection module integrates with MCTS through the **prior probability distribution** $P(s, a)$ used in the UCB1 selection formula:
+For lookahead planning under uncertainty, MCTS is the standard approach. The reflection module integrates with MCTS through the **prior probability distribution** $P(s, a)$ used in the PUCT selection formula (from AlphaGo Zero and AlphaZero; UCB1 itself has no prior term):
 
 $$
 \text{UCB}(s, a) = Q(s, a) + c \cdot P(s, a) \cdot \frac{\sqrt{N(s)}}{1 + N(s, a)}
@@ -699,7 +699,7 @@ $$
 \pi_{\text{new}} \leftarrow (1 - \alpha) \cdot \pi_{\text{old}} + \alpha \cdot \pi_{\text{reflective update}}
 $$
 
-with $\alpha \in [0.05, 0.2]$ as a conservative step size. This is directly analogous to the target network update rule in Deep Q-Networks (DQN).
+with $\alpha \in [0.05, 0.2]$ as a conservative step size. This is directly analogous to the soft (Polyak-averaged) target-network update in DDPG and Soft Actor-Critic (DQN instead copies its target network periodically).
 
 **Reflection Hallucination (LLM-Specific)**
 
