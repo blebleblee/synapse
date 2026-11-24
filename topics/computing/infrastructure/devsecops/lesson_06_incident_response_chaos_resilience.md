@@ -792,13 +792,15 @@ def compute_timeout_recommendation(
     p999 = np.percentile(arr, 99.9)
     p9999 = np.percentile(arr, 99.99) if len(arr) >= 10000 else None
 
-    # Recommended timeout: covers normal p99.9 tail, with headroom for
-    # degraded conditions observed during past failover events.
-    baseline_timeout = p999 * degraded_multiplier * safety_factor
+    p_normal = np.percentile(arr, normal_percentile)
+
+    # Recommended timeout: covers the normal tail (p99.9 by default), with
+    # headroom for degraded conditions observed during past failover events.
+    baseline_timeout = p_normal * degraded_multiplier * safety_factor
 
     # Also compute the timeout that would cause false positives for
     # normal traffic (timeout must be above this).
-    min_safe_timeout = p999 * safety_factor
+    min_safe_timeout = p_normal * safety_factor
 
     return {
         "p50_ms": round(p50, 2),
@@ -808,5 +810,9 @@ def compute_timeout_recommendation(
         "recommended_timeout_ms": round(baseline_timeout, 0),
         "min_safe_timeout_ms": round(min_safe_timeout, 0),
         "note": (
-            f"Timeout set at p{normal_percentile} × {degraded_multiplier}× degrad
+            f"Timeout set at p{normal_percentile} × {degraded_multiplier}× degraded "
+            f"multiplier × {safety_factor} safety factor. Re-derive it after every "
+            "failover drill: the degraded multiplier is an assumption until measured."
+        ),
+    }
 ```

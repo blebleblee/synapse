@@ -579,7 +579,7 @@ Recompile without TSan (Valgrind is incompatible with TSan): `node-gyp rebuild`.
 
 Valgrind pinpoints the exact allocation site and leak size. Fix by storing the buffer in a RAII wrapper or calling `free(leak)` before returning. Note Valgrind's overhead makes it impractical for production profiling; prefer AddressSanitizer (ASan) for leak detection in CI pipelines. Rebuild with ASan:
 
-```python
+```json
 "cflags_cc": ["-fsanitize=address", "-g"],
 "ldflags": ["-fsanitize=address"],
 ```

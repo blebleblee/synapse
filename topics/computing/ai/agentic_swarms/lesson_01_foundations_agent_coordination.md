@@ -88,6 +88,12 @@ The runtime's control loop implements a sensing-reasoning-acting cycle familiar 
 The communication substrate defines how agents exchange messages and discover peers. Production implementations typically layer a logical communication API atop a physical message transport like Redis Streams, Apache Kafka, or cloud-native message queues. The logical API exposes primitives for point-to-point messaging, publish-subscribe topic-based communication, and request-response RPC-style interactions.
 
 ```python
+from collections import defaultdict
+from typing import Callable
+from typing import List
+import asyncio
+import time
+
 class MessageBus:
     def __init__(self, transport):
         self.transport = transport
@@ -154,6 +160,9 @@ Message ordering guarantees significantly impact coordination correctness. A ful
 The state persistence layer provides durable storage for agent checkpoints and shared memory. Agent checkpoints capture execution state at coordination points, enabling crash recovery by replaying from the last checkpoint. Shared memory stores facts, task queues, and coordination metadata that multiple agents read and write. The persistence layer must provide both strong consistency for critical coordination state and eventual consistency for advisory information.
 
 ```python
+from typing import Dict
+from typing import Optional
+
 class StatePersistence:
     def __init__(self, primary_db, vector_store):
         self.db = primary_db  # PostgreSQL, DynamoDB, etc.
@@ -234,6 +243,8 @@ The dual-store architecture separates exact key-value lookup from semantic vecto
 The coordination control plane provides higher-level coordination primitives built atop the communication and persistence layers. These primitives encapsulate common coordination patterns, relieving individual agents from implementing complex distributed algorithms. A production control plane typically includes a task queue with at-least-once delivery semantics, a distributed lock service, and a leader election mechanism.
 
 ```python
+from typing import Any
+
 class CoordinationControlPlane:
     def __init__(self, message_bus, state_persistence):
         self.bus = message_bus
@@ -504,6 +515,10 @@ The summarization strategy balances information retention with space efficiency.
 Caching strategies reduce redundant computation across agents. When multiple agents invoke identical tool calls—searching the same query, fetching the same document, computing the same embedding—a shared cache eliminates duplicate work. The cache key must capture all parameters that affect the result, including timestamps for time-sensitive data. Cache expiration policies balance freshness with hit rate, typically using time-to-live (TTL) for external data and invalidation-on-write for agent-modified state.
 
 ```python
+import hashlib
+import json
+import pickle
+
 class SharedCache:
     def __init__(self, redis_client, default_ttl_sec: int = 300):
         self.redis = redis_client

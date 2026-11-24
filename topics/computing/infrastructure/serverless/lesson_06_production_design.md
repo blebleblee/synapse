@@ -569,7 +569,7 @@ def handler(event: dict, context: LambdaContext) -> dict:
         
         # Record success metrics
         metrics.add_metric(name="PaymentSuccessful", unit=MetricUnit.Count, value=1)
-        metrics.add_metric(name="PaymentAmount", unit=MetricUnit.None, value=float(amount))
+        metrics.add_metric(name="PaymentAmount", unit=MetricUnit.NoUnit, value=float(amount))
         
         duration_ms = (time.time() - start_time) * 1000
         metrics.add_metric(name="PaymentProcessingDuration", unit=MetricUnit.Milliseconds, value=duration_ms)

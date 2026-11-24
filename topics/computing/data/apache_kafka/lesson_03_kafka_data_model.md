@@ -457,6 +457,7 @@ If the transaction commits, both the output records and the input offset are com
 ```python
 from confluent_kafka import Producer, Consumer, KafkaException, KafkaError
 import json
+import time
 
 # Transactional producer — writes are atomic across partitions
 producer = Producer({

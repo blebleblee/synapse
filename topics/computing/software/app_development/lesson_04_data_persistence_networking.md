@@ -362,6 +362,8 @@ flowchart LR
 Exponential backoff with jitter optimizes retry timing after transient failures. A naive approach retries immediately, overwhelming a recovering service. Constant delay spreads retries uniformly but doesn't adapt to failure duration. Exponential backoff doubles the delay after each failure, but if many clients fail simultaneously (e.g., due to a network partition), they all retry at the same time, creating a thundering herd. Adding random jitter—typically multiplying the delay by a random value between 0.5 and 1.5—desynchronizes retries across clients.
 
 ```python
+import random
+
 def exponential_backoff_with_jitter(attempt, base_delay=100, max_delay=30000):
     delay = min(base_delay * (2 ** attempt), max_delay)
     jittered_delay = delay * (0.5 + random.random())

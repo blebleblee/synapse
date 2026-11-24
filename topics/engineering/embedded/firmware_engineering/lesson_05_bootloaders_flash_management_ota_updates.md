@@ -1491,6 +1491,9 @@ Manufacturing test coverage must verify bootloader operation under fault injecti
 
 ```python
 # Manufacturing test fixture pseudocode
+import random
+import time
+
 def stress_test_bootloader(device, iterations=1000):
     for i in range(iterations):
         device.start_firmware_update(test_image)

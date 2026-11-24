@@ -10,7 +10,7 @@ The goal of this guide is to close the gap between pen-and-paper proof and machi
 
 Before executing any lab, establish that your toolchain is correctly installed. Python 3.11 or later is required. Run the following sequence in a terminal to confirm each dependency.
 
-```python
+```bash
 python -c "import sympy; print('SymPy', sympy.__version__)"
 python -c "import numpy; print('NumPy', numpy.__version__)"
 python -c "from sage.all import *; print('SageMath', version())"

@@ -246,6 +246,8 @@ A precision glitch platform requires:
 4. **Isolation**: Prevent glitch propagation to measurement equipment
 
 ```python
+import numpy as np
+
 """
 ChipWhisperer-compatible voltage glitch generator
 Requires FPGA with precise delay control

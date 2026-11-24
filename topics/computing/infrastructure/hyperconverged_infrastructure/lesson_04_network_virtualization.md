@@ -353,7 +353,7 @@ This reduces flow table size by 10-100x while maintaining fast-path performance.
 
 **Solution 3: Idle Timeout Tuning**: Aggressively expire idle flows to reclaim table space:
 
-```python
+```bash
 # Conservative: Keep flows for 5 minutes
 ovs-ofctl add-flow br0 "idle_timeout=300,priority=100,..."
 
@@ -549,7 +549,7 @@ Switches reject flows with stale fencing tokens, preventing split-brain.
 
 **Mitigation Strategy 1: Packet-In Rate Limiting**: Limit upcall rate per switch:
 
-```python
+```bash
 # OpenFlow Packet-In rate limiting
 ovs-vsctl set Bridge br0 other-config:packet-in-rate-limit=1000  # Max 1000 upcalls/sec
 ovs-vsctl set Bridge br0 other-config:packet-in-burst-limit=100   # Burst of 100 packets
@@ -559,7 +559,7 @@ Excess packets are dropped at switch, preventing controller overload at cost of 
 
 **Mitigation Strategy 2: Proactive Fail-Open**: Configure switches to fail open when controller unreachable:
 
-```python
+```bash
 ovs-vsctl set-fail-mode br0 standalone  # Fail open: switch acts as L2 learning switch
 # vs.
 ovs-vsctl set-fail-mode br0 secure      # Fail closed: drop all packets
@@ -648,6 +648,8 @@ tcpdump -i eth0 'udp port 4789 and src host 10.0.2.8'
 **Mitigation**: Implement bidirectional tunnel health checks:
 
 ```python
+import time
+
 class VXLANHealthMonitor:
     def __init__(self, local_vtep, remote_vtep):
         self.local = local_vtep
@@ -807,7 +809,7 @@ conn vtep-a-to-b
 
 **Mitigation 2: VTEP Allowlisting**: Configure VTEPs to accept VXLAN packets only from known peer VTEPs:
 
-```python
+```bash
 # iptables rules on VTEP
 iptables -A INPUT -p udp --dport 4789 -s 10.0.2.8 -j ACCEPT  # Known peer
 iptables -A INPUT -p udp --dport 4789 -s 10.0.3.12 -j ACCEPT # Known peer

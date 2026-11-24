@@ -75,6 +75,7 @@ In Python with `linearmodels`:
 ```python
 import pandas as pd
 from linearmodels.iv import IV2SLS
+import numpy as np
 data = pd.read_stata("cps_morg_2023_clean.dta")
 data['log_wage'] = np.log(data['hourly_wage_real'])
 data['exper'] = data['age'] - data['educ_years'] - 6

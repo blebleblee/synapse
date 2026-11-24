@@ -271,6 +271,7 @@ Effective continuous benchmarking requires statistical hypothesis testing. Estab
 
 from scipy import stats
 import numpy as np
+import sys
 
 def detect_regression(baseline_samples, candidate_samples, 
                       significance=0.01, min_effect=0.05):

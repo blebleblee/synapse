@@ -754,6 +754,8 @@ Troubleshooting: Bubbles in cuvette → false high OD (remove via gentle tapping
 Exponential growth rate from OD time series:
 ```python
 # Select exponential phase (OD 0.05 to 0.8)
+import time
+
 exp_mask = (od >= 0.05) & (od <= 0.8)
 ln_od = np.log(od[exp_mask])
 time_exp = time[exp_mask]

@@ -10,7 +10,7 @@ The theoretical scaffolding is intentional but disciplined. Planck's quantizatio
 
 Before mounting any instrument, confirm the Python scientific stack is fully operational. Run each of the following from your terminal, one line at a time, and inspect the version strings against the minimum requirements in the cheat sheet at the end of this guide.
 
-```python
+```bash
 python -c "import numpy; print('NumPy', numpy.__version__)"
 python -c "import scipy; print('SciPy', scipy.__version__)"
 python -c "import matplotlib; print('Matplotlib', matplotlib.__version__)"

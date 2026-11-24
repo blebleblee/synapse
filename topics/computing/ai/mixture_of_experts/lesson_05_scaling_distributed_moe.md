@@ -108,6 +108,8 @@ This requires decomposing the all-to-all into smaller, asynchronous point-to-poi
 ```python
 # Pseudocode: Asynchronous Pipelined Expert Parallelism
 
+import torch
+
 def async_moe_forward(tokens, gating_network, experts, device_map):
     """
     Overlap all-to-all communication with expert computation.
@@ -316,6 +318,9 @@ The solution is gradient clipping applied separately to the balance loss compone
 
 ```python
 # Numerical Stability: Mixed Precision Gating with Separate Gradient Clipping
+
+import torch.nn as nn
+import torch.nn.functional as F
 
 class NumericallyStableGating(nn.Module):
     def __init__(self, d_model, num_experts, balance_loss_weight=0.01):

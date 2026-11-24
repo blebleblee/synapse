@@ -544,4 +544,29 @@ class FunctionCallingAgent:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
+                tools=self._tools_to_openai_format() or None,
+            )
+            message = response.choices[0].message
+
+            # No tool calls: the model has produced its final answer
+            if not message.tool_calls:
+                return message.content or ""
+
+            # Record the assistant turn (with its tool calls), then each result
+            messages.append(message.model_dump(exclude_none=True))
+            for call in message.tool_calls:
+                try:
+                    arguments = json.loads(call.function.arguments or "{}")
+                except json.JSONDecodeError as e:
+                    result = json.dumps({"error": f"Invalid JSON arguments: {e}"})
+                else:
+                    result = self._execute_tool(call.function.name, arguments)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": call.id,
+                    "content": result,
+                })
+
+        logger.warning("Agent stopped after reaching max_iterations")
+        return "Stopped: maximum number of iterations reached without a final answer."
 ```

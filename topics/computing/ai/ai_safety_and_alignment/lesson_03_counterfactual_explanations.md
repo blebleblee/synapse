@@ -348,5 +348,38 @@ class CounterfactualEngine:
             optimizer.zero_grad()
 
             # Clamp inline (non-in-place to preserve autograd graph)
-            cfs_proj = torch.max(torch.min(cfs, ranges[:, 1]), ranges[:,
+            cfs_proj = torch.max(torch.min(cfs, ranges[:, 1]), ranges[:, 0])
+            if self.config.immutable_features:
+                mask = torch.ones_like(cfs_proj)
+                mask[:, self.config.immutable_features] = 0.0
+                cfs_proj = cfs_proj * mask + x_t.unsqueeze(0) * (1.0 - mask)
+
+            loss = (
+                self._validity_loss(cfs_proj, self.config.target_class)
+                + self.config.lambda_proximity * self._proximity_loss(x_t, cfs_proj)
+                + self.config.lambda_diversity * self.dpp_loss(cfs_proj)
+            )
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+
+            if abs(prev_loss - loss.item()) < self.config.convergence_threshold:
+                logger.info("Converged after %d iterations", iteration + 1)
+                break
+            prev_loss = loss.item()
+
+        with torch.no_grad():
+            final = self._apply_constraints(cfs.detach(), x_t)
+            preds = self.model(final).argmax(dim=-1)
+            distances = (torch.abs(final - x_t.unsqueeze(0)) / self.mad.to(device)).sum(dim=-1)
+
+        metadata = [
+            {
+                "valid": bool(preds[i].item() == self.config.target_class),
+                "distance": float(distances[i].item()),
+                "iterations": iteration + 1,
+            }
+            for i in range(final.shape[0])
+        ]
+        return final.cpu().numpy(), metadata
 ```

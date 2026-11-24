@@ -187,7 +187,7 @@ probabilities = softmax(adjusted_logits)
 
 **Top-p (nucleus sampling)**: Sample from smallest set of tokens whose cumulative probability exceeds p
 
-```python
+```text
 sorted_probs = sort(probabilities, descending=True)
 cumsum = cumulative_sum(sorted_probs)
 nucleus = tokens where cumsum <= p

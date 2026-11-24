@@ -288,6 +288,8 @@ $$h_{\text{new}} = h \cdot \min\left(f_{\max},\; \max\left(f_{\min},\; f_{\text{
 where $f_{\text{safety}} = 0.9$ is a safety margin (aiming slightly below the tolerance), $f_{\max} = 5$ limits aggressive growth, and $f_{\min} = 0.2$ limits aggressive shrinkage. If $\text{err} > \text{tol}$, the step is rejected and retried with $h_{\text{new}}$; if $\text{err} \leq \text{tol}$, the step is accepted and $h_{\text{new}}$ is used for the next step.
 
 ```python
+import numpy as np
+
 def adaptive_rk_step(f, t, y, h, tol, p=4):
     # DOPRI5: compute 7 stages, two solutions of order 5 and 4
     k1 = f(t, y)

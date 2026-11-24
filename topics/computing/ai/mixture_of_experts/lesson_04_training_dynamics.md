@@ -347,6 +347,7 @@ Addressing load imbalance at the systems level requires co-design of the routing
 ```python
 import torch
 import torch.distributed as dist
+import numpy as np
 
 class DistributedMoELayer(nn.Module):
     """

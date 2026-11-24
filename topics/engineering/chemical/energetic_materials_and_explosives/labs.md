@@ -165,6 +165,8 @@ $$\bar{X} = X_0 + d \cdot \left( \frac{A}{N} \pm 0.5 \right), \quad H_{50} = 10^
 Where $d$ is the logarithmic step size, $X_0$ is the lowest tested log-height, $N = \sum n_i$, and $A = \sum i \cdot n_i$.
 
 ```python
+import pandas as pd
+
 def bruceton_h50_analysis(drop_heights_cm, results):
     """
     results: list of binary outcomes (1 = explosion, 0 = no reaction)

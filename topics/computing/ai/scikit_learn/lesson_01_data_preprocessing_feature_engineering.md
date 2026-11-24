@@ -143,7 +143,7 @@ The encoder maintains an internal `categories_` attribute mapping each feature's
 
 Missing value imputation algorithms replace absent entries with plausible substitutes based on training-set statistics or model predictions. The `SimpleImputer` implements univariate strategies that compute per-feature statistics:
 
-```python
+```text
 SimpleImputer(strategy='mean')
     → X[:, j] where X[i, j] is NaN ← mean(X[~isnan(X[:, j]), j])
 
@@ -202,6 +202,8 @@ requiring careful regularization to prevent overfitting. The `interaction_only=T
 The `FunctionTransformer` wraps arbitrary functions into the transformer interface, enabling custom preprocessing logic:
 
 ```python
+import numpy as np
+
 log_transformer = FunctionTransformer(np.log1p, inverse_func=np.expm1, validate=True)
 ```
 
@@ -277,7 +279,7 @@ Scikit-learn's `clone()` function creates deep copies of estimators by introspec
 Pipeline debugging requires isolating which stage introduces errors or unexpected transformations. The `set_output(transform='pandas')` method (scikit-learn ≥1.2) configures transformers to output Pandas DataFrames with column names, enabling inspection of intermediate pipeline stages:
 
 ```python
-from sklearn.set_config
+from sklearn import set_config
 set_config(transform_output='pandas')
 X_transformed = pipeline[:-1].transform(X)  # exclude final estimator
 print(X_transformed.columns)

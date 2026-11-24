@@ -475,6 +475,7 @@ import time
 import hashlib
 import jwt
 from functools import lru_cache
+import requests
 
 class TokenValidator:
     def __init__(self, jwks_uri, cache_ttl=60):
