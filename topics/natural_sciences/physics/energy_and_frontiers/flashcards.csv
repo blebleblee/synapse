@@ -2,6 +2,15 @@
 #html:true
 #tags:natural_sciences physics energy_and_frontiers
 #tags column:3
-What did James Prescott Joule's 1843 paddle-wheel calorimetry experiment demonstrate?,"Joule's experiment demonstrated that a precise quantity of mechanical work produced a reproducible temperature rise in water, establishing the mechanical equivalent of heat at approximately 4.184 joules per calorie.",natural_sciences::energy_and_frontiers
-What is the minimum acceptable version of NumPy for the Python scientific stack?,The minimum acceptable version of NumPy is 1.24.,natural_sciences::energy_and_frontiers
-What is the minimum acceptable version of Matplotlib for the Python scientific stack?,The minimum acceptable version of Matplotlib is 3.7.,natural_sciences::energy_and_frontiers
+"What classic experiment established the mechanical equivalent of heat, and what value did it give?","Joule's paddle-wheel calorimetry gave approximately 4.184 J per calorie, showing mechanical work reproducibly converts to thermal energy.",natural_sciences::energy_and_frontiers
+"According to Noether's theorem, which conserved quantity follows from each continuous symmetry?",Time-translation invariance gives energy conservation; spatial-translation invariance gives linear momentum conservation; rotational invariance gives angular momentum conservation.,natural_sciences::energy_and_frontiers
+What condition defines the classical action principle?,The physical path makes the action S = ∫ L dt stationary: δS = 0 for variations vanishing at the endpoints.,natural_sciences::energy_and_frontiers
+Write the Euler-Lagrange equation for a generalized coordinate q_i.,d/dt(∂L/∂q̇_i) − ∂L/∂q_i = 0.,natural_sciences::energy_and_frontiers
+"What is the conjugate momentum p_i, and when is it conserved?","p_i = ∂L/∂q̇_i. It is conserved when L has no explicit dependence on q_i, i.e. q_i is cyclic.",natural_sciences::energy_and_frontiers
+Common misconception: does conservation of energy mean every energy form is individually conserved?,"No. Only total energy is conserved; mechanical, thermal, electrical, and chemical forms can interconvert, and dissipation transfers energy to heat without disappearing.",natural_sciences::energy_and_frontiers
+What is the Johnson-Nyquist noise power spectral density and RMS voltage over bandwidth Δf for resistor R at temperature T?,"S_V(f) = 4k_BTR, so V_n,rms = √(4k_BTRΔf); it is white noise up to frequencies near k_BT/h.",natural_sciences::energy_and_frontiers
+What is the RMS shot-noise current for DC current I over bandwidth Δf?,"I_n,rms = √(2eIΔf), arising from the discrete granularity of charge carriers.",natural_sciences::energy_and_frontiers
+"For independent uncertainties, how do you propagate uncertainties through y = f(x_1, ..., x_n)?","σ_y² = Σ_i (∂f/∂x_i)² σ_i², valid for independent, uncorrelated input uncertainties.",natural_sciences::energy_and_frontiers
+How is Planck's constant estimated from an LED threshold-voltage measurement?,"Use hν ≈ eV_threshold, so h ≈ eV_threshold/ν; choose the threshold where forward current rises sharply, and account for series resistance and turn-on broadening.",natural_sciences::energy_and_frontiers
+State the first-law energy balance used in calorimetry with sign convention Q into the system and W done by the system.,ΔU = Q − W; measured heat exchange and work must account for the system's internal-energy change and calorimeter heat capacity.,natural_sciences::energy_and_frontiers
+What quantum-mechanical invariant explains current flow through a barrier even when the classical energy is below the barrier height?,Quantum tunneling: the wavefunction has nonzero transmission probability through a finite barrier even for E < V_0.,natural_sciences::energy_and_frontiers

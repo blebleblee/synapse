@@ -339,26 +339,25 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 ### FIND-77: Gateways Got the Wrong Model
 - **Status:** **COMPLETED** (2026-11-23, `85f2e3b`, `19c2fed`). On a non-Anthropic base URL every model became one fixed name per family (`claude-sonnet-5`, which the new gateway lacks: 404), and `gpt-5.5` became Claude. Exact IDs now pass through. App env switched to `aeroai.aerolink.ink`, `claude-sonnet-5-5` (checked live).
 
-### Curriculum review: UNBLOCKED (owner 2026-11-23), sample running
-- Gateway serves `gpt-5.5` / `deepseek-v4-*` on `/v1/messages` (cross-family reviewer for Claude-written lessons). One-course pilot (`synapse review computing/data/sql_and_relational_query_optimization -p anthropic -m gpt-5.5`, read-only) was blocked pending the owner's cost decision (review on hold). Gateway reports `usage.tokens` ≈1,200–1,600 for a 16-token call; cost per course unknown.
-
 ### FIND-78: Translation State Was Invisible
 - **Status:** **COMPLETED** (2026-11-23, PR #5). Each lesson opened in English; a queued or finished translation showed only after re-picking the language, and the owner could not tell whether revisiting lost it (it did not: submit reuses the active job, the cache keeps results; a server restart drops queued jobs). Now: `GET /api/translate/status`, remembered reading language, auto-open of cached/queued lessons, Translate button otherwise, sidebar markers. Tests: `tests/test_translation_jobs.py`, E2E `test_translations_are_visible_per_lesson_in_the_remembered_language`.
 
 ### FIND-79: Status Bar Split App Status From the Running Translation
 - **Status:** **COMPLETED** (2026-11-23, PR #4). E2E `test_status_bar_during_background_translation` uses the app while a translation runs.
 
-### Curriculum review (focused): IN PROGRESS, NEEDS DECISION
-- 26 of 1,399 courses reviewed (`.agent/reports/review_focused_2026-11-23.md`). Next: choose a reviewer model with credit; then fix findings section by section (Claude), public via PR. Also fix the lint warnings `PYTHON_SYNTAX_ERROR` / `MISSING_IMPORT` (free to find). 2 public decks have under 6 cards (regenerate).
+### FIND-80: A Model Dropped by the Gateway Retried ~40 s, Then Showed Raw JSON
+- **Status:** **COMPLETED** (2026-11-24). aerolink removed `claude-sonnet-5-5` overnight; the mentor and translation retried 5 times and then showed the gateway's JSON. Now a 404 naming the model raises `ModelUnavailableError` at once: "<host> does not offer the model 'X'. It offers: ... Pick another model in Settings or set ANTHROPIC_MODEL." (list from `/v1/models`, omitted when unavailable). Tests: `tests/test_claude_provider.py`.
+
+### Curriculum review (focused): IN PROGRESS
+- Method, cost and the first 26 courses (329 findings): `.agent/reports/review_focused_2026-11-23.md`. Owner 2026-11-24: continue on aerolink `claude-opus-5-5` until its credit ($150) runs out; public courses first. Reports only; **fixing needs the owner** (each fix costs credit). Free first step: the lint warnings `PYTHON_SYNTAX_ERROR` / `MISSING_IMPORT`.
+- Thin public decks (under 6 cards): regenerated 2026-11-24 (2 courses, 12 cards each).
 
 ### Queued translations are lost on server restart
 - Candidate (not verified as a problem for the owner yet): the queue lives in memory. Persisting pending jobs would make restarts safe.
 
 ## Next Candidates (not yet verified)
 
-Waiting for the API proxy (owner says when it works); `synapse review --workers N --domain computing` is ready for the pilot.
-
-- **Curriculum hallucinations (owner 2026-11-23: use the API when possible):** option (1), a cross-family reviewer, with `synapse review`. Gemini reviewer via the proxy (`GEMINI_BASE_URL=https://apikey.vnaipro.app`, Gemini key) or `--provider anthropic` (added). **Waiting for the API proxy** (the owner's Google key is for testing only, not reviews). One-course pilot done with it before that rule: `.agent/reports/review_pilot_sql.md`. Before scaling up: parallel reviewing (one course took 8 min sequentially). Then `computing`, report findings before `--fix`. Options (2)-(4) not chosen yet.
+- **Curriculum hallucinations:** see "Curriculum review (focused)" above (cross-family full review measured: too costly, ~45% nitpicks).
 - **UI:** all main flows exercised in batches 1–6. (Listen, translation, Add Topic, rename/delete checked in batches 4–5.) (Quiz, Labs, Export checked: quiz generation works, ~2 min with a local model.)
 - **CLI:** checked in batch 2 (FIND-30). `pack list/install/uninstall` checked in batch 6. `add`, `generate`, `chat` checked in batch 7.
 - **Ship flashcard decks:** **COMPLETED** (2026-11-23). Scripts updated to support local Ollama generation without API credit. Final 29 decks generated and committed (`977e16a`). 100% of 539 public courses now have offline flashcard decks.
@@ -375,7 +374,7 @@ Waiting for the API proxy (owner says when it works); `synapse review --workers 
 - **FIND-74** `synapse lint` failed on topics outside the workspace (`relative_to(WORKSPACE_ROOT)` in linter.py). **Status:** **COMPLETED** (batch 19): report paths fall back to the topics folder's parent.
 - **FEAT** `synapse review --workers N --domain D`: bounded parallel full review; a unit whose review raises counts as "could not be reviewed" instead of aborting the run. **Status:** **COMPLETED** (batch 19).
 
-- **Curriculum review: ON HOLD (owner decision 2026-11-23).** Too expensive as built (~$5 per course with Gemini 3.8 Flash). Don't run reviews until the owner asks. The saved rag_systems findings are unapplied.
+- **Curriculum review:** superseded; running as the focused review (owner 2026-11-23/24). The saved rag_systems findings are unapplied.
 - **Flashcard decks:** **COMPLETED** (All 539 shipped, final 29 generated via local Ollama in `977e16a`).
 
 - **FIND-75 Refactor branch-heavy code (owner, 2026-11-23).** Status: **COMPLETED** (`8901d75`). Decomposed `get_topic_details` into 4 helpers, `scope_topic_curriculum` prompt generation into 4 template builders, and `get_chat_provider` into a strategy resolution pattern. Guarded by full backend test suites.

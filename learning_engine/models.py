@@ -10,6 +10,7 @@ import re
 import time
 import urllib.request
 import urllib.error
+import urllib.parse
 import itertools
 from pathlib import Path
 from typing import Callable, Optional, Dict, Any, List, Tuple
@@ -949,6 +950,11 @@ def _synapse_user_agent() -> str:
 DEFAULT_CLAUDE_MODEL = "claude-sonnet-5"
 
 
+class ModelUnavailableError(RuntimeError):
+    """The provider answered, but does not offer the requested model (HTTP 404).
+    Retrying cannot help; the message names the models it does offer."""
+
+
 class AnthropicProvider(LLMProvider):
     """
     Anthropic Claude 3.5 Sonnet / Haiku / Opus Provider.
@@ -1028,6 +1034,25 @@ class AnthropicProvider(LLMProvider):
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
+    def offered_models(self) -> List[str]:
+        """Model IDs the provider lists at /v1/models ([] when it cannot say)."""
+        base = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
+        try:
+            req = urllib.request.Request(f"{base}/v1/models", headers=self._get_headers())
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode("utf-8", errors="replace"))
+            return sorted(str(m["id"]) for m in data.get("data", []) if isinstance(m, dict) and m.get("id"))
+        except Exception:
+            return []
+
+    def _model_unavailable(self) -> "ModelUnavailableError":
+        host = urllib.parse.urlparse(self.base_url).hostname or self.base_url
+        offered = self.offered_models()
+        hint = f" It offers: {', '.join(offered)}." if offered else ""
+        return ModelUnavailableError(
+            f"Anthropic API error (404): {host} does not offer the model '{self.model}'.{hint} "
+            "Pick another model in Settings or set ANTHROPIC_MODEL.")
+
     def generate(self, prompt: str, system_instruction: str = "", max_tokens: int = 8192, retries: int = 5) -> str:
         """
         Generates full completion by consuming generate_stream with automatic retry
@@ -1040,6 +1065,8 @@ class AnthropicProvider(LLMProvider):
                 for chunk in self.generate_stream(prompt, system_instruction=system_instruction, max_tokens=max_tokens):
                     chunks.append(chunk)
                 return check_model_reply("".join(chunks))
+            except ModelUnavailableError:
+                raise
             except Exception as e:
                 last_err = e
                 err_str = str(e)
@@ -1144,6 +1171,8 @@ class AnthropicProvider(LLMProvider):
                             continue
         except urllib.error.HTTPError as e:
             err_body = e.read().decode("utf-8", errors="replace")
+            if e.code == 404 and "model" in err_body.lower():
+                raise self._model_unavailable() from None
             raise RuntimeError(f"Anthropic API error ({e.code}): {err_body}")
         except Exception as e:
             raise RuntimeError(f"Anthropic stream failed: {e}")
