@@ -19,6 +19,7 @@ RETIRED = {"claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022"}
 # conftest replaces generate_stream on every test; keep the real one (captured
 # at import, before fixtures run) for tests that drive it against a fake socket.
 _REAL_GENERATE_STREAM = models.AnthropicProvider.generate_stream
+_REAL_GENERATE = models.AnthropicProvider.generate
 
 
 class _FakeSSE(io.BytesIO):
@@ -126,3 +127,55 @@ def test_proxy_keeps_other_families_for_cross_family_review():
     # for GPT, not silently review Claude-written lessons with Claude.
     p = models.AnthropicProvider(model="gpt-5.5", base_url="https://proxy.example")
     assert p.model == "gpt-5.5"
+
+
+def _model_gone_gateway(monkeypatch, calls):
+    """A gateway that no longer offers the model: 404 on /v1/messages."""
+    import urllib.error
+
+    def fake_urlopen(req, timeout=None):
+        url = req.full_url
+        calls.append(url)
+        if url.endswith("/v1/models"):
+            return _FakeSSE(json.dumps({"data": [{"id": "claude-opus-5-5"}, {"id": "gpt-5.6-terra"}]}).encode())
+        body = json.dumps({"type": "error", "error": {"type": "not_found_error",
+                           "message": 'Model "claude-sonnet-5-5" is not available. See GET /v1/models.'}})
+        raise urllib.error.HTTPError(url, 404, "Not Found", {}, io.BytesIO(body.encode()))
+
+    monkeypatch.setattr(models.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(models.AnthropicProvider, "generate_stream", _REAL_GENERATE_STREAM)
+    monkeypatch.setattr(models.AnthropicProvider, "generate", _REAL_GENERATE)
+    monkeypatch.setattr(models.time, "sleep", lambda s: pytest.fail("retried a model the gateway does not offer"))
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
+
+def test_model_dropped_by_gateway_fails_at_once_with_the_models_it_offers(monkeypatch):
+    # 2026-11-23: the gateway dropped claude-sonnet-5-5 overnight; the mentor
+    # retried for ~40 s and then showed raw JSON.
+    calls = []
+    _model_gone_gateway(monkeypatch, calls)
+    p = models.AnthropicProvider(model="claude-sonnet-5-5", base_url="https://gw.example")
+    with pytest.raises(models.ModelUnavailableError) as e:
+        p.generate("hi")
+    msg = str(e.value)
+    assert "claude-sonnet-5-5" in msg and "gw.example" in msg
+    assert "claude-opus-5-5" in msg and "gpt-5.6-terra" in msg
+    assert "ANTHROPIC_MODEL" in msg
+    assert sum(u.endswith("/v1/messages") for u in calls) == 1
+
+
+def test_model_list_failure_still_names_the_missing_model(monkeypatch):
+    import urllib.error
+    calls = []
+    _model_gone_gateway(monkeypatch, calls)
+    real = models.urllib.request.urlopen
+
+    def no_list(req, timeout=None):
+        if req.full_url.endswith("/v1/models"):
+            raise urllib.error.URLError("down")
+        return real(req, timeout)
+
+    monkeypatch.setattr(models.urllib.request, "urlopen", no_list)
+    p = models.AnthropicProvider(model="claude-sonnet-5-5", base_url="https://gw.example")
+    with pytest.raises(models.ModelUnavailableError, match="claude-sonnet-5-5"):
+        p.generate("hi")
