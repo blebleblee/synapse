@@ -175,7 +175,7 @@ Total fitness decomposes multiplicatively: w = v₁ × v₂ × ... × f
 Coverage requirements:
 - Haploid: 30-50× coverage for SNP detection (error rate < 10⁻⁴)
 - Diploid: 60-100× for heterozygote detection
-- Pooled populations (Pool-seq): coverage = 100 × minimum allele frequency
+- Pooled populations (Pool-seq): 100–200× total coverage to detect variants at 1–5% frequency
 
 Variant calling pipeline:
 1. Quality filtering (Q > 30)

@@ -209,8 +209,8 @@ flowchart TD
     PS -->|"bears"| AC_R
     PS -->|"bears"| AC_P
 
-    SS -->|"predicated of"| AC_Q
-    SS -->|"predicated of"| AC_QT
+    AC_Q -->|"predicated of"| SS
+    AC_QT -->|"predicated of"| SS
 
     CYCLE_CHECK["✓ No Cycles Detected\nDependency direction is uniform and acyclic"]
     REGRESS_CHECK["✓ Regress Terminates\nat Prime Matter, Pure Form, and Unmoved Mover"]

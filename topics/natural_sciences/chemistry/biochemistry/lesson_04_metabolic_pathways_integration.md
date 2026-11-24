@@ -34,7 +34,7 @@ where $\mathbf{S}$ is the $m \times n$ stoichiometric matrix ($m$ metabolites, $
 
 Glycolysis converts one molecule of glucose ($\text{C}_6\text{H}_{12}\text{O}_6$) to two molecules of pyruvate ($\text{C}_3\text{H}_4\text{O}_3$), with a net yield of 2 ATP and 2 NADH and proceeding through ten enzymatic steps in the cytoplasm. The pathway divides cleanly into an investment phase (steps 1–5) that consumes 2 ATP to phosphorylate and cleave the hexose, and a payoff phase (steps 6–10) that harvests 4 ATP and 2 NADH from two triose phosphate molecules.
 
-The first committed step is catalyzed by **hexokinase** (or glucokinase in hepatocytes and pancreatic $\beta$-cells), which phosphorylates glucose at the C-1 hydroxyl using ATP:
+The first committed step is catalyzed by **hexokinase** (or glucokinase in hepatocytes and pancreatic $\beta$-cells), which phosphorylates glucose at the C-6 hydroxyl using ATP:
 
 $$\text{Glucose} + \text{ATP} \xrightarrow{\text{hexokinase}} \text{Glucose-6-phosphate} + \text{ADP} \quad \Delta G = -33.5\ \text{kJ mol}^{-1}$$
 
@@ -62,9 +62,9 @@ The TCA cycle itself condenses acetyl-CoA (2-carbon) with oxaloacetate (4-carbon
 
 $$\text{Acetyl-CoA} + 3\ \text{NAD}^+ + \text{FAD} + \text{ADP} + \text{P}_i + 2\ \text{H}_2\text{O} \longrightarrow 2\ \text{CO}_2 + 3\ \text{NADH} + \text{FADH}_2 + \text{ATP} + \text{CoA}$$
 
-This yields 10 equivalents of reduced electron carriers (3 NADH + 1 FADH$_2$) per turn, which the electron transport chain will convert into approximately 2.5 and 1.5 ATP respectively (using the P/O ratios established by Mitchell's chemiosmotic theory, corrected for the proton cost of ATP/ADP translocase). The TCA cycle is therefore primarily an electron-harvesting engine, not a primary source of substrate-level ATP.
+This yields 3 NADH and 1 FADH$_2$ per turn, which the electron transport chain will convert into approximately 2.5 and 1.5 ATP respectively (using the P/O ratios established by Mitchell's chemiosmotic theory, corrected for the proton cost of ATP/ADP translocase). The TCA cycle is therefore primarily an electron-harvesting engine, not a primary source of substrate-level ATP.
 
-Crucially, the TCA cycle is also the metabolic origin of the carbon skeletons for amino acid biosynthesis. $\alpha$-Ketoglutarate is the precursor to glutamate and glutamine (and through them, proline, arginine, and histidine); oxaloacetate is the precursor to aspartate and asparagine; and succinyl-CoA feeds into heme biosynthesis. When these intermediates are withdrawn for biosynthesis — called **cataplerosis** — the cycle would deplete itself and stop were it not replenished by **anaplerotic** reactions. The most quantitatively important anaplerotic reaction in most mammalian tissues is pyruvate carboxylase:
+Crucially, the TCA cycle is also the metabolic origin of the carbon skeletons for amino acid biosynthesis. $\alpha$-Ketoglutarate is the precursor to glutamate and glutamine (and through them, proline and arginine); oxaloacetate is the precursor to aspartate and asparagine; and succinyl-CoA feeds into heme biosynthesis. When these intermediates are withdrawn for biosynthesis — called **cataplerosis** — the cycle would deplete itself and stop were it not replenished by **anaplerotic** reactions. The most quantitatively important anaplerotic reaction in most mammalian tissues is pyruvate carboxylase:
 
 $$\text{Pyruvate} + \text{CO}_2 + \text{ATP} \xrightarrow{\text{pyruvate carboxylase}} \text{Oxaloacetate} + \text{ADP} + \text{P}_i$$
 
@@ -194,7 +194,7 @@ where $J$ is the steady-state flux through the pathway and $e_i$ is the activity
 
 To measure $C_i^J$ experimentally, you titrate enzyme activity with a specific inhibitor at sub-saturating concentrations while simultaneously measuring the steady-state flux (commonly by spectrophotometric or radiometric assay of a downstream product). For isolated perfused liver, the glycolytic flux is estimated from the rate of lactate plus pyruvate export into the perfusate, measured by standard enzymatic assays with NADH as the spectrophotometric reporter at 340 nm:
 
-Lactate is oxidized by lactate dehydrogenase in the assay mixture with excess NAD$^+$, generating NADH stoichiometrically. The decrease in absorbance at 340 nm ($\varepsilon_{\text{NADH}} = 6220\ \text{L mol}^{-1}\text{cm}^{-1}$) over time gives the lactate production rate directly. By repeating the perfusion experiment with graded concentrations of a PFK-1 inhibitor and plotting $\ln J$ versus $\ln(\text{residual PFK-1 activity})$, you recover $C_{\text{PFK-1}}^J$ from the slope.
+Lactate is oxidized by lactate dehydrogenase in the assay mixture with excess NAD$^+$, generating NADH stoichiometrically. The increase in absorbance at 340 nm ($\varepsilon_{\text{NADH}} = 6220\ \text{L mol}^{-1}\text{cm}^{-1}$) over time gives the lactate production rate directly. By repeating the perfusion experiment with graded concentrations of a PFK-1 inhibitor and plotting $\ln J$ versus $\ln(\text{residual PFK-1 activity})$, you recover $C_{\text{PFK-1}}^J$ from the slope.
 
 Historical MCA studies in erythrocytes have consistently found that glycolytic flux control is distributed broadly: hexokinase carries a control coefficient of approximately 0.75 in erythrocytes (where glucose transport is not limiting), while PFK-1's coefficient is surprisingly low ($\approx 0.1$) under most conditions despite its reputation as "the" regulatory enzyme. This distinction between allosteric regulation (which affects the enzyme's response to signals) and flux control (which measures actual influence on pathway throughput) is one of the most important conceptual lessons of quantitative biochemistry.
 

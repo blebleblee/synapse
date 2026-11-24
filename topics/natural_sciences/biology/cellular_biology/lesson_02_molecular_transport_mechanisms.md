@@ -62,7 +62,7 @@ Experimental characterization of glucose transporters employs radiolabeled ³H-2
 
 Voltage-gated and ligand-gated ion channels mediate rapid, high-flux ion transport (10⁶-10⁸ ions/s per channel) essential for electrical signaling. The aqueous pore formed by channel proteins provides a low-barrier pathway for ions, with selectivity achieved through geometric constraints and electrostatic filtering at the selectivity filter—a narrow constriction lined with precisely positioned carbonyl oxygens that stabilize dehydrated ions of appropriate size.
 
-The bacterial KcsA potassium channel, crystallographically resolved at 2 Å resolution, revealed the canonical K⁺ selectivity mechanism. The selectivity filter presents carbonyl oxygen atoms arranged to precisely mimic the hydration shell of K⁺ (ionic radius 1.33 Å) but not Na⁺ (0.95 Å). The energetic cost of partial dehydration for K⁺ entry is compensated by favorable protein-ion coordination, while the smaller Na⁺ cannot simultaneously contact all coordinating oxygens, resulting in 10,000-fold K⁺/Na⁺ selectivity despite only 0.38 Å difference in ionic radii.
+The bacterial KcsA potassium channel, crystallographically resolved at 3.2 Å resolution, revealed the canonical K⁺ selectivity mechanism. The selectivity filter presents carbonyl oxygen atoms arranged to precisely mimic the hydration shell of K⁺ (ionic radius 1.38 Å) but not Na⁺ (1.02 Å). The energetic cost of partial dehydration for K⁺ entry is compensated by favorable protein-ion coordination, while the smaller Na⁺ cannot simultaneously contact all coordinating oxygens, resulting in 10,000-fold K⁺/Na⁺ selectivity despite only 0.38 Å difference in ionic radii.
 
 ```text
     Extracellular
@@ -169,13 +169,13 @@ Converting radiotracer flux measurements to absolute transport rates requires ac
 
 Cotransporter stoichiometry determination employs simultaneous two-isotope flux measurements. For Na⁺/glucose cotransporters, parallel tracking of ²²Na⁺ and ¹⁴C-glucose uptake under initial rate conditions (first 5-10 seconds) yields flux ratios that directly report stoichiometry when transport is rate-limiting. Corrections for passive leak require measuring fluxes in the presence of specific inhibitors (phlorizin for SGLT1) and subtracting carrier-independent components. Reversal potential measurements provide independent stoichiometry validation: imposing opposing Na⁺ and glucose gradients and determining the voltage where net flux reverses yields the stoichiometric coupling ratio through:
 
-$$E_{\text{rev}} = \frac{RT}{nF}\ln\frac{[\text{Na}^+]_{\text{out}}^n}{[\text{Na}^+]_{\text{in}}^n} + \frac{RT}{F}\ln\frac{[\text{glucose}]_{\text{out}}}{[\text{glucose}]_{\text{in}}}$$
+$$E_{\text{rev}} = \frac{RT}{nF}\ln\frac{[\text{Na}^+]_{\text{out}}^n}{[\text{Na}^+]_{\text{in}}^n} + \frac{RT}{nF}\ln\frac{[\text{glucose}]_{\text{out}}}{[\text{glucose}]_{\text{in}}}$$
 
 where $n$ is the Na⁺:glucose coupling ratio.
 
 ### Environmental Controls and Reproducibility Considerations
 
-Temperature exerts profound effects on all transport processes through both thermodynamic (Arrhenius) and membrane fluidity mechanisms. Q₁₀ values—the fold-change in rate per 10°C temperature increase—typically range from 2-3 for diffusion-limited processes. Arrhenius plots of ln(rate) versus 1/T yield activation energies that discriminate between diffusion through lipid (low Ea, 10-20 kJ/mol) versus protein-mediated transport (higher Ea, 40-80 kJ/mol). Maintaining temperature stability within 0.1°C requires circulating water bath thermal control or Peltier heating/cooling stages for microscope applications.
+Temperature exerts profound effects on all transport processes through both thermodynamic (Arrhenius) and membrane fluidity mechanisms. Q₁₀ values—the fold-change in rate per 10°C temperature increase—typically range from 2-3 for protein-mediated transport processes. Arrhenius plots of ln(rate) versus 1/T yield activation energies that discriminate between diffusion through lipid (low Ea, 10-20 kJ/mol) versus protein-mediated transport (higher Ea, 40-80 kJ/mol). Maintaining temperature stability within 0.1°C requires circulating water bath thermal control or Peltier heating/cooling stages for microscope applications.
 
 Buffer composition, particularly ionic strength and pH, modulates transporter function through effects on protein conformation and electrochemical driving forces. Phosphate and HEPES buffers maintain physiological pH around 7.4, but their different temperature coefficients ($dpH/dT$) necessitate temperature-specific pH calibration. Ionic strength affects Debye screening length and electrostatic interactions within transporter binding sites. Recording all experimental parameters—temperature, pH, ionic composition, protein concentration, incubation times—in standardized formats enables reproducibility assessment and meta-analysis across laboratories.
 

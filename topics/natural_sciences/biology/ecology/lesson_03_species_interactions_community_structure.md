@@ -34,9 +34,9 @@ Parasitism encompasses a diverse array of interactions where parasites extract r
 
 $$\frac{dH}{dt} = (a - b)H - \alpha H \bar{P}$$
 
-$$\frac{d\bar{P}}{dt} = \lambda H - (\mu + b + \alpha)\\bar{P}$$
+$$\frac{d\bar{P}}{dt} = \lambda H - (\mu + b + \alpha)\bar{P}$$
 
-where $H$ represents host density, $\bar{P}$ denotes mean parasite burden per host, $\lambda$ quantifies parasite transmission rate, $\mu$ specifies parasite-induced host mortality, and $\alpha$ captures parasite-induced host mortality. The basic reproductive number $R_0 = \lambda H^* / (\mu + b + \alpha)$ determines invasion success, with parasite establishment requiring $R_0 > 1$. Aggregated parasite distributions, where a small fraction of hosts harbor most parasites, stabilize host-parasite dynamics by concentrating mortality in heavily infected individuals while maintaining a reservoir of lightly infected hosts.
+where $H$ represents host density, $\bar{P}$ denotes mean parasite burden per host, $\lambda$ quantifies parasite transmission rate, $\mu$ specifies parasite mortality rate, and $\alpha$ captures host mortality due to parasite burden. The basic reproductive number $R_0 = \lambda H^* / (\mu + b + \alpha)$ determines invasion success, with parasite establishment requiring $R_0 > 1$. Aggregated parasite distributions, where a small fraction of hosts harbor most parasites, stabilize host-parasite dynamics by concentrating mortality in heavily infected individuals while maintaining a reservoir of lightly infected hosts.
 
 Mutualistic interactions, where both species derive net fitness benefits, pervade terrestrial and marine ecosystems: plant-pollinator networks, plant-mycorrhizal fungal associations, legume-rhizobium nitrogen fixation, and coral-zooxanthellae photosymbioses. The demographic consequences of mutualism can be modeled through modified Lotka-Volterra equations with positive interaction coefficients:
 

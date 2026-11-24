@@ -326,7 +326,7 @@ The critical failure mode of Tajima's D is its insensitivity to confounded demog
 
 The practical implementation uses `selscan` or the R package `rehh`. Critical quality control requirements include phased haplotype data (EHH methods require haplotype phase, not just genotype calls; phasing is performed with SHAPEIT4 or BEAGLE), sufficient marker density ($\geq 1$ SNP per 5 kb across the region of interest), and a physical map or recombination rate estimate to properly normalize EHH decay by distance rather than by number of markers.
 
-**Site Frequency Spectrum (SFS) fitting for demographic inference** requires careful handling. The SFS is a vector whose $i$-th entry counts the number of SNPs at which the derived allele occurs in exactly $i$ out of $n$ samples. Under neutrality and constant population size, the expected SFS has a characteristic $1/i$ shape (Watterson's formula). Population contractions, expansions, and bottlenecks each distort the SFS in characteristic ways, and tools like `∂a∂i` (now `moments`) fit parametric demographic models by optimizing the likelihood of the observed SFS under a diffusion-based forward model. The failure modes here are model misspecification (the true demographic history may not be well captured by simple expansion/contraction models) and the non-identifiability of some parameter combinations — multiple different demographic histories can produce nearly identical SFS shapes, requiring careful model comparison via likelihood ratio tests or AIC.
+**Site Frequency Spectrum (SFS) fitting for demographic inference** requires careful handling. The SFS is a vector whose $i$-th entry counts the number of SNPs at which the derived allele occurs in exactly $i$ out of $n$ samples. Under neutrality and constant population size, the expected SFS has a characteristic $1/i$ shape (Kingman's coalescent). Population contractions, expansions, and bottlenecks each distort the SFS in characteristic ways, and tools like `∂a∂i` (now `moments`) fit parametric demographic models by optimizing the likelihood of the observed SFS under a diffusion-based forward model. The failure modes here are model misspecification (the true demographic history may not be well captured by simple expansion/contraction models) and the non-identifiability of some parameter combinations — multiple different demographic histories can produce nearly identical SFS shapes, requiring careful model comparison via likelihood ratio tests or AIC.
 
 ### Coalescent Simulation and Forward-Time Simulation
 
@@ -340,10 +340,10 @@ import msprime
 # Simulate two populations that split 1000 generations ago
 # with migration rate 1e-4 per generation after split
 demography = msprime.Demography()
+demography.add_population(name="ANC", initial_size=15000)
+demography.add_population_split(time=1000, derived=["A", "B"], ancestral="ANC")
 demography.add_population(name="A", initial_size=10000)
 demography.add_population(name="B", initial_size=8000)
-demography.add_population_split(time=1000, derived=["A", "B"], ancestral="ANC")
-demography.add_population(name="ANC", initial_size=15000)
 
 ts = msprime.sim_ancestry(
     samples={"A": 50, "B": 50},      # 50 diploid individuals per population
@@ -388,8 +388,8 @@ initialize() {
 }
 
 1000 late() {
-    sim.simulationFinished();
     sim.outputFull("output_generation1000.txt");
+    sim.simulationFinished();
 }
 ```
 

@@ -135,7 +135,7 @@ Revisionary metaphysics, by contrast, embraces the substantive nature of metaphy
 
 The debate between deflationary and revisionary approaches structures much contemporary metametaphysics. Deflationists diagnose metaphysical disputes as arising from conceptual confusion or pseudo-questions and prescribe therapeutic clarification. Revisionists embrace robust metaphysical realism—the view that there are objective facts about what exists—and advocate reforming commonsense ontology in light of scientific and philosophical inquiry. The free will debate serves as a test case: is the question "Do humans possess free will?" answerable by empirical and philosophical investigation, or does it dissolve upon careful analysis of what we mean by freedom and agency?
 
-## 3. High-Performance Optimization & Failure Modes
+## 3. Philosophical Methodology: Argument Structure, Bias Mitigation & Failure Modes
 
 ### Dialectical Toolchain: Mapping Argument Structure
 

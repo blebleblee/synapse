@@ -290,7 +290,7 @@ Mechanistic investigations via X-ray crystallography and 2D NMR spectroscopy (NO
 
 1. **Catalyst Synthesis:** In a glovebox, dissolve 100 mg [Rh(COD)₂]BF₄ (0.25 mmol) and 200 mg (R,R)-DiPAMP (0.27 mmol) in 10 mL degassed dichloromethane. Stir for 30 minutes to form the orange [Rh(COD)(DiPAMP)]BF₄ complex. Precipitate with 30 mL diethyl ether, filter, wash with ether, and dry under vacuum.
 
-2. **Hydrogenation Reaction:** Dissolve 500 mg substrate (α-acetamidocinnamic acid, 2.0 mmol) in 20 mL degassed MeOH in a 100 mL Parr reactor. Add 5 mg catalyst (S/C = 400:1). Seal, purge with H₂ (3 cycles), and pressurize to 3 bar H₂ at 25°C. Stir at 600 rpm for 12 hours.
+2. **Hydrogenation Reaction:** Dissolve 410 mg substrate (α-acetamidocinnamic acid, 2.0 mmol) in 20 mL degassed MeOH in a 100 mL Parr reactor. Add 5 mg catalyst (S/C = 400:1). Seal, purge with H₂ (3 cycles), and pressurize to 3 bar H₂ at 25°C. Stir at 600 rpm for 12 hours.
 
 3. **Enantiomeric Excess Determination:** Evaporate solvent, dissolve the residue in 1 mL MeOH, and inject 10 μL into a chiral HPLC system equipped with a Chiralpak AD-H column (250 mm × 4.6 mm). Elute with hexane/IPA 85:15 + 0.1% TFA at 1 mL/min, detecting at λ = 254 nm. Integrate the enantiomer peaks and calculate ee = (|A_R - A_S|)/(A_R + A_S) × 100%, where A_R and A_S represent the areas of the R and S enantiomers.
 
@@ -330,7 +330,7 @@ Green chemistry principles prioritize atom-efficient transformations that minimi
 
 $$\text{Atom Economy} = \frac{M_{\text{product}}}{M_{\text{reactants}}} \times 100\%$$
 
-For the Suzuki coupling Ar-Br + Ar'-B(OH)₂ → Ar-Ar', the atom economy is (M_biaryl) / (M_Ar-Br + M_Ar'-B(OH)₂) × 100%. Byproducts include boronic acid (wasted boron), bromide salts, and water, reducing atom economy to 60-75% depending on molecular weights.
+For the Suzuki coupling Ar-Br + Ar'-B(OH)₂ → Ar-Ar', the atom economy is (M_biaryl) / (M_Ar-Br + M_Ar'-B(OH)₂) × 100%. Byproducts include boric acid (from boronic acid hydrolysis), bromide salts, and water, reducing atom economy to 60-75% depending on molecular weights.
 
 The environmental factor (E-factor) accounts for total waste (solvents, reagents, workup chemicals) per kilogram of product:
 

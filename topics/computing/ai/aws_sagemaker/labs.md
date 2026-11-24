@@ -507,7 +507,7 @@ def build_estimator(
     max_length: int = 128,
     warmup_ratio: float = 0.06,
     weight_decay: float = 0.01,
-) -> PyTorch:
+) -> tuple[PyTorch, str]:
     job_name = f"agnews-distilbert-{job_name_suffix}-{int(time.time())}"
 
     estimator = PyTorch(
@@ -796,7 +796,7 @@ python deploy_endpoint.py
 
 ### 2.1 — Automated HPO with SageMaker Automatic Model Tuning
 
-Manual hyperparameter search over a learning rate / batch size grid is methodologically unsound at scale. SageMaker's Automatic Model Tuning (AMT) service implements Bayesian optimization over a continuous or categorical search space, using a Gaussian Process surrogate model to predict which hyperparameter configuration is most likely to improve the objective metric, given the results of all previously evaluated configurations. This is strictly superior to random search after roughly the eighth trial, because the GP model's uncertainty estimates guide exploration toward unexplored high-probability regions of the hyperparameter surface.
+Manual hyperparameter search over a learning rate / batch size grid is methodologically unsound at scale. SageMaker's Automatic Model Tuning (AMT) service implements Bayesian optimization over a continuous or categorical search space, using a Gaussian Process surrogate model to predict which hyperparameter configuration is most likely to improve the objective metric, given the results of all previously evaluated configurations. Bayesian optimization often outperforms random search, especially as the number of trials grows and the GP model's uncertainty estimates guide exploration toward high-probability regions of the hyperparameter surface, though the crossover point depends on problem structure and noise.
 
 Create `hpo_job.py`:
 
@@ -1263,7 +1263,8 @@ def main():
     # Pearson correlation of each HP with objective
     print("\nCorrelation with val_macro_f1:")
     for col in ["learning_rate", "batch_size", "warmup_ratio", "weight_decay"]:
-        valid = df.filter(pl.col("val_macro_f1").is_not_nan() & pl.col(col).is_not_nan())
+        valid = df.filter(pl.col("val_macro_f1").is_not_nan()).with_columns(pl.col(col).cast(pl.Float64))
+        valid = valid.filter(pl.col(col).is_not_nan())
         if len(valid) >= 3:
             corr = valid.select(pl.pearson_corr(col, "val_macro_f1")).item()
             print(f"  {col:<18}: r = {corr:+.4f}")
@@ -1573,7 +1574,7 @@ class TestEdgeCaseInputs:
         # Confidence will be low; just verify structure
 
     def test_maximum_length_truncation(self, runtime_client, endpoint_name):
-        """512-word article gets truncated to max_length=128 tokens; must not crash."""
+        """~400-word article gets truncated to max_length=128 tokens; must not crash."""
         long_text = (
             "The government announced a sweeping new economic policy today. " * 40
         )
@@ -1664,7 +1665,7 @@ python -m pytest edge_case_tests.py -v --tb=short 2>&1 | tee edge_case_results.t
 
 ### 3.3 — Failure Mitigation: Automated Endpoint Health and Rollback
 
-A deployed endpoint can fail silently: the HTTP 200 response code may still arrive while the model returns nonsensical predictions if a corrupted model artifact was deployed or if a container environment variable was misconfigured. The correct mitigation is a continuous health check that validates not just the HTTP status code but the semantic content of predictions against a small golden test set. If health checks fail three times in a row, the script rolls back the endpoint to the previous model variant. Create `endpoint_health_check.py`:
+A deployed endpoint can fail silently: the HTTP 200 response code may still arrive while the model returns nonsensical predictions if a corrupted model artifact was deployed or if a container environment variable was misconfigured. The correct mitigation is a continuous health check that validates not just the HTTP status code but the semantic content of predictions against a small golden test set. If health checks fail three consecutive times, the script emits a critical alert requiring manual rollback via update_endpoint(). Create `endpoint_health_check.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -1995,7 +1996,7 @@ After `submit_training_job.py` exits, check that `training_job_metadata.json` ex
 
 **HPO Convergence**
 
-After `hpo_job.py`, run `python analyze_hpo.py` and confirm that `val_macro_f1` is monotonically non-decreasing across the top-5 trials sorted by submission time. If the best trial was among the first three, the Bayesian optimizer did not have enough budget to exploit the GP model's predictions — increase `max_jobs` to at least 20 for real-world HPO campaigns.
+After `hpo_job.py`, run `python analyze_hpo.py` and confirm that `val_macro_f1` is monotonically non-decreasing across the top-5 trials sorted by submission time. If convergence plateaus or improvement slows, increase `max_jobs` beyond 12 to at least 20 for real-world HPO campaigns.
 
 **Endpoint Health Baseline**
 

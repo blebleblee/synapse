@@ -18,7 +18,7 @@ Since $K_{TS}^\ddagger$ values for efficient enzymes approach femtomolar concent
 
 The thermodynamic cycle connecting substrate binding, transition state formation, and catalytic turnover reveals that enzymes do not violate conservation of energy but rather provide an alternative reaction pathway with lower activation barriers. For an uncatalyzed reaction, the substrate $S$ must surmount an activation free energy $\Delta G_{\text{uncat}}^\ddagger$ to reach the transition state $S^\ddagger$ before descending to product $P$ with an overall free energy change $\Delta G_{\text{rxn}}$. In the enzyme-catalyzed pathway, substrate first binds to form the Michaelis complex $ES$ with binding free energy $\Delta G_{\text{bind}}$, then traverses a reduced activation barrier $\Delta G_{\text{cat}}^\ddagger$ to reach the enzyme-transition state complex $ES^\ddagger$, and finally releases product. The fundamental invariant connecting these pathways emerges from Hess's law of constant heat summation:
 
-$$\Delta G_{\text{rxn}} = \Delta G_{\text{bind}} + \Delta G_{\text{cat}}^\ddagger + \Delta G_{\text{release}} - \Delta G_{\text{bind}}$$
+$$\Delta G_{\text{rxn}} = \Delta G_{\text{bind}} + \Delta G_{\text{chem}} + \Delta G_{\text{release}}$$
 
 The equilibrium constant for the overall transformation $K_{\text{eq}} = \exp(-\Delta G_{\text{rxn}}/RT)$ remains identical whether the reaction proceeds catalyzed or uncatalyzed, a consequence of free energy being a state function independent of pathway. Enzymes accelerate approach to equilibrium but cannot shift the equilibrium position itself, a constraint that proves essential for maintaining thermodynamic consistency in metabolic networks where forward and reverse reactions must remain thermodynamically coherent.
 

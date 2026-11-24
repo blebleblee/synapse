@@ -111,7 +111,6 @@ for log_file in sorted(log_directory.glob("*.ld")):
 df = pd.DataFrame(results)
 
 # Compute lap time evolution and apex speed trend
-df['Lap Time Seconds'] = df['Lap Number']  # Assuming sequential lap numbering
 fig, axes = plt.subplots(2, 1, figsize=(12, 8))
 
 axes[0].plot(df['Lap Number'], df['Lap Time'], marker='o', color='blue', linewidth=2)
@@ -206,6 +205,7 @@ g = 9.81;  % [m/s^2]
 load_transfer = zeros(num_configs, 1);
 outside_tire_load = zeros(num_configs, 1);
 inside_tire_load = zeros(num_configs, 1);
+roll_angle_deg = zeros(num_configs, 1);
 
 %% Simulate Each Configuration
 for idx = 1:num_configs
@@ -214,7 +214,7 @@ for idx = 1:num_configs
     % Compute roll angle (simplified quasi-static model)
     M_roll = m_sprung * lat_accel * g * (cg_height - roll_center_height);
     k_roll_total = k_spring * (track_width/2)^2 + k_arb;
-    roll_angle = M_roll / k_roll_total;  % [rad]
+    roll_angle_deg(idx) = (M_roll / k_roll_total) * 180 / pi;  % [deg]
     
     % Compute lateral load transfer
     delta_Fz = M_roll / track_width;  % [N]
@@ -239,7 +239,7 @@ load_transfer_pct = 100 * load_transfer ./ (outside_tire_load + inside_tire_load
 figure('Position', [100, 100, 1200, 500]);
 
 subplot(1, 2, 1);
-plot(arb_stiffness_range / 1000, roll_angle * 180/pi, 'LineWidth', 2.5, 'Color', [0.2, 0.4, 0.8]);
+plot(arb_stiffness_range / 1000, roll_angle_deg, 'LineWidth', 2.5, 'Color', [0.2, 0.4, 0.8]);
 xlabel('Anti-Roll Bar Stiffness [kNm/rad]', 'FontSize', 12, 'FontWeight', 'bold');
 ylabel('Roll Angle [deg]', 'FontSize', 12, 'FontWeight', 'bold');
 title('Roll Angle vs. ARB Stiffness @ 1.0g Lateral', 'FontSize', 14, 'FontWeight', 'bold');
@@ -271,7 +271,7 @@ Tire performance defines the ultimate limit of vehicle dynamics. The pneumatic t
 
 Racing tire compounds exhibit pronounced temperature sensitivity. At temperatures below the optimal window, the rubber compound remains too stiff, reducing contact patch compliance and limiting mechanical grip. As temperature increases into the working range, the compound softens, maximizing the contact area and friction coefficient. Exceeding the optimal range causes the compound to overheat and grain or blister, degrading surface texture and precipitously reducing grip. The tire's thermal mass, approximately twenty to thirty kilograms for a GT3 slick, introduces significant thermal inertia: it requires multiple high-load corners to heat the tire into the working range from cold ambient temperature, and conversely, temperatures decay slowly during caution periods or lower-intensity driving.
 
-Begin this exercise by establishing a tire temperature measurement protocol using professional infrared pyrometers. Acquire a calibrated handheld IR pyrometer with sub-one-degree Celsius accuracy and a measurement range spanning zero to two hundred fifty Celsius. Popular models include the Longacre Professional Series or the RACEceiver Tire Temp Gun. Configure the emissivity setting to 0.95 to account for the non-ideal blackbody radiation characteristics of rubber compounds. Ensure the pyrometer's distance-to-spot ratio (typically twelve-to-one) permits accurate surface temperature capture when positioned fifty to sixty millimeters from the tire tread.
+Begin this exercise by establishing a tire temperature measurement protocol using professional infrared pyrometers. Acquire a calibrated handheld IR pyrometer with sub-one-degree Celsius accuracy and a measurement range spanning zero to two hundred fifty Celsius. Popular models include the Longacre Professional Series or the Raytek infrared pyrometer. Configure the emissivity setting to 0.95 to account for the non-ideal blackbody radiation characteristics of rubber compounds. Ensure the pyrometer's distance-to-spot ratio (typically twelve-to-one) permits accurate surface temperature capture when positioned fifty to sixty millimeters from the tire tread.
 
 Execute a baseline tire temperature capture session. After completing a five-lap race simulation run, immediately drive into the pit lane without excessive cooling-down laps that would allow tire temperatures to decay. Position the car on level ground and deploy a crew member with the IR pyrometer to each corner simultaneously, minimizing time delay between measurements. Measure tread surface temperature at three circumferential positions (inner edge, center, outer edge) and record values in a pre-formatted data sheet. Complete all sixteen measurements (four tires, four positions per tire including sidewall) within ninety seconds to ensure thermal consistency.
 

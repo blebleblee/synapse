@@ -726,7 +726,7 @@ pip list | grep -E "(numpy|scipy|matplotlib)"  # Check all versions
 ```bash
 avogadro molecule.xyz  # Launch Avogadro with structure file
 pymol protein.pdb  # Launch PyMOL with protein structure
-python -c "from rdkit import Chem; print(Chem.__version__)"  # RDKit version
+python -c "import rdkit; print(rdkit.__version__)"  # RDKit version
 ```
 
 **Emergency Troubleshooting Decision Tree**

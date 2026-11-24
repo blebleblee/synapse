@@ -104,11 +104,11 @@ The chart below maps the major Level I suffixes alongside their stress and phono
 
 The consonant alternation set that Level I morphology activates is a closed, learnable system derived from Latin phonology:
 
-The velar stops alternate before high front vowels: *opaque* → *opacity*, *electric* → *electricity*, *critic* → *criticism*. The alveolar nasal alternates before the *-tion* suffix: *act* → *action*, *construct* → *construction*, *permit* → *permission* (where the */t/* of *permit* undergoes palatalization to yield /ʃ/). These alternations, invisible at the level of casual usage, are the phonological signature of the Latinate stratum and must be internalized by any practitioner who wants to build Latinate vocabulary productively rather than memorizing each form in isolation.
+The velar stops alternate before high front vowels: *opaque* → *opacity*, *electric* → *electricity*, *critic* → *criticism*. The alveolar stop alternates before the *-tion* suffix: *act* → *action*, *construct* → *construction*, *permit* → *permission* (where the */t/* of *permit* undergoes palatalization to yield /ʃ/). These alternations, invisible at the level of casual usage, are the phonological signature of the Latinate stratum and must be internalized by any practitioner who wants to build Latinate vocabulary productively rather than memorizing each form in isolation.
 
 **The Level II (Germanic) Stratum**
 
-Level II suffixes are largely Germanic in origin and phonologically inert in the precise sense that they never cause stress shift or consonant alternations in their base. The base word appears with its full, unmodified phonological form, and the suffix is simply concatenated. This is why *happy* → *happiness* leaves *happy* intact, while *happy* → *happily* simply replaces the final /ɪ/ with /ɪlɪ/ without any deeper restructuring.
+Level II suffixes are largely Germanic in origin and phonologically inert in the precise sense that they never cause stress shift or consonant alternations in their base. The base word appears with its full, unmodified phonological form, and the suffix is simply concatenated. This is why *happy* → *happiness* leaves *happy* intact, while *happy* → *happily* simply replaces the final /ɪ/ with /li/ without any deeper restructuring.
 
 The Level II suffixes form productive, transparent paradigm sets:
 

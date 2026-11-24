@@ -24,6 +24,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
+import matplotlib
+import scipy
 import cantools
 
 print(f"pandas version: {pd.__version__}")
@@ -51,7 +53,7 @@ The MoTeC i2 Pro workspace configuration requires importing the CSV files as ext
 
 Construct the track map overlay by selecting the GPS latitude and longitude channels in the i2 Pro channel list, right-clicking to invoke the context menu, and choosing Create Track Map from GPS Data. The software will process the GPS coordinate trace to synthesize a two-dimensional track outline with embedded distance markers at 100-meter intervals, enabling spatial correlation of telemetry events to specific corner entry, apex, and exit zones. Validate the track map accuracy by overlaying the GPS ground speed channel as a color gradient on the track map polyline, confirming that maximum speed zones align with the main straight and minimum speed zones correspond to the slowest corner apex points. If GPS coordinate noise produces erratic track map geometry, apply a moving average smoothing filter to the latitude and longitude channels before regenerating the track map, using a 10-sample window to suppress sub-meter GPS jitter while preserving the true racing line trajectory.
 
-The workspace configuration concludes by defining custom math channels that derive higher-order diagnostic metrics from raw sensor telemetry. Create a damper velocity channel for each corner by computing the time derivative of the damper position signal using the i2 Pro built-in `deriv()` function, specifying a derivative calculation window of five samples to balance noise rejection against temporal resolution. The damper velocity channels provide instantaneous shaft speed in millimeters per second, revealing the compression and rebound stroke velocities that directly map to the damper's internal piston velocity domain where valve shim stacks modulate hydraulic fluid flow resistance. Generate a combined longitudinal and lateral acceleration magnitude channel by computing the Euclidean norm of the accelerometer X and Y components, yielding a scalar G-G friction circle radius metric that quantifies the instantaneous tire grip utilization fraction. Construct a slip angle estimate for each axle by dividing the lateral acceleration by the longitudinal velocity squared and scaling by the wheelbase geometry, producing an approximation of the front and rear tire sideslip angles in degrees, although this simplified kinematic model neglects aerodynamic downforce effects and tire relaxation length transients.
+The workspace configuration concludes by defining custom math channels that derive higher-order diagnostic metrics from raw sensor telemetry. Create a damper velocity channel for each corner by computing the time derivative of the damper position signal using the i2 Pro built-in `deriv()` function, specifying a derivative calculation window of five samples to balance noise rejection against temporal resolution. The damper velocity channels provide instantaneous shaft speed in millimeters per second, revealing the compression and rebound stroke velocities that directly map to the damper's internal piston velocity domain where valve shim stacks modulate hydraulic fluid flow resistance. Generate a combined longitudinal and lateral acceleration magnitude channel by computing the Euclidean norm of the accelerometer X and Y components, yielding a scalar G-G friction circle radius metric that quantifies the instantaneous tire grip utilization fraction. Construct a slip angle estimate for each axle by dividing the lateral acceleration by the longitudinal velocity and scaling by the wheelbase geometry, producing an approximation of the front and rear tire sideslip angles in degrees, although this simplified kinematic model neglects aerodynamic downforce effects and tire relaxation length transients.
 
 With the MoTeC workspace fully configured and the Python environment operational, the diagnostic laboratory progresses through three structured exercises that isolate distinct vehicle dynamic phenomena: driver trace correlation to quantify lap time consistency and identify corner-specific technique deviations, damper velocity histogram analysis to optimize rebound and compression click settings, and tire temperature distribution mapping to diagnose camber alignment and pressure tuning requirements. Each exercise follows a systematic protocol of data import, signal processing, statistical analysis, physical interpretation grounded in vehicle dynamics first principles, and actionable chassis tuning recommendations expressed as concrete setup sheet parameter changes.
 
@@ -482,7 +484,7 @@ for corner in ['FL', 'FR', 'RL', 'RR']:
           f"Rebound shift={reb_shift:+.1f} mm/s ({reb_shift_pct:+.1f}%)")
 ```
 
-The histogram shift metrics quantify the effectiveness of the damper click adjustments in altering the velocity distribution. Compression damping increases should produce positive shifts in median compression velocity, indicating that the damper generates higher forces for a given shaft speed, reducing the velocity magnitude by controlling suspension motion more aggressively. Rebound damping increases should produce negative shifts in median rebound velocity (reducing the magnitude), reflecting enhanced control of suspension extension rates. Typical damper click adjustments produce median velocity shifts in the 5 to 15 percent range, with diminishing returns beyond four clicks due to valve stack saturation and hydraulic fluid compressibility effects at extreme damping levels.
+The histogram shift metrics quantify the effectiveness of the damper click adjustments in altering the velocity distribution. Compression damping increases should produce negative shifts in median compression velocity, indicating that the damper generates higher forces for a given shaft speed, reducing the velocity magnitude by controlling suspension motion more aggressively. Rebound damping increases should produce negative shifts in median rebound velocity (reducing the magnitude), reflecting enhanced control of suspension extension rates. Typical damper click adjustments produce median velocity shifts in the 5 to 15 percent range, with diminishing returns beyond four clicks due to valve stack saturation and hydraulic fluid compressibility effects at extreme damping levels.
 
 Synthesize the damper tuning results into a practical setup sheet format that communicates the optimized damper click positions to the race team. Document the baseline damper settings, the observed velocity histogram characteristics, the click adjustments applied, and the resulting histogram shifts. Include front and rear anti-roll bar diameter specifications, as anti-roll bar stiffness directly couples to damper tuning by altering the roll stiffness distribution and consequently the lateral load transfer magnitude that drives damper compression velocities during cornering.
 
@@ -586,10 +588,10 @@ load_transfer_to_temp_delta_coeff = 0.002  # degrees C per Newton
 df_baseline['temp_delta_left_right_C'] = (df_baseline['lateral_load_transfer_N'] * 
                                            load_transfer_to_temp_delta_coeff)
 
-# Left tire is hotter during right turns (positive lateral accel), right tire hotter during left turns
-df_baseline['tire_temp_left_C'] = df_baseline['tire_temp_model_C'] + np.abs(
-    df_baseline['temp_delta_left_right_C'] * (df_baseline['accel_lat_g'] > 0).astype(int))
+# Sign convention: positive lateral accel = left turn, which loads and heats the right (outside) tire
 df_baseline['tire_temp_right_C'] = df_baseline['tire_temp_model_C'] + np.abs(
+    df_baseline['temp_delta_left_right_C'] * (df_baseline['accel_lat_g'] > 0).astype(int))
+df_baseline['tire_temp_left_C'] = df_baseline['tire_temp_model_C'] + np.abs(
     df_baseline['temp_delta_left_right_C'] * (df_baseline['accel_lat_g'] < 0).astype(int))
 
 print("Tire temperature model computed")

@@ -36,7 +36,7 @@ Differential reproductive success, the engine of natural selection, arises from 
 
 The concept of relative fitness clarifies how selection operates on allele frequency dynamics. Defining relative fitness $w_i = W_i / W_{\text{max}}$, where $W_{\text{max}}$ is the fitness of the most fit genotype, rescales the fitness landscape such that the optimal genotype has $w = 1$ and all others have $w \leq 1$. The selection coefficient $s = 1 - w$ measures the proportional fitness disadvantage of a genotype relative to the optimum. In the canonical case of a deleterious recessive allele $a$ with selection coefficient $s$, genotypes $AA$, $Aa$, and $aa$ have fitnesses $1$, $1$, and $1-s$ respectively. The allele frequency dynamics under selection are:
 
-$$\Delta p = \frac{-s p^2 q}{1 - s q^2}$$
+$$\Delta p = \frac{s p q^2}{1 - s q^2}$$
 
 where $p$ and $q = 1-p$ are the frequencies of the dominant and recessive alleles. This recursion shows that rare recessive deleterious alleles decline slowly because they are hidden from selection in heterozygotes; most copies of $a$ reside in $Aa$ individuals with normal fitness when $q \ll 1$.
 

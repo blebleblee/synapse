@@ -77,7 +77,7 @@ Address lateral aerodynamic balance through anti-roll bar stiffness optimization
 Create a calculated channel quantifying roll angle from left-right ride height differentials. Define a new math channel "Front_Roll_Angle" using the expression:
 
 ```text
-atan((RideHeight_FR - RideHeight_FL) / FrontTrackWidth) * (180 / pi())
+atan((RideHeight_FR - RideHeight_FL) / FrontTrackWidth) * (180 / PI)
 ```
 
 Assume a front track width of 1.6 meters for GT3 vehicles. Plot this roll angle channel alongside lateral acceleration through a medium-speed corner (120–140 km/h, generating 1.8–2.2 lateral g). Measure the roll angle magnitude at peak lateral acceleration: optimal aerodynamic platform control maintains front roll angles below 2.5 degrees to preserve front wing endplate ground clearance and prevent excessive ride height asymmetry that disrupts underbody flow uniformity.

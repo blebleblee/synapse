@@ -207,7 +207,7 @@ When you recognize you are in a triggering relational interaction, execute the f
 
 I want to understand what you're saying before reacting." Then continue without requiring resolution—spiritual practice at this level means tolerating the discomfort of an unfinished relational moment rather than forcing premature closure.
 
-**Protocol for Scenario 2 — Contemplative Drought:**
+**Protocol for Scenario 3 — Contemplative Drought:**
 
 When extended practice yields no felt sense of connection, meaning, or presence, resist the survival-system's conclusion that the practice has failed or that you have been abandoned by whatever you hold sacred. Execute instead: (1) reduce the session to its irreducible minimum—five minutes, one breath cycle, one spoken intention—so the habit structure remains intact even when motivation is absent; (2) reframe the drought explicitly as practice rather than failure, recognizing that the capacity to continue without reward is precisely the competency advanced practice is designed to build; (3) consult your written record of prior dry periods to verify that they have ended before, supplying your rational mind with evidence against the catastrophizing narrative your emotional system is generating.
 

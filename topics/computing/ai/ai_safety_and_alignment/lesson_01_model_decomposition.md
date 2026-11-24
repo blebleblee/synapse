@@ -67,7 +67,8 @@ def analyze_linear_model_coefficients(X: np.ndarray, y: np.ndarray,
     # Features selected by Lasso (nonzero coefficient)
     selected = [name for name, coef in zip(feature_names, lasso_coefs) if coef != 0.0]
 
-    # Variance Inflation Factor (VIF) proxy: correlation matrix diagonal
+    # Multicollinearity indicator: max absolute pairwise correlation
+    # (VIF is the diagonal of the inverse correlation matrix)
     corr_matrix = np.corrcoef(X_scaled.T)
     # High off-diagonal values indicate multicollinearity
     max_off_diag_corr = np.max(np.abs(corr_matrix - np.eye(len(feature_names))))
@@ -229,7 +230,7 @@ $$\text{MLP}^{(l)}(\mathbf{x}) = W_2^{(l)} \cdot \text{GELU}(W_1^{(l)} \mathbf{x
 
 where $W_1 \in \mathbb{R}^{d_{ff} \times d}$ and $W_2 \in \mathbb{R}^{d \times d_{ff}}$ are the up-projection and down-projection matrices. Each neuron in the hidden layer computes a scalar $h_i = \text{GELU}(\mathbf{w}_i^\top \mathbf{x} + b_i)$, which is then broadcast back to the residual stream via the column $W_2[:, i]$.
 
-This architecture has a critical implication for decomposition: the MLP is a **sum of rank-1 updates** to the residual stream. Each neuron contributes independently (before interactions through GELU nonlinearity). This is the foundation of **neuron-level interpretability**: if neuron $i$ fires when inputs contain feature $F$, then it adds the direction $W_2[:, i]$ to the residual stream, which subsequent layers read as "feature $F$ is present."
+This architecture has a critical implication for decomposition: the MLP is a **sum of rank-1 updates** to the residual stream. Each neuron's output is computed by applying GELU (an elementwise nonlinearity) to its pre-activation, then broadcast independently via the corresponding column of W₂. This is the foundation of **neuron-level interpretability**: if neuron $i$ fires when inputs contain feature $F$, then it adds the direction $W_2[:, i]$ to the residual stream, which subsequent layers read as "feature $F$ is present."
 
 ```mermaid
 graph LR
@@ -407,7 +408,7 @@ Layer-Wise Relevance Propagation (LRP) computes a *conservation* score: the outp
 
 $$R_i^{(l)} = \sum_j \frac{a_i w_{ij}}{z_j + \varepsilon \cdot \text{sign}(z_j)} R_j^{(l+1)}$$
 
-The $\varepsilon$ term prevents division by zero and stabilizes attribution for near-zero activations. The conservation property $\sum_i R_i^{(l)} = \sum_j R_j^{(l+1)}$ ensures that the total relevance propagated to the input layer equals the model output, providing a consistent pixel-level attribution for image classifiers or token-level attribution for language models.
+The $\varepsilon$ term prevents division by zero and stabilizes attribution for near-zero activations. The conservation property $\sum_i R_i^{(l)} \approx \sum_j R_j^{(l+1)}$ holds approximately for LRP-epsilon (exactly for LRP-0), ensuring that the total relevance propagated to the input layer approximately equals the model output, providing a consistent pixel-level attribution for image classifiers or token-level attribution for language models.
 
 **Critical distinction from gradient-based attribution**: Gradients measure local sensitivity ($\partial f / \partial x_i$ at **x**). LRP measures contribution: how much of the output *value* is explained by feature $i$. For a ReLU network, these can differ substantially: a feature can have high gradient (small perturbation matters) but low LRP relevance (it contributed little to the actual output), or vice versa.
 
@@ -482,17 +483,18 @@ class LRPLinear(nn.Module):
 
 ### 3.1 SHAP: Shapley Value Attribution
 
-SHAP (SHapley Additive exPlanations, Lundberg & Lee, 2017) grounds feature attribution in cooperative game theory. The Shapley value for feature $i$ is the average marginal contribution of feature $i$ across all possible orderings of features:
+SHAP (SHapley Additive exPlanations, Lundberg & Lee, 2017) grounds feature attribution in cooperative game theory and uniquely satisfies the efficiency, symmetry, dummy, and additivity axioms. The Shapley value for feature $i$ is the average marginal contribution of feature $i$ across all possible orderings of features:
 
 $$\phi_i(f, \mathbf{x}) = \sum_{S \subseteq F \setminus \{i\}} \frac{|S|!\,(|F|-|S|-1)!}{|F|!} \left[ f(\mathbf{x}_{S \cup \{i\}}) - f(\mathbf{x}_S) \right]$$
 
 where $F$ is the full feature set, $S$ is a subset not containing $i$, and $f(\mathbf{x}_S)$ denotes the model's expected output when only features in $S$ are known (and others are marginalized over).
 
-SHAP satisfies three axioms that make it uniquely appropriate for safety-critical attribution:
+SHAP satisfies four axioms that make it uniquely appropriate for safety-critical attribution:
 
-1. **Efficiency**: $\sum_i \phi_i = f(\mathbf{x}) - \mathbb{E}[f]$. The sum of attributions equals the model's deviation from its baseline, so attributions are *complete* — they account for the entire output.
+1. 1. **Efficiency**: $\sum_i \phi_i = f(\mathbf{x}) - \mathbb{E}[f]$. The sum of attributions equals the model's deviation from its baseline, so attributions are *complete* — they account for the entire output.
 2. **Symmetry**: if two features contribute identically in all subsets, they receive equal attribution. This prevents arbitrary asymmetric blame assignment.
 3. **Dummy**: a feature that contributes nothing in any subset receives zero attribution.
+4. **Additivity (Linearity)**: if the model output is a sum of two functions, the Shapley values must be the sum of their separate Shapley values. This ensures consistency across model compositions.
 
 The computational cost of exact Shapley values is exponential in the number of features. For tree ensembles, `TreeSHAP` (Lundberg et al., 2020) computes exact Shapley values in $O(TLD^2)$ time, where $T$ is the number of trees, $L$ is the maximum number of leaves, and $D$ is tree depth. For neural networks, `DeepSHAP` uses a linear approximation based on backpropagation, trading exactness for tractability.
 
@@ -548,7 +550,7 @@ def shap_decomposition_analysis(
     if isinstance(expected_value, (list, np.ndarray)):
         expected_value = expected_value[1]
 
-    model_outputs = model.predict_proba(X_test)[:, 1]
+    model_outputs = model.decision_function(X_test)
     shap_sums = sv.sum(axis=1) + expected_value
     max_efficiency_error = np.abs(model_outputs - shap_sums).max()
 
@@ -943,7 +945,7 @@ def run_decomposition_pipeline(random_state: int = 42) -> None:
     ev = explainer.expected_value
     if isinstance(ev, (list, np.ndarray)):
         ev = ev[1]
-    preds = gbm.predict_proba(X_test_s)[:, 1]
+    preds = gbm.decision_function(X_test_s)
     efficiency_error = np.abs(preds - (shap_vals.sum(axis=1) + ev)).max()
 
     # --- 4. Cross-model agreement ---

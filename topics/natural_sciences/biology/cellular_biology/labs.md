@@ -66,7 +66,7 @@ print(f'Calibration: {um_per_pixel:.4f} μm/pixel')
 print(f'Pixel distance measured: {pixel_distance:.1f} pixels')
 ```
 
-Execute this calibration procedure and record the conversion factor. A typical value for a 100× objective with a 0.5× camera coupler and 5.0 μm pixel pitch CCD sensor yields approximately 0.065 μm/pixel, but your system will differ based on optical magnification and sensor geometry. This calibration constant converts all subsequent pixel measurements into absolute physical dimensions traceable to the international standard meter through the certified stage micrometer.
+Execute this calibration procedure and record the conversion factor. A typical value for a 100× objective with a 0.5× camera coupler and 5.0 μm pixel pitch CCD sensor yields approximately 0.1 μm/pixel, but your system will differ based on optical magnification and sensor geometry. This calibration constant converts all subsequent pixel measurements into absolute physical dimensions traceable to the international standard meter through the certified stage micrometer.
 
 Return to your yeast cell slide and acquire 15–20 high-quality images from different fields of view, ensuring that each field contains 10–20 isolated cells with clear membrane boundaries. Avoid selecting fields with overlapping cells, out-of-focus regions, or debris particles that would contaminate your size distribution. Save each image as a 16-bit grayscale TIFF file with filenames encoding the acquisition sequence: `yeast_field_001.tif`, `yeast_field_002.tif`, etc.
 
@@ -517,7 +517,7 @@ velocity_errors = np.array([1.2, 2.1, 3.8, 6.1, 8.4])  # Standard deviations fro
 # Substrate concentration used
 substrate_conc_mM = 2.5
 
-# Compute apparent rate constants (min^-1 mg^-1)
+# Compute apparent rate constants (min^-1 mg^-1 mM^-1)
 k_app = velocities / substrate_conc_mM
 k_app_errors = velocity_errors / substrate_conc_mM
 

@@ -52,7 +52,7 @@ The vowel /e/ or /o/ appears only in the short masculine, vanishes in the femini
 
 Verbal morphophonology is where consonant mutation achieves its greatest functional density. Russian verbs organize into two conjugation classes (First Conjugation and Second Conjugation), and within each class, the stem-final consonant interacts with the thematic vowel and the personal endings to produce predictable surface mutations.
 
-The key site is the **present-tense stem**. For First Conjugation verbs, the thematic vowel *-e-* follows the stem directly, and if the stem ends in a velar or sibilant, no mutation occurs because *-e-* does not trigger palatalization in the modern grammar. But the infinitive suffix *-ti* (now reduced to *-t'*) in some archaic classes, and especially the derivational suffixes *-i-*, *-ova-*, and *-a-* interacting with the stem through *j*-suffixation, produce iotation. This is the engine of consonant mutation in conjugation.
+The key site is the **present-tense stem**. For First Conjugation verbs, the thematic vowel *-e-* follows the stem directly, and in most cases no mutation occurs because *-e-* does not trigger palatalization in the modern grammar. However, the 1st-person singular ending may contain *j*-suffixation, which does trigger iotation, as in искать > ищу. But the infinitive suffix *-ti* (now reduced to *-t'*) in some archaic classes, and especially the derivational suffixes *-i-*, *-ova-*, and *-a-* interacting with the stem through *j*-suffixation, produce iotation. This is the engine of consonant mutation in conjugation.
 
 For Second Conjugation verbs (characterized by the infinitive suffix *-it'* or *-et'* and the thematic vowel *-i-*), the first-person singular present tense is derived by a suffix that historically contained *j*, triggering iotation of the stem-final consonant. The rule applies only in the first-person singular; all other present-tense forms lack the *j* and preserve the base consonant. This produces the classic 1sg mutation pattern:
 
@@ -74,9 +74,9 @@ The mutation *b* > *bl'* in the first-person singular is iotation: *b + j* > *bl
 | /z/ | ж (*ž*) | возить | вожу |
 | /sk/ | щ (*šč*) | искать (1st conj.) | ищу |
 | /st/ | щ (*šč*) | свистеть | свищу |
-| /x/ | ш (*š*) | слышать | слышу |
+| /x/ | ш (*š*) | сухой → сушить | сушу |
 | /g/ | ж (*ž*) | двигать | движу |
-| /k/ | ч (*č*) | пекать type | печёт |
+| /k/ | ч (*č*) | печь (пеку) | печёт |
 | /б/ | бл' (*bl'*) | любить | люблю |
 | /п/ | пл' (*pl'*) | купить | куплю |
 | /в/ | вл' (*vl'*) | ставить | ставлю |
@@ -158,4 +158,4 @@ A subtler failure mode is **overapplication of fleeting vowel rules** to stems t
 
 At the practitioner level, these rules have an immediate application in parsing unfamiliar inflected forms encountered in authentic text. When you encounter the form **подо мной** (*podo mnoy*, 'under me'), the preposition **под** has acquired the fleeting vowel /o/ before the consonant cluster *mn-* of the first-person pronoun in the instrumental. This is not a separate prepositional form to memorize; it is the same fleeting vowel rule operating in a prepositional rather than a nominal context, triggered by the fact that **под** would otherwise create an impermissible onset cluster with *mn-*. Similarly, the alternation between **во** and **в** (*vo* and *v*, 'in/into'), between **со** and **с** (*so* and *s*, 'with'), and between **ко** and **к** (*ko* and *k*, 'to/toward') all reflect exactly this mechanism.
 
-Productive word formation is the ultimate test. When a journalist coins a new verb from an English borrowing—**гуглить** (*guglit'*, 'to google'), for instance—the morphophonological rules apply immediately and without deliberation: second conjugation, stem **гугл-**, no iotation mutation because *l* undergoes labial epenthesis (*l* > *l'* in the 1sg by analogy with the *bl'/pl'* class), yielding **гуглю, гуглишь, гуглит**, and so on. The practitioner who has internalized the stem-based, rule-governed architecture of Russian morphophonology handles neologisms, technical vocabulary, proper nouns in inflected constructions, and hybrid Russo-foreign formations without hesitation—not because they have more memorized, but because they have fewer rules working harder.
+Productive word formation is the ultimate test. When a journalist coins a new verb from an English borrowing—**гуглить** (*guglit'*, 'to google'), for instance—the morphophonological rules apply immediately and without deliberation: second conjugation, stem **гугл-**, no iotation mutation because *l* undergoes palatalization (*l* > *l'* in the 1sg by analogy with the *bl'/pl'* class), yielding **гуглю, гуглишь, гуглит**, and so on. The practitioner who has internalized the stem-based, rule-governed architecture of Russian morphophonology handles neologisms, technical vocabulary, proper nouns in inflected constructions, and hybrid Russo-foreign formations without hesitation—not because they have more memorized, but because they have fewer rules working harder.

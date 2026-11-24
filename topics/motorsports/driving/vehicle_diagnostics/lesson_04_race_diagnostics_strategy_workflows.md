@@ -99,7 +99,7 @@ The qualitative driver feedback domain deserves particular attention here becaus
 
 ### ECU Fault Codes and CAN-Level Diagnosis
 
-Modern racing ECUs — the MoTeC M1, Cosworth Pi, Pectel T6, Bosch MS 6.4, or Magneti Marelli 7SM series — maintain internal fault code registers that are accessible both through direct serial/USB connection in the pits and through dedicated CAN messages broadcast at defined intervals on the powertrain bus. Understanding the structure of these fault messages is essential because they carry more information than a simple error code.
+Modern racing ECUs — the MoTeC M1, Cosworth Pi, Pectel T6, or Magneti Marelli 7SM series — maintain internal fault code registers that are accessible both through direct serial/USB connection in the pits and through dedicated CAN messages broadcast at defined intervals on the powertrain bus. Understanding the structure of these fault messages is essential because they carry more information than a simple error code.
 
 An ECU fault frame on the CAN bus typically encodes several fields within its data bytes: a fault code identifier, a fault status byte (pending, confirmed, historical, or healed), a frequency counter indicating how many times the fault has been detected in the current power cycle, and in some implementations a severity ranking. Correctly decoding this structure from the DBC file is prerequisite to understanding whether a fault code represents a persistent failure — which demands immediate action — or a transient electrical disturbance that healed itself — which may be log-and-monitor.
 
@@ -107,12 +107,12 @@ The DBC decode for a typical powertrain fault message might look as follows, exp
 
 | CAN ID | Signal Name | Start Bit | Length | Factor | Offset | Unit |
 |---|---|---|---|---|---|---|
-| 0x7E8 | FaultCodeID | 0 | 16 | 1 | 0 | — |
-| 0x7E8 | FaultStatus | 16 | 4 | 1 | 0 | enum |
-| 0x7E8 | FaultFreqCount | 20 | 8 | 1 | 0 | count |
-| 0x7E8 | FaultSeverity | 28 | 4 | 1 | 0 | enum |
-| 0x7E8 | EngineProtectFlag | 32 | 1 | 1 | 0 | bool |
-| 0x7E8 | LimpModeActive | 33 | 1 | 1 | 0 | bool |
+| 0x### | FaultCodeID | 0 | 16 | 1 | 0 | — |
+| 0x### | FaultStatus | 16 | 4 | 1 | 0 | enum |
+| 0x### | FaultFreqCount | 20 | 8 | 1 | 0 | count |
+| 0x### | FaultSeverity | 28 | 4 | 1 | 0 | enum |
+| 0x### | EngineProtectFlag | 32 | 1 | 1 | 0 | bool |
+| 0x### | LimpModeActive | 33 | 1 | 1 | 0 | bool |
 
 The `EngineProtectFlag` and `LimpModeActive` bits are the ones that elevate a fault from engineering interest to immediate pit decision. When `LimpModeActive` is set, the ECU has already implemented a protective strategy — typically fuel cut above a threshold RPM, injection timing retard, or boost pressure reduction — that will be directly visible in the driver's experience as sudden power loss. The driver will almost certainly report this before the engineer reads it off the telemetry screen. The discipline is to have already seen it on the screen, understood the fault ancestry, and have the response framed before the driver finishes their radio sentence.
 

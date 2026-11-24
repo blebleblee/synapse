@@ -166,7 +166,7 @@ The quantification of enantiomeric excess (ee) or diastereomeric excess (de) req
 
 $$\text{ee} = \frac{|n_R - n_S|}{n_R + n_S} \times 100\%$$
 
-where $n_R$ and $n_S$ are the mole fractions of the two enantiomers. An enantiomerically pure sample exhibits $\text{ee} = 100\%$, while a racemic mixture shows $\text{ee} = 0\%$.
+where $n_R$ and $n_S$ are the mole amounts of the two enantiomers. An enantiomerically pure sample exhibits $\text{ee} = 100\%$, while a racemic mixture shows $\text{ee} = 0\%$.
 
 Polarimetry provides a rapid but low-precision method for determining enantiomeric excess. The observed optical rotation of a mixture is proportional to the enantiomeric excess:
 
@@ -174,9 +174,9 @@ $$\alpha_{\text{obs}} = [\alpha] \cdot l \cdot c \cdot \frac{\text{ee}}{100\%}$$
 
 However, polarimetry requires knowledge of the specific rotation $[\alpha]$ for the pure enantiomer, and its precision is limited by instrument sensitivity (typically $\pm 0.01°$), translating to ee uncertainty of several percent for compounds with modest specific rotations.
 
-Chiral chromatography—either gas chromatography (GC) on cyclodextrin-derivatized phases or high-performance liquid chromatography (HPLC) on chiral stationary phases—provides superior resolution and quantification. Modern chiral HPLC columns employ immobilized polysaccharide derivatives (cellulose or amylose tris-3,5-dimethylphenylcarbamate) that create chiral cavities offering diastereomeric interactions with enantiomers. Integration of the two enantiomer peaks yields mole fractions directly, with precision better than $0.1\%$ ee under optimized conditions.
+Chiral chromatography—either gas chromatography (GC) on cyclodextrin-derivatized phases or high-performance liquid chromatography (HPLC) on chiral stationary phases—provides superior resolution and quantification. Modern chiral HPLC columns employ immobilized polysaccharide derivatives (cellulose or amylose tris(3,5-dimethylphenyl)carbamate) that create chiral cavities offering diastereomeric interactions with enantiomers. Integration of the two enantiomer peaks yields mole fractions directly, with precision better than $0.1\%$ ee under optimized conditions.
 
-Chiral derivatization converts enantiomers into diastereomers through reaction with an enantiomerically pure chiral reagent. For example, racemic alcohols react with (S)-Mosher's acid chloride to form diastereomeric esters, which exhibit distinct $^{19}\text{F}$ NMR chemical shifts separated by $0.1–0.5\,\text{ppm}$. Integration of the two fluorine signals quantifies the enantiomeric ratio. This method requires complete reaction and absence of kinetic resolution (differential reaction rates for the two enantiomers), making careful optimization essential.
+Chiral derivatization converts enantiomers into diastereomers through reaction with an enantiomerically pure chiral reagent. For example, racemic alcohols react with (S)-Mosher's acid chloride to form diastereomeric esters, which exhibit distinct $^{19}\text{F}$ NMR chemical shifts separated by $0.1–0.5\,\text{ppm}$. Integration of the two distinct $^{19}\text{F}$ NMR signals from the diastereomeric esters quantifies the enantiomeric ratio. This method requires complete reaction and absence of kinetic resolution (differential reaction rates for the two enantiomers), making careful optimization essential.
 
 X-ray crystallography of racemic compounds sometimes yields conglomerate crystals—separate crystals each containing only one enantiomer—enabling manual separation under a microscope. More commonly, racemic compounds form racemic crystals containing equal numbers of both enantiomers in the unit cell. Occasionally, spontaneous resolution occurs during crystallization, with different crystals enriched in opposite enantiomers. Louis Pasteur's original resolution of sodium ammonium tartrate in 1848 relied on such spontaneous resolution, manually separating visibly distinct left- and right-handed crystal forms.
 

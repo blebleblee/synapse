@@ -102,7 +102,7 @@ Assembly quality is assessed with **CheckM2**, which estimates completeness and 
 
 ```bash
 prokka --outdir annotation/ --prefix isolate_01 \
-    --kingdom Bacteria --genus Sulfolobus \
+    --kingdom Archaea --genus Sulfolobus \
     --cpus 16 --rfam --rnammer \
     assembly/isolate_01_final.fasta
 

@@ -491,7 +491,7 @@ df['survival'] = df['cfu_mean'] / control_mean
 df['survival_sem'] = df['cfu_sem'] / control_mean
 
 # Replace zero CFU (complete killing) with detection limit for plotting
-detection_limit = 1.0 / (1e5 * 0.1)   # 1 colony at max dilution (10^5) in 0.1 mL plate
+detection_limit = 1.0 / (1e-5 * 0.1)   # 1 colony at max dilution (10^-5) in 0.1 mL plate
 df['survival_plot'] = df['survival'].replace(0.0, detection_limit / control_mean)
 
 temps     = df['temperature'].values.astype(float)
@@ -672,7 +672,7 @@ sigma_survival_from_counting = rel_sigma_survival_counting * S_at_ld50
 # sigma_dilution/dilution = n_steps * sigma_single/step
 n_dilution_steps   = 4
 sigma_per_step_rel = 0.02   # 2% per pipetting step
-sigma_dilution_rel = n_dilution_steps * sigma_per_step_rel  # 8% total
+sigma_dilution_rel = np.sqrt(n_dilution_steps) * sigma_per_step_rel  # 4% total
 sigma_survival_from_pipetting = sigma_dilution_rel * S_at_ld50
 
 # --- SOURCE 4: BIOLOGICAL REPLICATE VARIABILITY ---
@@ -796,7 +796,7 @@ This section is a condensed operational reference. Use it at the bench for rapid
 |:---|:---|:---|
 | No band at any annealing temperature | Template quality failure | Verify A260/A280; re-extract DNA |
 | Smear instead of discrete band | Non-specific priming; annealing too low | Increase annealing temp by 2°C increments |
-| Band at wrong size | Primer-dimer artifact | Add 1M betaine at 1× final; redesign primers |
+| Band at wrong size | Non-specific priming or off-target sites | Increase annealing temperature by 2–4 °C; redesign primers with higher specificity |
 | Band present in no-template control | Contamination | Replace all reagents; decontaminate bench with 10% bleach |
 | Faint band only at optimal temp | Insufficient template | Increase template to 25–50 ng per reaction |
 

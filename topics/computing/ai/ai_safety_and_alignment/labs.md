@@ -116,7 +116,7 @@ print(f"Using device: {device}")
 # hook points at every activation site in the network.
 model = HookedTransformer.from_pretrained(
     "gpt2",
-    center_writing_weights=True,   # fold LayerNorm scale into weights
+    center_writing_weights=True,   # center weights writing to residual stream
     center_unembed=True,            # center W_U so mean logit = 0
     fold_ln=True,                   # fold LayerNorm into adjacent weights
     refactor_factored_attn_matrices=True,  # decompose W_QK, W_OV
@@ -149,9 +149,9 @@ logits, cache = model.run_with_cache(tokens, remove_batch_dim=True)
 # logits shape: [seq_len, d_vocab]
 
 # Top-5 predicted next tokens
-last_logits = logits[-1]  # predictions for the final position
-top5_logits, top5_indices = torch.topk(last_logits, k=5)
-top5_probs = torch.softmax(top5_logits, dim=-1)
+last_logits = logits[0, -1]  # predictions for the final position
+probs = torch.softmax(last_logits, dim=-1)
+top5_probs, top5_indices = torch.topk(probs, k=5)
 print("\nTop-5 next-token predictions:")
 for prob, idx in zip(top5_probs, top5_indices):
     print(f"  {model.to_single_str_token(idx.item())!r:>15} → {prob.item():.4f}")
@@ -317,7 +317,7 @@ def compute_induction_score(model: HookedTransformer, seq_len: int = 50) -> torc
         for head in range(n_heads):
             head_pattern = pattern[head]  # [2*seq_len, 2*seq_len]
             induction_stripe = torch.diagonal(
-                head_pattern[seq_len:, 1:],
+                head_pattern[seq_len:, :],
                 offset=-(seq_len - 1)
             )
             scores[layer, head] = induction_stripe.mean().item()
@@ -352,7 +352,7 @@ for idx in flat_indices:
 
 ## Exercise 2: Activation Patching and Causal Tracing
 
-Activation patching—introduced in Wang et al. (2022) *"Interpretability in the Wild"* and popularized by Meng et al. (2022) *"Locating and Editing Factual Associations in GPT"*—is the gold-standard technique for identifying which components causally mediate a specific model behavior.
+Activation patching was introduced by Vig et al. (2020) and developed further as causal tracing by Meng et al. (2022) *"Locating and Editing Factual Associations in GPT"*. Wang et al. (2022) *"Interpretability in the Wild"* applied it to analyze the IOI circuit. It is now the gold-standard technique for identifying which components causally mediate a specific model behavior.
 
 The procedure:
 
@@ -407,9 +407,9 @@ model = HookedTransformer.from_pretrained("gpt2",
 model.to(device).eval()
 
 # ── Define clean and corrupted prompt pairs ─────────────────────────────────
-# Clean:     model correctly predicts " Mary" at the end
-# Corrupted: swap the first occurrence of the subject name with a different
-#            name so the model no longer has the IOI signal
+# Clean:     model correctly predicts " Mary" (indirect object) at the end
+# Corrupted: swap the first occurrence of the indirect object name with a different
+#            name so the model no longer has the IO signal
 
 clean_prompt   = "When Mary and John went to the store, John gave a drink to"
 corrupt_prompt = "When Alice and John went to the store, John gave a drink to"
@@ -584,7 +584,7 @@ x̂ = W_dec · z + b_dec               # reconstruction
 L = ||x - x̂||² + λ ||z||₁          # reconstruction + sparsity
 ```
 
-The L1 penalty forces most features to be zero for any given input, ensuring each active feature carries a concentrated, interpretable meaning.
+The L1 penalty forces most features to be zero for any given input. Empirically, this training procedure often produces monosemantic features—each active feature carries concentrated, interpretable meaning—though polysemanticity and feature splitting can still occur.
 
 ```python
 """
@@ -678,7 +678,7 @@ class SparseAutoencoder(nn.Module):
     def _normalise_decoder(self) -> None:
         """Enforce unit norm on each decoder column (feature direction)."""
         with torch.no_grad():
-            norms = self.W_dec.norm(dim=1, keepdim=True).clamp(min=1.0)
+            norms = self.W_dec.norm(dim=1, keepdim=True).clamp(min=1e-8)
             self.W_dec.div_(norms)
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
@@ -925,8 +925,8 @@ stress_cases = {
     "all_punctuation": "!@#$%^&*()_+-=[]{}|;':\",./<>?",
     "repeated_tokens_32": "the " * 32,
     "repeated_tokens_256": "the " * 256,
-    "near_context_window": "The quick brown fox jumped over the lazy dog. " * 22,
-    "over_context_window": "The quick brown fox jumped over the lazy dog. " * 50,
+    "near_context_window": "The quick brown fox jumped over the lazy dog. " * 100,
+    "over_context_window": "The quick brown fox jumped over the lazy dog. " * 150,
     "null_bytes": "Hello\x00World",
     "mixed_numbers": "1 2 3 4 5 6 7 8 9 10 100 1000 1e10 -1 0.001",
     "code_snippet": "def fibonacci(n):\n    if n <= 1: return n\n    return fibonacci(n-1)+fibonacci(n-2)",
@@ -1156,4 +1156,5 @@ The following papers constitute the primary literature for this lab's techniques
 - **Wang et al. (2022)** — *Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 Small.* The definitive circuit analysis paper; produces the IOI circuit used in Exercise 2.
 - **Meng et al. (2022)** — *Locating and Editing Factual Associations in GPT.* Introduces causal tracing as a systematic method; identifies MLP layers as "factual association" sites.
 - **Bricken et al. (2023)** — *Towards Monosemanticity: Decomposing Language Models With Dictionary Learning.* Anthropic's SAE paper; demonstrates monosemantic features in MLP layers of a one-layer transformer.
-- **Nanda et al. (2023)** — *Progress measures for grokking via mechanistic interpretability.* TransformerLens library; demonstrates the induction head circuit through training dynamics.
+- **Nanda et al. (2023)** — *Progress measures for grokking via mechanistic interpretability.* Reverse-engineers the learned algorithm in a transformer trained on modular addition during grokking.
+- **Olsson et al. (2022)** — *In-context Learning and Induction Heads.* Identifies and characterizes the induction head circuit in GPT-2 and larger models.

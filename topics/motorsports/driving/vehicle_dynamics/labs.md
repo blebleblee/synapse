@@ -344,7 +344,7 @@ Execute the script to generate the correlation plot and statistical summary. The
 
 Validate the damper adjustment conclusion through driver feedback correlation by reviewing the driver debrief notes recorded during the test session. The debrief documentation for the 12-click configuration reports: "Initial turn-in response improved, car rotates more freely on entry. Mid-corner platform feels slightly softer over curbing but not loose. High-speed sweeper balance neutral to slight understeer, acceptable." The debrief for the 16-click configuration reports: "Initial turn-in feels sluggish, have to wait for the car to respond to steering input. Mid-corner platform very stable but car won't rotate, pushing understeer in high-speed turns." This qualitative feedback aligns precisely with the quantitative telemetry analysis: reducing high-speed compression damping from 14 to 12 clicks improves transient response by allowing more rapid damper shaft velocity during initial weight transfer, enhancing front axle load generation and turn-in authority.
 
-Address the residual mid-corner understeer complaint through anti-roll bar analysis by comparing roll angle distributions between the 12-click damper configuration and a proposed modification to front anti-roll bar stiffness. Load the telemetry data from the 12-click configuration fastest lap and insert a Math Channel to compute chassis roll angle from the suspension travel differential. Configure the channel formula as `atan(('Susp_Travel_FR' - 'Susp_Travel_FL') / track_width) * 180 / pi`, where `track_width` is defined as 1.650 meters for the GT3 vehicle. Add this derived roll angle channel to a new trace in the worksheet and zoom into the high-speed sweeper complex spanning Turns 2 through 5 (distance range 3400 to 4300 meters).
+Address the residual mid-corner understeer complaint through anti-roll bar analysis by comparing roll angle distributions between the 12-click damper configuration and a proposed modification to front anti-roll bar stiffness. Load the telemetry data from the 12-click configuration fastest lap and insert a Math Channel to compute chassis roll angle from the suspension travel differential. Configure the channel formula as `np.arctan(('Susp_Travel_FR' - 'Susp_Travel_FL') / track_width) * 180 / np.pi`, where `track_width` is defined as 1.650 meters for the GT3 vehicle. Add this derived roll angle channel to a new trace in the worksheet and zoom into the high-speed sweeper complex spanning Turns 2 through 5 (distance range 3400 to 4300 meters).
 
 The roll angle trace during the Turn 2-3 Esses reveals a peak roll angle of 2.8 degrees to the right, sustained throughout the mid-corner phase from 3480 to 3550 meters. Overlay the lateral acceleration channel on a second trace to correlate roll angle with lateral load. The peak lateral acceleration of 1.92 G occurs at 3510 meters, coinciding with the peak roll angle. The ratio of roll angle to lateral acceleration, computed as 2.8 degrees / 1.92 G = 1.46 degrees per G, provides a scalar metric for overall chassis roll stiffness. This roll gradient can be decomposed into contributions from spring stiffness, anti-roll bar stiffness, and tire vertical stiffness through the relationship:
 
@@ -371,12 +371,12 @@ track_width_front = 1.650  # meters
 track_width_rear = 1.620  # meters
 
 # Baseline anti-roll bar stiffness
-arb_front_baseline = 120000  # Nm/deg (28mm blade)
-arb_rear_baseline = 165000  # Nm/deg (32mm blade)
+arb_front_baseline = 120000  # Nm/rad (28mm blade)
+arb_rear_baseline = 165000  # Nm/rad (32mm blade)
 
 # Proposed anti-roll bar stiffness
-arb_front_proposed = 145000  # Nm/deg (30mm blade)
-arb_rear_proposed = 165000  # Nm/deg (32mm rear, unchanged)
+arb_front_proposed = 145000  # Nm/rad (30mm blade)
+arb_rear_proposed = 165000  # Nm/rad (32mm rear, unchanged)
 
 def compute_lateral_load_transfer(lateral_accel_g, arb_front, arb_rear):
     """Compute lateral load transfer distribution for given anti-roll bar stiffness."""
@@ -504,9 +504,9 @@ Formulate the final tuning recommendation by synthesizing the damper velocity hi
 - **Expected lap time improvement:** 0.24 seconds (validated through sweep test)
 
 ### Front Anti-Roll Bar
-- **Current:** 28mm blade (120,000 Nm/deg)
-- **Proposed:** 30mm blade (145,000 Nm/deg)
-- **Rationale:** Increase steady-state front load transfer from 1842 N to 2134 N (+292 N), shift roll stiffness distribution from 42% to 47% front
+- **Current:** 28mm blade (120,000 Nm/rad)
+- **Proposed:** 30mm blade (145,000 Nm/rad)
+- **Rationale:** Increase steady-state front load transfer from 1842 N to 2134 N (+292 N), shift ARB roll stiffness distribution from 42% to 47% front
 - **Expected effect:** Reduce mid-corner understeer, increase front tire slip angle 0.5-0.8 degrees
 
 ## Implementation Notes
@@ -553,7 +553,7 @@ tire_temps['RR_spread'] = tire_temps['RR_outside'] - tire_temps['RR_inside']
 tire_temps['FL_avg'] = (tire_temps['FL_inside'] + tire_temps['FL_middle'] + tire_temps['FL_outside']) / 3
 tire_temps['FR_avg'] = (tire_temps['FR_inside'] + tire_temps['FR_middle'] + tire_temps['FR_outside']) / 3
 tire_temps['RL_avg'] = (tire_temps['RL_inside'] + tire_temps['RL_middle'] + tire_temps['RL_outside']) / 3
-tire_temps['RR_avg'] = (tire_temps['RR_inside'] + tire_temps['RR_middle'] + tire_temps['RR_inside']) / 3
+tire_temps['RR_avg'] = (tire_temps['RR_inside'] + tire_temps['RR_middle'] + tire_temps['RR_outside']) / 3
 
 print("Tire Temperature Analysis Summary")
 print("=" * 70)
@@ -765,7 +765,7 @@ The operational verification laboratory concludes with the synthesis of diagnost
    - $12°C < |\Delta T| < 20°C$: Suboptimal contact patch loading, camber adjustment recommended
    - $|\Delta T| > 20°C$: Severe contact patch loading imbalance, immediate camber adjustment mandatory
 5. Determine camber adjustment direction: positive spread (outside hotter) indicates excessive negative camber, reduce static camber by $(\Delta T / 7°C)$ degrees; negative spread (inside hotter) indicates insufficient negative camber, increase static camber
-6. Monitor average contact patch temperature relative to compound-specific optimal window: Pirelli DHE 85-105°C, Michelin Sport Cup 90-110°C, Goodyear Eagle F1 80-100°C
+6. Monitor average contact patch temperature relative to compound-specific optimal window: Pirelli DHE 85-105°C, Michelin Sport Cup 90-110°C, Goodyear racing slick 80-100°C
 7. For average temperature above optimal window: reduce tire pressure 0.5-1.0 psi to increase contact patch area and distribute heat generation, reduce camber angle to balance contact patch loading
 8. For average temperature below optimal window: increase tire pressure 0.5-1.0 psi to concentrate contact patch loading and elevate shear stress, increase driving aggression to generate additional slip energy
 9. Apply tire wear prediction model using measured temperatures to estimate remaining tire life and inform stint strategy

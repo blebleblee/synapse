@@ -70,11 +70,11 @@ For each scenario, estimate the following outcomes over a 10-year horizon:
 | Estimated patients treated with antibiotic (10-year horizon) | 4,200,000 (based on market projections and uptake rates) | 2,100,000 (reduced uptake due to delayed entry and competitor alternatives) | 1,680,000 (restricted to specialist settings and complex cases) |
 | Estimated lives saved from resistant infections (assuming 3% mortality rate if untreated) | 126,000 lives saved (4.2M × 3% mortality reduction) | 63,000 lives saved (2.1M × 3% mortality reduction) | 50,400 lives saved (1.68M × 3% mortality reduction) |
 | Estimated permanent nerve damage cases (at 0.3% rate) | 12,600 cases (4.2M × 0.3%) | 6,300 cases (2.1M × 0.3%) | 5,040 cases (1.68M × 0.3%) |
-| Serious quality-of-life impact per nerve damage case (chronic pain, disability) | Assume 20-year loss of quality-adjusted life years (QALYs) per case: 252,000 QALYs lost | 126,000 QALYs lost | 100,800 QALYs lost |
-| Net QALYs gained (lives saved minus QALYs lost to adverse events) | 126,000 − 252,000 = −126,000 net QALYs (worse outcome) | 63,000 − 126,000 = −63,000 net QALYs (worse outcome) | 50,400 − 100,800 = −50,400 net QALYs (worse outcome) |
+| Serious quality-of-life impact per nerve damage case (chronic pain, disability) | Assume 20-year impairment with 0.4 utility decrement = ~8 QALYs lost per case: 100,800 QALYs lost (12,600 × 8) | 50,400 QALYs lost | 40,320 QALYs lost |
+| Net QALYs gained (lives saved × estimated remaining life-years, minus QALYs lost to adverse events) | 1,890,000 − 100,800 = +1,789,200 net QALYs (126,000 lives × ~15 avg remaining life-years = 1,890,000 QALYs gained) | 945,000 − 50,400 = +894,600 net QALYs | 756,000 − 40,320 = +715,680 net QALYs |
 | Company revenue (10-year cumulative) | $3.2 billion | $1.6 billion (delayed entry and lost market share) | $1.8 billion (premium pricing due to restricted availability) |
-| Expected legal liability and settlement costs | $200 million (assumes 5% of adverse cases litigated, average $3M settlement) | $100 million | $120 million |
-| Net company benefit (revenue minus costs and liability) | $3.0 billion | $1.5 billion | $1.68 billion |
+| Expected legal liability and settlement costs | $1.89 billion (assumes 5% of adverse cases litigated, average $3M settlement: 630 cases × $3M) | $945 million | $756 million |
+| Net company benefit (revenue minus costs and liability) | $1.31 billion | $655 million | $1.04 billion |
 | Regulatory trust and institutional reputation | High risk of future regulatory scrutiny and reputational damage if adverse events cluster or if competitors highlight the risk | Low risk; demonstrates commitment to thorough safety evaluation | Medium risk; demonstrates safety awareness but raises questions about why restrictions are necessary |
 | Competitor advantage (market share shift if firm delays) | Minor advantage for competitors who launch similar products first | Substantial advantage; competitors capture market share during delay window | Medium advantage; restricted launch allows competitor expansion in open-market segment |
 
