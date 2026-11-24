@@ -327,7 +327,7 @@ plt.show()
 
 # Statistical goodness-of-fit: chi-squared test
 chi_squared = np.sum(((ranges_mean - ranges_with_drag) / ranges_sem) ** 2)
-degrees_of_freedom = len(angles_deg) - 1  # one constraint from fitting
+degrees_of_freedom = len(angles_deg)
 reduced_chi_squared = chi_squared / degrees_of_freedom
 
 print(f"\n=== Goodness of Fit ===")
@@ -364,7 +364,7 @@ Calibration curve construction from this parameter sweep enables predictive laun
 
 The third operational exercise probes the limits of classical mechanical models by stress-testing boundary conditions where simplifying assumptions break down. This protocol investigates damped harmonic oscillation, where frictional forces extract energy from an oscillating system, gradually reducing amplitude until motion ceases. The experimental objective is threefold: measure the exponential decay envelope characterizing energy dissipation, extract the damping coefficient from time-domain oscillation data, and distinguish between underdamped, critically damped, and overdamped regimes through controlled variation of dissipative coupling strength.
 
-Construct a damped pendulum apparatus by suspending a rigid bob from a low-friction pivot bearing, with adjustable magnetic or viscous damping mechanisms to control energy dissipation rate. The undamped natural frequency $\omega_0 = \sqrt{g/L}$ depends only on pendulum length $L$ and gravitational acceleration, while the damping coefficient $\gamma$ quantifies energy loss per oscillation cycle. For weak damping ($\gamma < \omega_0$), the system executes underdamped oscillation with exponentially decaying amplitude following the envelope function $A(t) = A_0 e^{-\gamma t / 2}$. As damping increases toward the critical value $\gamma_c = 2\omega_0$, oscillation frequency decreases and decay rate accelerates, until the critically damped threshold where the system returns to equilibrium in minimum time without overshooting.
+Construct a damped pendulum apparatus by suspending a rigid bob from a low-friction pivot bearing, with adjustable magnetic or viscous damping mechanisms to control energy dissipation rate. The undamped natural frequency $\omega_0 = \sqrt{g/L}$ depends only on pendulum length $L$ and gravitational acceleration, while the damping coefficient $\gamma$ quantifies energy loss per oscillation cycle. For weak damping ($\gamma < \omega_0$), the system executes underdamped oscillation with exponentially decaying amplitude following the envelope function $A(t) = A_0 e^{-\gamma t}$. As damping increases toward the critical value $\gamma_c = 2\omega_0$, oscillation frequency decreases and decay rate accelerates, until the critically damped threshold where the system returns to equilibrium in minimum time without overshooting.
 
 Measure pendulum motion using a rotary position encoder or accelerometer attached to the bob, streaming angular displacement data to a computer through a data acquisition interface. Alternatively, video analysis with motion tracking software extracts bob position from high-speed camera footage, providing non-contact measurement immune to sensor loading effects. Sample position data at 100 Hz minimum to resolve oscillation waveforms accurately, ensuring at least 20 samples per oscillation period for the fastest expected frequency.
 
@@ -459,7 +459,7 @@ def analyze_damped_oscillation(time, theta, label, natural_freq):
         delta_mean = np.mean(log_decrements)
         
         # Damping coefficient from logarithmic decrement
-        gamma_logdec = delta_mean * natural_freq / (2 * np.pi)
+        gamma_logdec = delta_mean * omega_d_measured / (2 * np.pi)
         
         print(f"Logarithmic Decrement:")
         print(f"  Mean δ: {delta_mean:.4f}")
@@ -659,7 +659,7 @@ Expected result range for sea-level locations: $g = 9.78$ to $9.83 \, \text{m/s}
 
 **Projectile Motion Parameter Sweep (Exercise 2):**
 
-Vacuum range formula check: at $45°$ launch angle with $v_0 = 12 \, \text{m/s}$ and $h_0 = 1.5 \, \text{m}$, the theoretical vacuum range should be approximately $15.4 \, \text{m}$. For a golf ball under standard atmospheric conditions, drag typically reduces this to $13–14 \, \text{m}$, a 10–15% range penalty. The optimal angle shifts from $45°$ in vacuum to approximately $40–42°$ with air resistance. If your optimal angle appears at $30°$ or $50°$, suspect systematic errors: inconsistent launch velocity across angle settings (verify with photogate speed measurements at each angle), launcher misalignment (check that the rotary platform's angular scale correctly indicates actual launch direction), or incorrect distance measurement baseline (ensure range measurements originate from the launcher's horizontal position, not the base of the support structure).
+Vacuum range formula check: at $45°$ launch angle with $v_0 = 12 \, \text{m/s}$ and $h_0 = 1.5 \, \text{m}$, the theoretical vacuum range should be approximately $16.1 \, \text{m}$. For a golf ball under standard atmospheric conditions, drag typically reduces this to $13–14 \, \text{m}$, a 10–15% range penalty. The optimal angle shifts from $45°$ in vacuum to approximately $40–42°$ with air resistance. If your optimal angle appears at $30°$ or $50°$, suspect systematic errors: inconsistent launch velocity across angle settings (verify with photogate speed measurements at each angle), launcher misalignment (check that the rotary platform's angular scale correctly indicates actual launch direction), or incorrect distance measurement baseline (ensure range measurements originate from the launcher's horizontal position, not the base of the support structure).
 
 **Damped Oscillation Analysis (Exercise 3):**
 
@@ -679,7 +679,7 @@ For a function $f(x, y)$ with independent uncertainties $\delta x$ and $\delta y
 
 $$\delta f = \sqrt{\left(\frac{\partial f}{\partial x} \delta x\right)^2 + \left(\frac{\partial f}{\partial y} \delta y\right)^2}$$
 
-Specific applications: gravitational acceleration from free-fall kinematics $g = 2h / t^2$ gives $\delta g / g = \sqrt{(\delta h / h)^2 + (2 \delta t / t)^2}$, demonstrating timing uncertainty's dominant contribution. Damping coefficient from logarithmic decrement $\gamma = (\delta / T) \omega_0$ propagates as $\delta \gamma / \gamma = \sqrt{(\delta \delta / \delta)^2 + (\delta T / T)^2}$, where $\delta$ is the mean logarithmic decrement and $T$ is the period.
+Specific applications: gravitational acceleration from free-fall kinematics $g = 2h / t^2$ gives $\delta g / g = \sqrt{(\delta h / h)^2 + (2 \delta t / t)^2}$, demonstrating timing uncertainty's dominant contribution. Damping coefficient from logarithmic decrement $\gamma = \delta / T$ propagates as $\delta \gamma / \gamma = \sqrt{(\delta \delta / \delta)^2 + (\delta T / T)^2}$, where $\delta$ is the mean logarithmic decrement and $T$ is the period.
 
 **Data Acquisition Best Practices:**
 

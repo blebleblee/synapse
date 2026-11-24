@@ -136,7 +136,7 @@ For the same dense core parameters, $t_{\text{ff}} \approx 0.1\ \text{Myr}$. Onc
 
 ### Degenerate Matter and the Chandrasekhar Transition
 
-As a stellar core runs out of nuclear fuel, the electrons in the interior become degenerate: their number density is high enough that the Pauli exclusion principle, not thermal pressure, provides the dominant support against gravity. The transition between ideal-gas behavior and electron degeneracy occurs when the de Broglie wavelength of the electrons $\lambda_e = h / \sqrt{2 m_e k_B T}$ becomes comparable to the interelectron spacing $n_e^{-1/3}$. Setting $\lambda_e \sim n_e^{-1/3}$ gives the degeneracy temperature
+As a stellar core runs out of nuclear fuel, the electrons in the interior become degenerate: their number density is high enough that the Pauli exclusion principle, not thermal pressure, provides the dominant support against gravity. The transition between ideal-gas behavior and electron degeneracy occurs when the de Broglie wavelength of the electrons $\lambda_e = h / \sqrt{2\pi m_e k_B T}$ becomes comparable to the interelectron spacing $n_e^{-1/3}$. Setting $\lambda_e \sim n_e^{-1/3}$ gives the degeneracy temperature
 
 $$T_{\text{deg}} = \frac{h^2 n_e^{2/3}}{2\pi m_e k_B} \equiv \frac{2}{3}\frac{E_F}{k_B}$$
 

@@ -84,7 +84,7 @@ The critical implementation detail: $\mu_j$ and $\sigma_j$ must be computed **ex
 
 **Categorical Encoding.** Nominal variables (no ordinal relationship) must not be encoded as integers, because this introduces a false ordinal structure that gradient-based models will exploit. One-hot encoding produces a binary vector of length $|\mathcal{V}|$ where $|\mathcal{V}|$ is the vocabulary size. For high-cardinality features (e.g., ZIP codes, user IDs), one-hot encoding is intractable; the standard alternatives are:
 
-- *Target encoding*: replace category $c$ with $\mathbb{E}[Y | X = c]$ estimated from training data, with leave-one-out smoothing to prevent leakage.
+- *Target encoding*: replace category $c$ with $\mathbb{E}[Y | X = c]$ estimated from training data, with shrinkage regularization toward the global mean.
 - *Embedding layers*: learn a dense vector representation $\mathbf{e}_c \in \mathbb{R}^d$ jointly with the model (standard in deep learning).
 - *Feature hashing*: map $c \to \{0, \ldots, B-1\}$ via a hash function, trading collision risk for bounded memory.
 
@@ -340,7 +340,7 @@ class AdamOptimizer:
 
 ### 2.3 Backpropagation: Reverse-Mode Automatic Differentiation
 
-Backpropagation is *not* a learning algorithm — it is an efficient algorithm for computing gradients via the chain rule. It is a specific application of *reverse-mode automatic differentiation* (reverse-mode AD or adjoint differentiation), which has time complexity $O(1)$ relative to the number of outputs regardless of the number of inputs. This is why it is efficient for ML: the loss is a scalar (one output), and we need gradients with respect to millions of parameters (many inputs).
+Backpropagation is *not* a learning algorithm — it is an efficient algorithm for computing gradients via the chain rule. It is a specific application of *reverse-mode automatic differentiation* (reverse-mode AD or adjoint differentiation), which requires a single backward pass whose cost is a small constant multiple of the forward pass, independent of the number of parameters, scaling linearly with the number of outputs. This is why it is efficient for ML: the loss is a scalar (one output), and we need gradients with respect to millions of parameters (many inputs).
 
 For a computational graph representing $\mathcal{L} = f_L \circ f_{L-1} \circ \cdots \circ f_1(\mathbf{x})$, the gradient of $\mathcal{L}$ with respect to parameters $\theta_l$ at layer $l$ is:
 
@@ -617,7 +617,7 @@ from typing import Tuple
 def roc_auc(y_true: np.ndarray, y_score: np.ndarray) -> float:
     """
     Compute AUROC using the trapezoidal rule.
-    Equivalent to scipy.metrics.roc_auc_score but dependency-free.
+    Equivalent to sklearn.metrics.roc_auc_score but dependency-free.
 
     Args:
         y_true:  Binary labels {0, 1}, shape (n,)
@@ -765,7 +765,7 @@ A model's test-set performance is only unbiased if the test set has never inform
 
 **$k$-Fold Cross-Validation** partitions the training set into $k$ folds, trains on $k-1$ folds, evaluates on the held-out fold, and averages performance across folds. The standard error of the CV estimate is $\hat{\sigma} / \sqrt{k}$ where $\hat{\sigma}$ is the standard deviation of fold-level scores. The bias-variance tradeoff for $k$: large $k$ (leave-one-out) produces low-bias but high-variance estimates; small $k$ (5 or 10) is empirically found to minimize mean squared error of the CV estimator.
 
-**The Multiple Comparisons Problem.** When selecting among $M$ model variants based on cross-validation score, the probability that the best-performing variant is best due to chance is $1 - (1-\alpha)^M$. For $M=20$ models and $\alpha=0.05$, this exceeds 64%. The correct procedure is to use the validation set for a single comparison between the top candidate and a chosen baseline, reserving the test set for final reporting.
+**The Multiple Comparisons Problem.** When selecting among $M$ model variants based on cross-validation score, the family-wise probability of at least one false positive across $M$ independent tests is $1 - (1-\alpha)^M$. For $M=20$ models and $\alpha=0.05$, this exceeds 64%. The correct procedure is to use the validation set for a single comparison between the top candidate and a chosen baseline, reserving the test set for final reporting.
 
 ```python
 """

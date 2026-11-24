@@ -99,7 +99,7 @@ $$r_{\text{ergo}}(\theta) = \frac{GM}{c^2} + \sqrt{\left(\frac{GM}{c^2}\right)^2
 
 At the poles ($\theta = 0, \pi$), the ergosphere coincides with the horizon: $r_{\text{ergo}} = r_+$. At the equator ($\theta = \pi/2$), it extends furthest: $r_{\text{ergo}} = 2GM/c^2 = r_s$. The ergosphere's defining property is that the Killing vector $\partial/\partial t$ becomes spacelike inside it — there is no stationary observer. Every observer within the ergosphere is forced to corotate with the black hole, dragged by frame dragging at an angular velocity:
 
-$$\omega(r, \theta) = -\frac{g_{t\phi}}{g_{\phi\phi}} = \frac{2GMar}{c\,\Sigma\,(r^2 + a^2)^2 - \Delta\,a^2\sin^2\theta}$$
+$$\omega(r, \theta) = -\frac{g_{t\phi}}{g_{\phi\phi}} = \frac{2GMar}{c\,[(r^2 + a^2)^2 - a^2\Delta\sin^2\theta]}$$
 
 This is the Lense-Thirring precession rate, and it has been directly measured. The Gravity Probe B satellite, launched in 2004, carried four cryogenic gyroscopes in polar orbit around Earth. After 17 months of data collection and years of analysis, the frame-dragging effect was confirmed to a precision of approximately $19\%$ (the reported measurement was $0.0372 \pm 0.0072$ arcseconds per year, compared to the GR prediction of $0.0392$ arcseconds per year). The LAGEOS and LAGEOS II satellite laser ranging experiments, using the measured nodal precession of two laser-reflector satellites, achieved a $10\%$ confirmation of the Lense-Thirring effect in 2004, later improved to $5\%$.
 
@@ -289,9 +289,9 @@ def schwarzschild_geodesic(x0, p0, M=1.0, G=6.674e-11, c=3e8,
 
         # Derivatives of inverse metric w.r.t. coordinates
         dgtt_inv_dr = -rs / (r**2 * gtt(r)**2)
-        dgrr_inv_dr = -rs / (r**2 * (1 - rs/r)**2)
-        dgthth_inv_dr = 2 * r
-        dgphph_inv_dr = 2 * r * np.sin(th)**2
+        dgrr_inv_dr = rs / r**2
+        dgthth_inv_dr = -2 / r**3
+        dgphph_inv_dr = -2 / (r**3 * np.sin(th)**2)
         dgphph_inv_dth = r**2 * 2 * np.sin(th) * np.cos(th)
 
         dH_dt = 0.0  # static metric

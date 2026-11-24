@@ -269,7 +269,7 @@ $$
 \hat{z}_i = \frac{z_i - \mu_\mathcal{B}}{\sqrt{\sigma_\mathcal{B}^2 + \epsilon}}, \qquad \tilde{z}_i = \gamma \hat{z}_i + \beta
 $$
 
-where $\gamma$ and $\beta$ are learned scale and shift parameters. The standard narrative—that BN reduces **internal covariate shift**—is not well-supported empirically. The more accurate explanation (Santurkar et al., 2018) is that BN **smooths the loss landscape**: it increases the Lipschitz constant of the gradient, making the loss more predictable and allowing larger, more aggressive learning rates. This explains the empirical observation that BN enables faster convergence and reduces sensitivity to weight initialization.
+where $\gamma$ and $\beta$ are learned scale and shift parameters. The standard narrative—that BN reduces **internal covariate shift**—is not well-supported empirically. The more accurate explanation (Santurkar et al., 2018) is that BN **smooths the loss landscape**: it reduces the Lipschitz constant of the gradient, making the loss more predictable and allowing larger, more aggressive learning rates. This explains the empirical observation that BN enables faster convergence and reduces sensitivity to weight initialization.
 
 ### 2.3 Recurrent Neural Networks and the Gradient Pathology
 
@@ -486,7 +486,7 @@ def train_epoch_amp(
         optimizer.zero_grad(set_to_none=True)   # faster than zero_grad()
 
         # Forward pass in BF16/FP16
-        with autocast(device_type="cuda", dtype=torch.bfloat16):
+        with autocast(dtype=torch.bfloat16):
             logits = model(X)
             loss = criterion(logits, y)
 
@@ -792,7 +792,7 @@ You are given a training script that diverges at step 5000. The loss curve shows
 ### Exercise 4: Quantize a ResNet to INT8
 
 Using PyTorch's `torch.ao.quantization` API:
-1. Apply static PTQ with `torch.quantization.quantize_dynamic` (linear layers only).
+1. Apply dynamic quantization with `torch.ao.quantization.quantize_dynamic` (linear layers only).
 2. Apply full static PTQ with calibration using 100 representative samples.
 3. Measure accuracy, model size (bytes), and inference latency on CPU before and after.
 4. Explain the accuracy gap between dynamic and static quantization in terms of activation range calibration.

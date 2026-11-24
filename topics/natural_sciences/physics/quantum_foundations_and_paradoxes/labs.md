@@ -589,7 +589,7 @@ print(f'kB   = {k:.6e} J/K      (CODATA: 1.380649e-23)')
 | Ex. 1 Photoelectric | $h$ from stopping potential slope | $< 3\%$ error from $6.626 \times 10^{-34}\ \text{J·s}$ | Contact potential offset in phototube; fix by calibrating with known UV line |
 | Ex. 1 Photoelectric | Work function $\phi$ | Within $\pm 0.1\ \text{eV}$ of tabulated metal value | Contaminated cathode surface; clean with isopropanol and re-evacuate |
 | Ex. 2 Diffraction | $\lambda$ recovered from $y_1$ | $< 2\%$ error from $532\ \text{nm}$ | Slit width deviation; re-measure slit with traveling microscope |
-| Ex. 2 Uncertainty | $\Delta x \cdot \Delta p_y / \hbar$ | In range $[5, 8]$ (expect $\approx 2\pi \approx 6.28$) | Camera not in far-field ($L < 50a^2/\lambda$); increase $L$ |
+| Ex. 2 Uncertainty | $\Delta x \cdot \Delta p_y$ (absolute product) | Ratio $\Delta x \cdot \Delta p_y / \hbar$ in range $[5, 8]$ (expect $\approx 2\pi \approx 6.28$) | Camera not in far-field ($L < 50a^2/\lambda$); increase $L$ |
 | Ex. 3 FTIR | $\tilde{\nu}_e$ for HCl | $< 0.1\%$ from $2990.95\ \text{cm}^{-1}$ | Insufficient resolution; rescan at $0.5\ \text{cm}^{-1}$ |
 | Ex. 3 FTIR | $x_e$ for HCl | Within $\pm 0.0005$ of $0.01741$ | Only two bands detected; extend scan to $7000\ \text{cm}^{-1}$ for $v=3$ |
 | Ex. 3 Propagation | $\sigma_{D_e} / D_e$ | Report with $< 5\%$ relative uncertainty | Too few overtone bands in Birge-Sponer fit; increase gas pressure |

@@ -141,7 +141,7 @@ To extract the precession angle, identify successive perihelion passages (local 
 from scipy.signal import find_peaks
 
 # Invert to find minima as peaks of -r
-peaks, _ = find_peaks(-r_vals, prominence=1e9)
+peaks, _ = find_peaks(-r_vals, prominence=0.01 * np.ptp(r_vals))
 
 if len(peaks) > 1:
     perihelion_angles = phi_vals[peaks]
@@ -753,7 +753,7 @@ This quick-reference section consolidates the essential formulas, computational 
 - Solar limb deflection: 1.75 arcseconds (factor of 2 larger than Newtonian)
 - Einstein radius: $\theta_E = \sqrt{4GM/c^2 \cdot D_{LS}/(D_L D_S)}$
 - Lens equation: $\beta = \theta - (D_{LS}/D_S)\alpha(\theta)$
-- Magnification: $\mu = |1 - (theta_E/\theta)^4|^{-1}$
+- Magnification: $\mu = |1 - (\theta_E/\theta)^4|^{-1}$
 - Post-Newtonian parameter: $\gamma = 1$ (GR); deflection angle $\propto (1+\gamma)$
 - Current observational constraint: $\gamma = 1.00 \pm 0.02$ from galaxy lensing
 

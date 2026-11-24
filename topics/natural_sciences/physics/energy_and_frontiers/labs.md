@@ -49,7 +49,7 @@ Set the series resistor to 1 kΩ and confirm its value with the multimeter in re
 
 Repeat this sweep three times for each LED without touching the mechanical connections between sweeps. The three sweeps will reveal reproducibility: if the three I-V curves overlay within your multimeter's 1 mV resolution, your contact resistance is stable. If they drift, check the probe clips for oxidation and clean with isopropyl alcohol.
 
-For peak wavelength: do not rely on the LED manufacturer's nominal datasheet value. Use the spectrophotometer in transmission mode. Hold the lit LED (at 2 mA forward current) against the input aperture with the shroud on and collect a 400–700 nm scan at 1 nm resolution. Identify the peak wavelength $\lambda_{peak}$ and record the FWHM of the emission band. The uncertainty in $\lambda_{peak}$ from a decent grating spectrometer is ±1–2 nm; this will be your dominant wavelength error source in the final $h$ estimate.
+For peak wavelength: do not rely on the LED manufacturer's nominal datasheet value. Use the spectrophotometer in emission mode. Hold the lit LED (at 2 mA forward current) against the input aperture with the shroud on and collect a 400–700 nm scan at 1 nm resolution. Identify the peak wavelength $\lambda_{peak}$ and record the FWHM of the emission band. The uncertainty in $\lambda_{peak}$ from a decent grating spectrometer is ±1–2 nm; this will be your dominant wavelength error source in the final $h$ estimate.
 
 ### Data Reduction: Python Analysis Script
 
@@ -226,7 +226,7 @@ for idx, led in enumerate(leds):
     print(f"% error    : {percent_error:.2f}%")
 
     # Plot I-V curve
-    ax.semilogy(V, I * 1e3 + 1e-12, 'o', markersize=3, color='steelblue',
+    ax.semilogy(V, np.maximum(I * 1e3, 1e-12), 'o', markersize=3, color='steelblue',
                 alpha=0.6, label='Measured I-V')
 
     # Plot tangent line extrapolation
@@ -625,8 +625,8 @@ u_B_tb     = tau_fit * 50e-6
 rows = [
     ("Fit covariance (Type A)",     "A", u_A_fit,    u_A_fit),
     ("Cursor repeatability (A)",    "A", u_A_cursor, u_A_cursor),
-    ("R component tolerance (B)",   "B", u_B_R,      u_B_R * C_mean),
-    ("C component tolerance (B)",   "B", u_B_C,      tau_lcr * (u_B_C/C_mean)),
+    ("R component tolerance (B)",   "B", u_B_R * C_mean, u_B_R * C_mean),
+    ("C component tolerance (B)",   "B", tau_lcr * (u_B_C/C_mean), tau_lcr * (u_B_C/C_mean)),
     ("Scope timebase (B)",          "B", u_B_tb,     u_B_tb),
 ]
 
@@ -698,4 +698,4 @@ Perform the following before any measurement session starts. Run through the lis
 
 ### Common Error States and Diagnostic Actions
 
-A threshold voltage that shifts by more than 15 mV between consecutive sweeps on the same LED almost always indicates junction self-heating from too-rapid stepping or insufficient current limiting. Verify the series resistance is physically in circuit by measuring $V_{resistor}$ directly; a solder bridge or reversed probe will read zero volts across it. A calorimetric $L_f$ that exceeds the literature value by more than 10% points to an overestimated $P_{net}$: recalibrate the heat-loss rate at the specific ambient temperature of the lab, because the Styrofoam loss rate increases by roughly 0.4 W per 5 °C of room temperature rise. An RC time constant that is consistently shorter than predicted at all $R$ values in the stress sweep indicates parasitic capacitance on the breadboard rails — spring-clip breadboards add 5–20 pF of stray capacitance per row, which is negligible at 100 nF but becomes a 1–5% correction at 10 nF. Replace the breadboard with direct soldered connections for high-precision RC work below 10 nF.
+A threshold voltage that shifts by more than 15 mV between consecutive sweeps on the same LED almost always indicates junction self-heating from too-rapid stepping or insufficient current limiting. Verify the series resistance is physically in circuit by measuring $V_{resistor}$ directly; a solder bridge or reversed probe will read zero volts across it. A calorimetric $L_f$ that exceeds the literature value by more than 10% points to an overestimated $P_{net}$: recalibrate the heat-loss rate at the specific ambient temperature of the lab, because the Styrofoam loss rate increases by roughly 0.4 W per 5 °C of room temperature rise. An RC time constant that is consistently shorter than predicted at all $R$ values in the stress sweep indicates parasitic capacitance on the breadboard rails — spring-clip breadboards add 5–20 pF of stray capacitance per row, which is negligible at 100 nF but becomes a 0.05–0.2% correction at 10 nF. Replace the breadboard with direct soldered connections for high-precision RC work below 10 nF.

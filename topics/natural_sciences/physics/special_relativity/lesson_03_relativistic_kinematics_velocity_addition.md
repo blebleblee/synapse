@@ -88,7 +88,7 @@ To analyze a relativistic kinematics problem, we proceed through the following s
 
 Third, determine the Lorentz boost parameters required to transform between frames. If frame $S'$ moves with velocity $\vec{V}$ relative to frame $S$, compute $\gamma(V)$ and $\beta = V/c$. If the velocity is not aligned with a coordinate axis, decompose the transformation into a sequence of boosts and rotations—a general Lorentz transformation can always be written as a rotation followed by a boost along a principal axis followed by another rotation. For most practical problems, careful choice of coordinate axes reduces the transformation to a single boost along one direction.
 
-Fourth, apply the Lorentz transformation to compute the four-velocity or four-momentum in the target frame. Extract the three-velocity components using $\vec{v} = c\vec{u}/u^0$ or the three-momentum using $\vec{p} = c^{-1}(p^1, p^2, p^3)$. When dealing with massless particles like photons, remember that the energy-momentum relation is $E = pc$, which constrains the four-momentum magnitude to $p^\mu p_\mu = 0$.
+Fourth, apply the Lorentz transformation to compute the four-velocity or four-momentum in the target frame. Extract the three-velocity components using $\vec{v} = c\vec{u}/u^0$ or the three-momentum using $\vec{p} = (p^1, p^2, p^3)$. When dealing with massless particles like photons, remember that the energy-momentum relation is $E = pc$, which constrains the four-momentum magnitude to $p^\mu p_\mu = 0$.
 
 Fifth, verify invariant quantities as a consistency check. The four-velocity must satisfy $u^\mu u_\mu = -c^2$ for any massive particle. The invariant mass is given by $(p^\mu p_\mu) c^{-2} = -m^2c^2$ where $p^\mu = mu^\mu$ for a particle with rest mass $m$. For a system of multiple particles, the invariant mass of the system is $M^2c^2 = -(P^\mu P_\mu)/c^{-2}$ where $P^\mu = \sum_i p_i^\mu$ is the total four-momentum.
 
@@ -167,7 +167,7 @@ Relativistic Kinematics Calculation Workflow:
    
 4. Three-Vector Extraction
    - Extract velocity: v⃗ = c u⃗/u⁰
-   - Extract momentum: p⃗ = c(p¹, p², p³)
+   - Extract momentum: p⃗ = (p¹, p², p³)
    - Compute energy: E = cp⁰
    
 5. Observable Computation
@@ -199,7 +199,7 @@ When dealing with massless particles like photons, the momentum-energy relation 
 
 In multi-particle systems, conservation of four-momentum provides powerful constraints that reduce the number of independent variables. For a two-body decay $A \to B + C$, the initial state has four-momentum $p_A^\mu$ and the final state satisfies $p_B^\mu + p_C^\mu = p_A^\mu$. In the rest frame of particle $A$, this reduces to four equations: one for energy conservation and three for momentum conservation. However, the three-momentum conservation equations are coupled and nonlinear when expressed in terms of particle velocities or angles. A more efficient approach works directly with four-momentum magnitudes and Lorentz invariants.
 
-Define the Mandelstam variable $s = -(p_A^\mu p_{A\mu})/c^{-2} = m_A^2 c^2$, and similarly $t = -((p_A - p_B)^\mu(p_A - p_B)_\mu)/c^{-2}$ and $u = -((p_A - p_C)^\mu(p_A - p_C)_\mu)/c^{-2}$. These three variables satisfy the identity $s + t + u = m_A^2 c^2 + m_B^2 c^2 + m_C^2 c^2$, reducing the system to two independent parameters (typically $s$ and $t$, or equivalently $s$ and a scattering angle). This invariant formulation automatically respects Lorentz covariance and simplifies calculations in arbitrary frames.
+Define the Mandelstam variable $s = -(p_A^\mu p_{A\mu}) = m_A^2 c^4$, and similarly $t = -((p_A - p_B)^\mu(p_A - p_B)_\mu)$ and $u = -((p_A - p_C)^\mu(p_A - p_C)_\mu)$. These three variables satisfy the identity $s + t + u = m_A^2 c^2 + m_B^2 c^2 + m_C^2 c^2$, reducing the system to two independent parameters (typically $s$ and $t$, or equivalently $s$ and a scattering angle). This invariant formulation automatically respects Lorentz covariance and simplifies calculations in arbitrary frames.
 
 For astrophysical applications involving extreme Doppler shifts ($z > 1$), beware of the distinction between spectroscopic redshift and cosmological redshift. In special relativity, arbitrarily large redshifts require velocities approaching $c$. From $\beta = [(1+z)^2 - 1]/[(1+z)^2 + 1]$, we find that $z = 1$ corresponds to $\beta = 3/5 = 0.6$, while $z = 10$ gives $\beta = 120/122 \approx 0.984$. In cosmology, redshifts arise primarily from the expansion of space itself, and the relation between redshift and recession velocity is modified by the scale factor evolution. For precision work on distant quasars or high-redshift galaxies, the cosmological redshift-distance relation must be computed using the Friedmann equations of general relativity, not the special relativistic Doppler formula. However, the Doppler formula remains the correct local description for any source with a well-defined peculiar velocity relative to the cosmological rest frame.
 

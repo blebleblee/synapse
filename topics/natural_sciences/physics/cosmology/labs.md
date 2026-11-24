@@ -358,7 +358,7 @@ for i, Om in enumerate(Om_grid):
 mask_p1 = (ell_m >= 150) & (ell_m <= 350)
 ell_p1  = ell_m[mask_p1]
 Dl_p1   = Dl_m[mask_p1]
-sig_p1  = sigma_sym[mask[mask]][mask_p1] if len(sigma_sym[mask]) == len(ell_m) else \
+sig_p1  = sigma_sym[mask][mask_p1] if len(sigma_sym[mask]) == len(ell_m) else \
           sigma_sym[:len(ell_m)][mask_p1]
 
 def peak_model(ell, A, ell_c, sigma_g, a, b, c_bg):
@@ -366,6 +366,7 @@ def peak_model(ell, A, ell_c, sigma_g, a, b, c_bg):
     return A * np.exp(-0.5 * ((ell - ell_c) / sigma_g)**2) + a*ell**2 + b*ell + c_bg
 
 p0_p1 = [5500, 220, 30, 0, 0, 1000]
+popt_p1 = p0_p1  # fallback if curve_fit fails
 bounds_p1 = ([0, 180, 10, -1, -100, 0], [10000, 280, 80, 1, 100, 5000])
 
 try:
@@ -454,7 +455,7 @@ print("\nFigures saved: cmb_bao_analysis.pdf / .png")
 plt.show()
 ```
 
-The four-panel output tells a coherent physical story. Panel A shows the full TT spectrum with six acoustic peaks marked: the first peak near $\ell = 220$ reflects the fundamental mode of the photon-baryon acoustic oscillator; the second peak near $\ell = 540$ is suppressed relative to the first because baryons add inertia to the oscillator, deepening odd-numbered (compressions) peaks and raising even-numbered (rarefactions) ones. Panel C is the most diagnostic for parameter sensitivity: as $\Omega_m$ increases from 0.20 to 0.50, the first peak multipole shifts from roughly $\ell \approx 190$ to $\ell \approx 240$, because higher matter density increases the angular diameter distance to recombination faster than it shrinks the sound horizon, projecting the same physical ruler to a smaller angular scale (higher $\ell$). The measured peak position from Panel B, superimposed as a horizontal red line in Panel C, constrains $\Omega_m$ to a narrow band visually — this is precisely the geometric constraint the Planck team uses in their likelihood analysis.
+The four-panel output tells a coherent physical story. Panel A shows the full TT spectrum with six acoustic peaks marked: the first peak near $\ell = 220$ reflects the fundamental mode of the photon-baryon acoustic oscillator; the second peak near $\ell = 540$ is suppressed relative to the first because baryons add inertia to the oscillator, enhancing odd-numbered (compression) peaks and suppressing even-numbered (rarefaction) ones. Panel C is the most diagnostic for parameter sensitivity: as $\Omega_m$ increases from 0.20 to 0.50, the first peak multipole shifts from roughly $\ell \approx 190$ to $\ell \approx 240$, because higher matter density at fixed $H_0$ reduces the angular diameter distance to recombination (less dark energy to drive late-time expansion) while only slightly shrinking the sound horizon, projecting the same physical ruler to a smaller angular scale (higher $\ell$). The measured peak position from Panel B, superimposed as a horizontal red line in Panel C, constrains $\Omega_m$ to a narrow band visually — this is precisely the geometric constraint the Planck team uses in their likelihood analysis.
 
 ---
 

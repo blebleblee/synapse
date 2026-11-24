@@ -205,6 +205,7 @@ from __future__ import annotations
 
 import math
 import numpy as np
+from scipy import stats
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -351,7 +352,7 @@ def auc_trapezoid(x: np.ndarray, y: np.ndarray) -> float:
     """
     idx = np.argsort(x)
     x, y = x[idx], y[idx]
-    return float(np.trapz(y, x))
+    return float(np.trapezoid(y, x))
 
 
 @dataclass
@@ -497,7 +498,7 @@ def stratified_kfold_cv(
     mean = scores_arr.mean()
     std = scores_arr.std(ddof=1)
     # 95% CI via t-distribution (conservative for small k)
-    t_crit = 2.776  # t_{0.025, df=4} for k=5
+    t_crit = stats.t.ppf(0.975, df=k - 1)
     margin = t_crit * std / np.sqrt(k)
     
     return {
@@ -519,7 +520,7 @@ For production ML pipelines processing tens of millions of predictions (model mo
 //! evaluation_metrics.rs
 //! 
 //! Zero-allocation, cache-efficient binary classification metric computation.
-//! Compile with: rustc -O3 --edition 2021 evaluation_metrics.rs
+//! Compile with: rustc -C opt-level=3 --crate-type lib --edition 2021 evaluation_metrics.rs
 
 /// Confusion matrix components as u64 to handle very large datasets.
 #[derive(Debug, Clone, Copy, Default)]
@@ -543,7 +544,7 @@ impl ConfusionMatrix {
         let mut fp = 0u64;
         let mut fn_ = 0u64;
 
-        // Process in chunks of 64 for better branch prediction and vectorization
+        // Simple loop autovectorizable by LLVM at -O3
         for (&t, &p) in y_true.iter().zip(y_pred.iter()) {
             match (t, p) {
                 (1, 1) => tp += 1,

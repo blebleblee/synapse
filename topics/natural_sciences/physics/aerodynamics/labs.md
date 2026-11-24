@@ -318,7 +318,7 @@ The Reynolds numbers printed in the console output are critical context for all 
 
 ### Angle-of-Attack Sweep: Lift and Drag Polar Measurement
 
-Having established a reliable velocity reference, you are now ready to characterize the aerodynamic performance of an airfoil across its full operating envelope. The central quantity is the aerodynamic force coefficient, which renders the dimensional lift and drag forces non-dimensional and comparable across different tunnel speeds, chord lengths, and air densities. For a wing of planform area $S$ (or per unit span, $S = c \cdot 1$) in flow at dynamic pressure $q_\infty$:
+Having established a reliable velocity reference, you are now ready to characterize the aerodynamic performance of an airfoil across its full operating envelope. The central quantity is the aerodynamic force coefficient, which renders the dimensional lift and drag forces non-dimensional and comparable across different tunnel speeds, chord lengths, and air densities. For a wing of planform area $S = c \cdot b$ in flow at dynamic pressure $q_\infty$:
 
 $$C_L = \frac{L}{\frac{1}{2} \rho u_\infty^2 \cdot c \cdot b}, \qquad C_D = \frac{D}{\frac{1}{2} \rho u_\infty^2 \cdot c \cdot b}$$
 
@@ -445,9 +445,6 @@ def run_aoa_sweep(tunnel_speed: float,
     sweep_dir  = data_dir / f"aoa_sweep_{speed_tag}"
 
     for alpha_deg in AOA_RANGE:
-        sign = "+" if alpha_deg >= 0 else ""
-        tag  = f"aoa_{sign}{alpha_deg:03d}" if alpha_deg >= 0 \
-               else f"aoa_{alpha_deg:04d}"
         # Signed filename convention: aoa_+005.csv, aoa_-008.csv
         fname = f"aoa_{alpha_deg:+04d}.csv"
 
@@ -533,7 +530,8 @@ def plot_cl_curve(sweeps: list[dict], linear_fits: list[dict],
 
         # Annotate stall
         alpha_stall = find_stall_angle(sw['alpha'], sw['CL'])
-        CL_stall    = sw['CL'][sw['alpha'] == int(alpha_stall)][0]
+        idx_stall   = np.argmin(np.abs(sw['alpha'] - alpha_stall))
+        CL_stall    = sw['CL'][idx_stall]
         ax.annotate(f"stall {alpha_stall:.0f}°",
                     xy=(alpha_stall, CL_stall),
                     xytext=(alpha_stall + 1.5, CL_stall - 0.07),
@@ -774,7 +772,7 @@ def cn_to_cl(C_N: float, alpha_deg: float) -> float:
 
 # ── Uncertainty budget ─────────────────────────────────────────────────────────
 def uncertainty_budget_cp(p_tap_mean: float, p_tap_std: float,
-                           p_inf_std: float,
+                           p_inf_Pa: float, p_inf_std: float,
                            n_samples: int = 2000) -> dict:
     """
     Full first-order error propagation for Cp = (p_tap - p_inf) / q_inf.
@@ -812,7 +810,7 @@ def uncertainty_budget_cp(p_tap_mean: float, p_tap_std: float,
     # dCp/dp_tap = 1/q_inf
     # dCp/dp_inf = -1/q_inf
     # dCp/dq_inf = -(p_tap-p_inf)/q_inf^2 = -Cp/q_inf
-    Cp_val    = (p_tap_mean - 101325.0) / Q_INF   # rough nominal Cp
+    Cp_val    = (p_tap_mean - p_inf_Pa) / Q_INF   # rough nominal Cp
     dCp_dp    = 1.0 / Q_INF
     dCp_dq    = -Cp_val / Q_INF
 
@@ -867,7 +865,7 @@ def autocorrelation_analysis(time_series: np.ndarray,
     # Autocorrelation
     ax = axes[0]
     lag_range = np.abs(lags) < 0.5  # show ±0.5 s
-    ax.plot(lags[lag_range], acf[n-1:][lag_range[:n]], color='steelblue', lw=1.0)
+    ax.plot(lags[lag_range], acf[lag_range], color='steelblue', lw=1.0)
     ax.axhline(0, color='k', lw=0.5)
     ax.axhline(1.96/np.sqrt(n), color='r', lw=0.8, ls='--', label='95% CI bounds')
     ax.axhline(-1.96/np.sqrt(n), color='r', lw=0.8, ls='--')
@@ -1029,12 +1027,12 @@ def run_exercise_3():
     fp_rep    = data_dir / "cp_alpha_+08_tap_07.csv"
     res_rep   = load_tap_csv(fp_rep, zero_v)
     budget    = uncertainty_budget_cp(res_rep['mean'], res_rep['std'],
-                                       p_inf_data['std'], n_samples=2000)
+                                       P_INF, p_inf_data['std'], n_samples=2000)
     print_uncertainty_table(budget, alpha=8.0, tap_xc=XC_UPPER[6])
 
     # ── Unsteady pressure analysis at alpha = 15° ─────────────────────────────
     print("\n  Running autocorrelation and PSD analysis on unsteady tap data...")
-    unsteady_path = data_dir / "unsteady_alpha15_tap07.csv"
+    unsteady_path = data_dir / "unsteady_alpha15_tap06.csv"
     raw_counts    = np.loadtxt(unsteady_path, delimiter=',')
     adc_b16       = 16
     v_ts = (raw_counts / (2**adc_b16 - 1)) * 2 * SCAN_VREF - SCAN_VREF
@@ -1042,6 +1040,7 @@ def run_exercise_3():
 
     autocorrelation_analysis(p_ts, FS_HZ,
                               out_dir / "unsteady_vortex_shedding.png")
+    print(f"    Analysis performed on tap 6 (x/c = 0.10, upper surface)")
 
     # ── Tripped vs untripped comparison at alpha = 15° ────────────────────────
     print("\n  Comparing tripped vs untripped boundary layer at α=15°...")
@@ -1174,8 +1173,11 @@ Expected output: all PASS with version numbers printed.
 
 import sys
 
+def get_py_version():
+    return f"{sys.version_info.major}.{sys.version_info.minor}"
+
 checks = [
-    ("Python",      lambda: sys.version,              "3.10"),
+    ("Python",      get_py_version,                                "3."),
     ("NumPy",       lambda: __import__('numpy').__version__,       "1."),
     ("SciPy",       lambda: __import__('scipy').__version__,       "1."),
     ("Matplotlib",  lambda: __import__('matplotlib').__version__,  "3."),
@@ -1189,9 +1191,8 @@ all_pass = True
 for name, version_fn, min_prefix in checks:
     try:
         ver = version_fn()
-        status = "PASS" if ver.startswith(min_prefix) else "CHECK"
-        if status != "PASS":
-            all_pass = False
+        status = "PASS" if ver.startswith(min_prefix) else "FAIL"
+        all_pass = all_pass and (status == "PASS")
         print(f"  {name:<14}  {str(ver):<22}  {status:>8}")
     except Exception as e:
         print(f"  {name:<14}  {'IMPORT ERROR':<22}  {'FAIL':>8}")

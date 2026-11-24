@@ -134,6 +134,7 @@ def fit_stopping_potential(voltage_data, current_data):
     return popt[1], perr[1], popt, photoelectric_model
 
 # Analyze all wavelength datasets
+wavelengths = [365, 405, 436, 546, 578]  # nm (mercury emission lines)
 stopping_potentials = []
 stopping_uncertainties = []
 frequencies = []
@@ -551,7 +552,7 @@ def schrodinger_barrier_system(xi, psi_dpsi, alpha_squared, epsilon):
     Define Schrödinger equation as first-order ODE system for barrier tunneling.
     
     State vector: [ψ, dψ/dξ]
-    Equation: d²ψ/dξ² = α²[(1-ε)Θ(ξ)Θ(1-ξ) + ε]ψ
+    Equation: d²ψ/dξ² = α²[Θ(ξ)Θ(1-ξ) - ε]ψ
     where Θ is Heaviside step function defining barrier region 0 ≤ ξ ≤ 1
     
     Args:

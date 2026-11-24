@@ -82,9 +82,9 @@ where $H(z) = H_0 \sqrt{\Omega_m (1+z)^3 + \Omega_r (1+z)^4 + \Omega_k (1+z)^2 +
 
 The particle horizon—the maximum comoving distance from which light could have reached us by time $t$—is:
 
-$$\chi_{\text{horizon}}(t) = c \int_0^t \frac{dt'}{a(t')} = c \int_z^\infty \frac{dz'}{H(z')}$$
+$$\chi_{\text{horizon}}(t) = c \int_0^t \frac{dt'}{a(t')} = c \int_0^\infty \frac{dz'}{H(z')}$$
 
-For our universe with dark energy, this integral converges, yielding a finite observable universe with comoving radius $\chi_{\text{horizon}}(t_0) \approx 14 \, \text{Gpc}$ corresponding to a present-day proper distance (accounting for expansion during light travel time) of roughly $46 \, \text{Gpc}$. Objects beyond this horizon are causally disconnected from us; their light has not yet had time to reach us.
+For our universe with dark energy, this integral converges, yielding a finite observable universe with comoving radius $\chi_{\text{horizon}}(t_0) \approx 46 \, \text{Gly} \approx 14 \, \text{Gpc}$, corresponding to a present-day proper distance of the same value. Objects beyond this horizon are causally disconnected from us; their light has not yet had time to reach us.
 
 ## 2. Core Architecture & Mechanics
 
@@ -151,7 +151,7 @@ Systematic uncertainties dominate statistical errors in contemporary cosmology. 
 
 Observational systematics include photometric calibration errors, dust extinction corrections, peculiar velocity contamination at low redshift, and selection biases in flux-limited surveys. The "cosmic variance" from finite sampling of density fluctuations imposes fundamental statistical limits: measuring large-scale structure modes with wavelength $\lambda \sim 100 \, \text{Mpc}$ in a survey volume $(1 \, \text{Gpc})^3$ samples only $\sim (1000/100)^3 = 1000$ independent modes, yielding $\sim 3\%$ fractional uncertainty.
 
-Weak gravitational lensing measurements require exquisite control of point-spread functions and shear systematics. Galaxy shapes are distorted by percent-level effects from intervening large-scale structure, but atmospheric seeing and telescope optics produce much larger PSF anisotropies that must be modeled and removed. Next-generation surveys like Rubin Observatory LSST and ESA Euclid will image billions of galaxies, probing dark energy equation of state evolution through $w(z) = w_0 + w_a(1-a)$ parameterizations with sub-percent precision.
+Weak gravitational lensing measurements require exquisite control of point-spread functions and shear systematics. Galaxy shapes are distorted by percent-level effects from intervening large-scale structure, but atmospheric seeing and telescope optics produce much larger PSF anisotropies that must be modeled and removed. Next-generation surveys like Rubin Observatory LSST and ESA Euclid will image billions of galaxies, probing dark energy equation of state evolution through $w(a) = w_0 + w_a(1-a)$ parameterizations with sub-percent precision.
 
 Theoretical uncertainties in nonlinear structure formation affect predictions for small-scale clustering and lensing. The matter power spectrum transitions from linear perturbation theory ($\delta \rho / \rho \ll 1$) on large scales to nonlinear N-body dynamics ($\delta \rho / \rho \gg 1$) on scales below $\sim 10 \, \text{Mpc}$. Baryonic physics—gas cooling, star formation, supernova feedback, AGN jets—further complicates predictions. Hydrodynamic simulations like IllustrisTNG and EAGLE model these processes, but residual uncertainties limit precision cosmology from small-scale observables.
 

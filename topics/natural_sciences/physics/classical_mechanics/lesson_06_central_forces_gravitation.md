@@ -66,11 +66,11 @@ The radial motion is now identical to one-dimensional motion in the potential $V
 
 For the gravitational potential $V(r) = -GMm/r$, writing the reduced mass $\mu$ and the two masses explicitly as $m$ (satellite) and $M$ (central body, $M \gg m$),
 
-$$V_{\text{eff}}(r) = -\frac{GMm}{r} + \frac{\ell^2}{2mr^2}$$
+$$V_{\text{eff}}(r) = -\frac{GMm}{r} + \frac{\ell^2}{2\mu r^2}$$
 
 The attractive $1/r$ term dominates at large $r$ and the repulsive $1/r^2$ centrifugal term dominates at small $r$. Their competition produces a minimum at
 
-$$r_{\min} = \frac{\ell^2}{GMm^2}$$
+$$r_{\min} = \frac{\ell^2}{GMm\mu}$$
 
 which you can verify by setting $dV_{\text{eff}}/dr = 0$. At this radius $V_{\text{eff}}$ achieves its global minimum value $V_{\text{eff,min}} = -G^2M^2m^3/(2\ell^2)$. A particle sitting exactly at this energy with $\dot{r} = 0$ moves in a perfect circle. If $E$ exceeds this minimum but remains negative, the particle oscillates radially between two turning points $r_1$ and $r_2$ — the periapsis and apoapsis of an elliptical orbit. If $E = 0$ the orbit is parabolic, and if $E > 0$ it is hyperbolic. The entire zoo of Keplerian orbits emerges from reading a single graph of $V_{\text{eff}}(r)$.
 

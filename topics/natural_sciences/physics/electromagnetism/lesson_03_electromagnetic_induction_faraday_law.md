@@ -162,11 +162,11 @@ Induction heating systems require impedance matching between the RF power supply
 
 In pulsed inductive systems such as coilguns and magnetic pulsers, the discharge time constant $\tau = L/R$ must be minimized to achieve high peak currents. Use low-inductance coil geometries (pancake coils, single-layer solenoids) and low-resistance bus bars. The peak current in a capacitor-driven inductive discharge is
 
-$$I_{\text{peak}} = V_0 \sqrt{\frac{C}{L}} e^{-R/(2L) t_{\text{peak}}}$$
+$$I_{\text{peak}} \approx V_0 \sqrt{\frac{C}{L}}$$
 
-where $t_{\text{peak}} \approx \pi \sqrt{LC}$ for underdamped oscillations. Maximize $I_{\text{peak}}$ by increasing capacitance or decreasing inductance, but beware of increased stress on insulation and mechanical forces proportional to $I^2$.
+occurring near $t_{\text{peak}} \approx \pi \sqrt{LC}$ for underdamped oscillations, with subsequent peaks attenuated by $e^{-Rt/(2L)}$. Maximize $I_{\text{peak}}$ by increasing capacitance or decreasing inductance, but beware of increased stress on insulation and mechanical forces proportional to $I^2$.
 
-Thermal management in high-current inductors and transformers is critical to prevent insulation degradation and core saturation. Operate well below the Curie temperature of ferromagnetic cores ($\sim 770 \, \text{K}$ for iron, $\sim 850 \, \text{K}$ for cobalt) to avoid loss of magnetic permeability. Monitor core temperature using embedded thermocouples or IR thermography. If the core temperature exceeds 100 °C during normal operation, reduce the excitation current, increase ventilation, or switch to a core material with lower hysteresis losses (e.g., amorphous metal alloys).
+Thermal management in high-current inductors and transformers is critical to prevent insulation degradation and core saturation. Operate well below the Curie temperature of ferromagnetic cores ($\sim 1043 \, \text{K}$ for iron, $\sim 1388 \, \text{K}$ for cobalt) to avoid loss of magnetic permeability. Monitor core temperature using embedded thermocouples or IR thermography. If the core temperature exceeds 100 °C during normal operation, reduce the excitation current, increase ventilation, or switch to a core material with lower hysteresis losses (e.g., amorphous metal alloys).
 
 Precision measurement of small inductances (nH to µH) requires a vector network analyzer (VNA) or an LCR meter operating at the intended application frequency. Parasitic capacitance and lead inductance dominate measurements at high frequencies, so use four-terminal Kelvin connections to eliminate lead resistance and inductance errors. Calibrate the instrument using open, short, and load standards before measurement. The measured impedance $Z(\omega) = R + j\omega L$ yields inductance $L = \text{Im}(Z)/\omega$ and series resistance $R = \text{Re}(Z)$.
 

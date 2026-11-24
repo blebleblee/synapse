@@ -177,7 +177,7 @@ dt = t_eval[1] - t_eval[0]
 # Estimate LLE
 # tau can be estimated via mutual information or autocorrelation, using 10*dt here
 # m can be estimated via false nearest neighbors, using 3 here
-lle = largest_lyapunov_exponent(signal, tau=int(10/dt), m=3, max_iter=5000)
+lle = largest_lyapunov_exponent(signal, tau=50, m=3, max_iter=5000)
 print(f"Estimated Largest Lyapunov Exponent: {lle:.4f} (per unit time)")
 ```
 
@@ -233,12 +233,12 @@ def detect_separation_plateau(cp_data, chord_positions, gradient_threshold=0.5):
         cp_gradient = np.gradient(cp_row, chord_positions)
         
         # On the suction surface (upper), Cp is negative. 
-        # Separation is indicated by a sudden drop in the magnitude of the adverse pressure gradient.
-        # Look for the region where dCp/dx is near zero (dead air region)
+        # Separation is indicated by a plateau where dCp/dx is near zero.
+        # This flat region indicates a dead-air recirculation zone.
         # We search from the leading edge (x/c=0) towards the trailing edge.
         separation_idx = None
         for j in range(1, len(cp_gradient)):
-            if cp_gradient[j] > -gradient_threshold and chord_positions[j] < 0.5:
+            if abs(cp_gradient[j]) < gradient_threshold and chord_positions[j] < 0.5:
                 # Plateau found on the front half of the airfoil indicates major separation
                 separation_idx = j
                 break

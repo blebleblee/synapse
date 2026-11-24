@@ -182,7 +182,7 @@ requires calculating all first derivatives $\partial_\mu g_{\nu\rho}$ of the met
 
 For the Schwarzschild metric, the non-zero derivatives of $g_{\mu\nu}$ are
 
-$$\partial_r g_{tt} = \frac{r_s}{r^2}, \quad \partial_r g_{rr} = -\frac{r_s}{r^2}\left(1-\frac{r_s}{r}\right)^{-2}, \quad \partial_r g_{\theta\theta} = 2r, \quad \partial_r g_{\phi\phi} = 2r\sin^2\theta,$$
+$$\partial_r g_{tt} = -\frac{r_s}{r^2}, \quad \partial_r g_{rr} = -\frac{r_s}{r^2}\left(1-\frac{r_s}{r}\right)^{-2}, \quad \partial_r g_{\theta\theta} = 2r, \quad \partial_r g_{\phi\phi} = 2r\sin^2\theta,$$
 
 $$\partial_\theta g_{\phi\phi} = 2r^2 \sin\theta \cos\theta.$$
 
@@ -228,7 +228,7 @@ governs radial motion via
 
 $$\frac{1}{2}\left(\frac{dr}{d\tau}\right)^2 + V_{\text{eff}}(r) = \frac{E^2 - 1}{2}.$$
 
-The last term $-r_s L^2/r^3$, absent in Newtonian gravity, causes perihelion precession and the existence of unstable circular orbits at $r = 3r_s$ for photons.
+The last term $-r_s L^2/r^3$, absent in Newtonian gravity, causes perihelion precession and the existence of unstable circular orbits at $r = 3r_s/2$ for photons.
 
 ### Riemann Tensor Component Calculation
 
@@ -346,7 +346,7 @@ This projection keeps $g_{\mu\nu} u^\mu u^\nu = -1$ exactly at each step. For nu
 
 Manual calculation of Christoffel symbols and Riemann tensors is error-prone for complex metrics. Symbolic algebra systems automate this:
 
-- **Mathematica**: Packages like `xAct` (specifically `xCoba` and `xTensor`) provide comprehensive tensor manipulation, automatic index contraction, and symmetry exploitation. The `GREATER` package specializes in perturbation theory and cosmological calculations.
+- **Mathematica**: Packages like `xAct` (specifically `xCoba` and `xTensor`) provide comprehensive tensor manipulation, automatic index contraction, and symmetry exploitation.
   
 - **Maxima**: The `ctensor` package computes Christoffel symbols, Riemann, Ricci, and Einstein tensors from a given metric. Commands such as `christof(true)`, `riemann(true)`, `einstein(true)` produce the desired quantities.
 

@@ -637,12 +637,12 @@ def c_Cu_calc(mC, mw, Ti, Th, Te, Ccal):
     return ((mw * c_water + Ccal) * (Te - Ti)) / (mC * (Th - Te))
 
 params = {
-    'm_Cu':     (m_Cu, m_Cu_err),
-    'm_water':   (m_water, m_water_err),
-    'T_initial': (T_initial, T_initial_err),
-    'T_hot':     (T_hot, T_hot_err),
-    'T_eq':      (T_eq, T_eq_err),
-    'C_cal':     (C_cal, C_cal_err),
+    'mC':   (m_Cu, m_Cu_err),
+    'mw':   (m_water, m_water_err),
+    'Ti':   (T_initial, T_initial_err),
+    'Th':   (T_hot, T_hot_err),
+    'Te':   (T_eq, T_eq_err),
+    'Ccal': (C_cal, C_cal_err),
 }
 
 c_base = c_Cu_calc(m_Cu, m_water, T_initial, T_hot, T_eq, C_cal)

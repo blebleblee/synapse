@@ -98,7 +98,7 @@ zp_err, k_err, c_err = np.sqrt(np.diag(pcov))
 print("Photometric Calibration Results:")
 print(f"Zero-Point (ZP_V):       {zp_fit:.4f} ± {zp_err:.4f} mag")
 print(f"Extinction (k_V):        {k_fit:.4f} ± {k_err:.4f} mag/airmass")
-print(f"Color Term (c_V):        {c_fit:.4f} ± {c_fit:.4f}")
+print(f"Color Term (c_V):        {c_fit:.4f} ± {c_err:.4f}")
 print(f"True Values:             ZP={zp_true}, k={k_true}, c={c_true}")
 print()
 
@@ -306,7 +306,7 @@ The velocity precision estimate derived from the CCF FWHM and signal-to-noise ra
 
 Binary star systems provide natural laboratories for measuring stellar masses through orbital dynamics, applying Newtonian mechanics and Kepler's laws to the observed radial velocity curves. A spectroscopic binary exhibits periodic Doppler shifts as the stars orbit their common center of mass, with the velocity amplitude $K = (2\pi a \sin i) / (P \sqrt{1 - e^2})$ encoding the semi-major axis $a$, orbital period $P$, eccentricity $e$, and inclination $i$. For single-lined spectroscopic binaries (SB1) where only one star's spectrum is visible, the mass function $f(M) = (M_2 \sin i)^3 / (M_1 + M_2)^2 = K^3 P (1 - e^2)^{3/2} / (2\pi G)$ provides a statistical constraint on the companion mass $M_2$ given the primary mass $M_1$ and unknown inclination. Double-lined systems (SB2) with measurable velocity amplitudes for both components yield individual masses through the mass ratio $M_1 / M_2 = K_2 / K_1$.
 
-This exercise simulates a multi-epoch radial velocity campaign on an SB1 system, fitting the full seven-parameter orbital model: period $P$, eccentricity $e$, argument of periastron $\omega$, time of periastron passage $T_0$, velocity semi-amplitude $K$, systemic velocity $\gamma$, and a linear velocity trend $\dot{\gamma}$ accounting for potential tertiary companions or galactic differential rotation. The parameter space contains degeneracies, particularly between $e$, $\omega$, and $T_0$, requiring careful initialization and robust optimization. The least-squares solution employs the Levenberg-Marquardt algorithm with analytical Jacobian for efficiency.
+This exercise simulates a multi-epoch radial velocity campaign on an SB1 system, fitting the six-parameter orbital model: period $P$, eccentricity $e$, argument of periastron $\omega$, time of periastron passage $T_0$, velocity semi-amplitude $K$, and systemic velocity $\gamma$ accounting for potential tertiary companions or galactic differential rotation. The parameter space contains degeneracies, particularly between $e$, $\omega$, and $T_0$, requiring careful initialization and robust optimization. The least-squares solution employs the Levenberg-Marquardt algorithm via numerical differentiation for efficiency.
 
 ```python
 import numpy as np
@@ -338,8 +338,8 @@ def rv_keplerian(t, P, K, e, omega, T0, gamma):
     # Solve Kepler's equation for eccentric anomaly E
     # M = E - e * sin(E)  [iterative Newton-Raphson]
     E = M.copy()
-    for _ in range(10):  # 10 iterations sufficient for e < 0.9
-        E = M + e * np.sin(E)
+    for _ in range(10):  # Newton-Raphson iteration
+        E = E + (M - E + e * np.sin(E)) / (1 - e * np.cos(E))
     
     # True anomaly
     nu = 2 * np.arctan2(np.sqrt(1 + e) * np.sin(E / 2),
@@ -464,6 +464,8 @@ axes[1].grid(alpha=0.3)
 axes[1].set_xlim(-0.5, 0.5)
 
 plt.tight_layout()
+import os
+os.makedirs('astro_labs/orbits', exist_ok=True)
 plt.savefig('astro_labs/orbits/binary_rv_fit.png', dpi=150)
 print("Saved binary orbit fit: astro_labs/orbits/binary_rv_fit.png")
 ```
@@ -636,6 +638,8 @@ if fit_success:
     axes[1].set_xlim(0, 6)
 
 plt.tight_layout()
+import os
+os.makedirs('astro_labs/photometry', exist_ok=True)
 plt.savefig('astro_labs/photometry/transit_lightcurve.png', dpi=150)
 print("Saved transit light curve: astro_labs/photometry/transit_lightcurve.png")
 ```
@@ -909,7 +913,7 @@ Fundamental constants anchor all astrophysical calculations, connecting observat
 **Magnitude System Conversions:**
 - Apparent magnitude to flux ratio: $F_1 / F_2 = 10^{0.4(m_2 - m_1)}$
 - Distance modulus: $\mu = m - M = 5 \log_{10}(d/\text{pc}) - 5$
-- Absolute magnitude to luminosity: $M_{\text{bol}} = 4.74 - 2.5 \log_{10}(L/L_\odot)$ (solar bolometric magnitude = 4.74)
+- Absolute magnitude to luminosity: $M_{\text{bol}} = 4.74 - 2.5 \log_{10}(L/L_\odot)$ (solar bolometric magnitude = 4.74, IAU 2015)
 - AB magnitude zero-point: $m_{\text{AB}} = -2.5 \log_{10}(f_\nu / \text{erg·s}^{-1}\text{·cm}^{-2}\text{·Hz}^{-1}) - 48.60$
 
 **Doppler Shift Relations:**
@@ -992,7 +996,7 @@ python -c "from scipy.optimize import curve_fit; print('SciPy optimization: OK')
 python -c "import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt; print('Matplotlib backend: OK')"
 
 # Validate Astropy core functionality
-python -c "from astropy import units as u, constants as const; print(f'Astropy {astropy.__version__}'); print(f'Speed of light: {const.c}')"
+python -c "import astropy; from astropy import units as u, constants as const; print(f'Astropy {astropy.__version__}'); print(f'Speed of light: {const.c}')"
 
 # Check Astropy coordinate transformations
 python -c "from astropy.coordinates import SkyCoord; c = SkyCoord('12h34m56s', '+23d45m12s'); print(f'Coordinates: RA={c.ra.deg:.4f} deg, Dec={c.dec.deg:.4f} deg')"

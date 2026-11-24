@@ -68,7 +68,7 @@ where $f$ represents friction. For sliding motion, $f = \mu_k N = \mu_k mg\cos\t
 
 $$a_x = g(\sin\theta - \mu_k \cos\theta)$$
 
-This analysis reveals that the angle $\theta_c = \arctan(\mu_k)$ marks the critical inclination—below this angle, friction prevents sliding; above it, the block accelerates downslope.
+This analysis reveals that the angle $\theta_c = \arctan(\mu_s)$ marks the critical inclination—below this angle, friction prevents sliding; above it, the block accelerates downslope.
 
 ### Experimental Protocol: Measuring Coefficients of Friction
 
@@ -196,7 +196,7 @@ $$P_{\text{dissipated}} = f \cdot v = \mu N v$$
 
 For a sliding block decelerating on a rough surface, integrating power over time yields the total thermal energy generated:
 
-$$Q_{\text{thermal}} = \int f \, dx = f \cdot d = \mu mg \cos\theta \cdot d$$
+$$Q_{\text{thermal}} = \int f \, dx = f \cdot d = \mu mg d$$
 
 where $d$ is the sliding distance. This energy warms both surfaces, and careful calorimetry can verify energy conservation across mechanical and thermal domains.
 

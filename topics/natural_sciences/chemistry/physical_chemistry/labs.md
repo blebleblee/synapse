@@ -20,7 +20,7 @@ The practitioner operates under the constraint that every measured quantity carr
 
 Power on the spectrophotometer and allow the deuterium and tungsten lamps to stabilize for thirty minutes; thermal drift during warm-up introduces baseline noise. Set the instrument to scan from 450 nm to 600 nm at 1 nm resolution with a scan rate of 100 nm/min. Fill a clean quartz cuvette with deionized water and insert it into the reference beam path to establish the baseline absorbance at zero. The spectrophotometer measures the ratio $I / I_0$ where $I$ represents transmitted intensity and $I_0$ denotes incident intensity; absorbance follows as $A = -\log_{10}(I / I_0)$.
 
-Rinse the sample cuvette three times with the 0.100 mM permanganate solution to eliminate dilution artifacts from residual water, then fill the cuvette to the optical window level without introducing air bubbles. Insert the cuvette into the sample beam path and record the absorption spectrum. The permanganate ion exhibits a sharp maximum near 525 nm with absorbance approximately 0.52 for the 0.100 mM solution in a 1 cm cuvette. Repeat the measurement for all five concentrations, recording the peak absorbance at the wavelength of maximum absorption. Between samples, rinse the cuvette thoroughly with deionized water followed by three rinses with the next solution.
+Rinse the sample cuvette three times with the 0.100 mM permanganate solution to eliminate dilution artifacts from residual water, then fill the cuvette to the optical window level without introducing air bubbles. Insert the cuvette into the sample beam path and record the absorption spectrum. The permanganate ion exhibits a sharp maximum near 525 nm with absorbance approximately 0.23 for the 0.100 mM solution in a 1 cm cuvette. Repeat the measurement for all five concentrations, recording the peak absorbance at the wavelength of maximum absorption. Between samples, rinse the cuvette thoroughly with deionized water followed by three rinses with the next solution.
 
 **Data Analysis:** Construct a calibration curve by plotting absorbance on the ordinate versus concentration on the abscissa. Execute the following Python script to perform linear regression and extract the molar absorptivity:
 
@@ -33,7 +33,7 @@ from scipy.stats import linregress
 concentrations = np.array([0.100e-3, 0.200e-3, 0.400e-3, 0.600e-3, 0.800e-3, 1.000e-3])
 
 # Measured absorbances at 525 nm (example data - replace with actual measurements)
-absorbances = np.array([0.052, 0.104, 0.208, 0.312, 0.416, 0.520])
+absorbances = np.array([0.230, 0.460, 0.920, 1.380, 1.840, 2.300])
 
 # Perform linear regression
 slope, intercept, r_value, p_value, std_err = linregress(concentrations, absorbances)
@@ -123,7 +123,7 @@ Ka_experimental = 10**(-pKa_experimental)
 print(f"pH at half-equivalence point (12.50 mL): {pH_half_equiv:.3f}")
 print(f"Experimental pKa: {pKa_experimental:.3f}")
 print(f"Experimental Ka: {Ka_experimental:.3e}")
-print(f"Literature Ka (acetic acid): 1.75e-5")
+print(f"Literature pKa (acetic acid at 25°C): {-np.log10(1.75e-5):.2f}")
 print(f"Percent error: {abs(Ka_experimental - 1.75e-5) / 1.75e-5 * 100:.2f}%")
 
 # Theoretical titration curve calculation using Henderson-Hasselbalch
@@ -139,7 +139,7 @@ def theoretical_pH(V_base, C_acid=0.100, V_acid=25.00, C_base=0.100, Ka=1.75e-5)
     # Total volume
     V_total = (V_acid + V_base) / 1000
     
-    if V_base == 0:
+    if V_base <= 0.01:
         # Initial pH: weak acid alone
         H_conc = np.sqrt(Ka * C_acid)
         return -np.log10(H_conc)
@@ -149,7 +149,7 @@ def theoretical_pH(V_base, C_acid=0.100, V_acid=25.00, C_base=0.100, Ka=1.75e-5)
         n_conjugate_base = n_base_added
         ratio = n_conjugate_base / n_acid_remaining
         return pKa_experimental + np.log10(ratio)
-    elif V_base == 25.00:
+    elif abs(V_base - 25.00) < 0.01:
         # Equivalence point: weak base hydrolysis
         C_conjugate_base = n_acid_initial / V_total
         Kb = 1e-14 / Ka
@@ -453,7 +453,7 @@ The Monte Carlo standard deviation typically exceeds the regression standard err
 - Planck constant $h = 6.626 \times 10^{-34}$ J s
 - Avogadro constant $N_A = 6.022 \times 10^{23}$ mol⁻¹
 - Speed of light $c = 2.998 \times 10^8$ m s⁻¹
-- Ion product of water $K_w = 1.01 \times 10^{-14}$ at 25 °C
+- Ion product of water $K_w = 1.0 \times 10^{-14}$ at 25 °C
 
 **Common Conversions:**
 - Energy: 1 eV = 96.485 kJ/mol = 1.602 × 10⁻¹⁹ J
