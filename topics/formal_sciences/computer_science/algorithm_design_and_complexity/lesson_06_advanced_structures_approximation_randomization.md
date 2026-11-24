@@ -50,7 +50,7 @@ $$s_k \geq 1 + F_2 + F_2 + \sum_{i=3}^{k} F_i = 1 + 1 + 1 + \sum_{i=3}^{k} F_i =
 
 Let us just state the standard result cleanly. The precise claim is $s_k \geq F_{k+2}$, proved by showing that $s_k \geq 1 + \sum_{i=2}^{k} s_{i-2}$ with base cases $s_0 \geq 1 = F_2$ and $s_1 \geq 2 = F_3$, and then observing that this recurrence yields $s_k \geq F_{k+2}$ by the Fibonacci recurrence $F_{k+2} = F_{k+1} + F_k$. The key identity is:
 
-$$F_{k+2} = 1 + \sum_{i=0}^{k-2} F_{i+2}$$
+$$F_{k+2} = 1 + \sum_{i=1}^{k} F_i$$
 
 which follows from repeated application of $F_{n} = F_{n-1} + F_{n-2}$.
 

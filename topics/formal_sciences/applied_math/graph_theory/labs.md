@@ -353,6 +353,8 @@ def chromatic_polynomial_deletion_contraction(G, k_sym):
         if neighbor != u:
             G_contract.add_edge(u, neighbor)
     G_contract.remove_node(v)
+    # Ensure no self-loops remain after contraction
+    G_contract.remove_edges_from([(v, v) for v in G_contract.nodes() if G_contract.has_edge(v, v)])
     # Relabel to maintain integer node labels
     mapping = {node: i for i, node in enumerate(G_contract.nodes())}
     G_contract = nx.relabel_nodes(G_contract, mapping)
@@ -757,7 +759,7 @@ theorem handshaking_lemma :
   -- Rewrite degree sum in terms of dart finset cardinality.
   -- G.dartFinset consists of ordered pairs (v, w) with v~w.
   -- Each undirected edge {u,v} contributes exactly 2 darts: (u,v) and (v,u).
-  rw [← G.sum_degrees_eq_twice_card_edges]
+  exact G.sum_degrees_eq_twice_card_edges
 ```
 
 The critical lemma `SimpleGraph.sum_degrees_eq_twice_card_edges` is proven in Mathlib by establishing a two-to-one correspondence between darts (directed incidences) and edges. Each dart is a pair $(v, w)$ with $v \sim w$, and the map sending a dart to its underlying undirected edge is exactly 2-to-1. The formal statement in Mathlib is:
@@ -779,18 +781,9 @@ import Mathlib.Data.Fin.Basic
 
 -- Define the cube graph on 8 vertices as a concrete SimpleGraph (Fin 8)
 def cubeAdj : Fin 8 → Fin 8 → Prop
-  | 0, 1 | 1, 0 => True
-  | 0, 2 | 2, 0 => True
-  | 0, 4 | 4, 0 => True
-  | 1, 3 | 3, 1 => True
-  | 1, 5 | 5, 1 => True
-  | 2, 3 | 3, 2 => True
-  | 2, 6 | 6, 2 => True
-  | 3, 7 | 7, 3 => True
-  | 4, 5 | 5, 4 => True
-  | 4, 6 | 6, 4 => True
-  | 5, 7 | 7, 5 => True
-  | 6, 7 | 7, 6 => True
+  | 0, 1 | 1, 0 | 0, 2 | 2, 0 | 0, 4 | 4, 0 | 1, 3 | 3, 1 | 1, 5 | 5, 1 |
+    2, 3 | 3, 2 | 2, 6 | 6, 2 | 3, 7 | 7, 3 | 4, 5 | 5, 4 | 4, 6 | 6, 4 |
+    5, 7 | 7, 5 | 6, 7 | 7, 6 => True
   | _, _ => False
 
 instance : DecidableEq (Fin 8) := inferInstance

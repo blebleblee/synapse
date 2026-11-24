@@ -104,7 +104,7 @@ Let $\mathcal{L}_G$ be the first-order language with a single binary predicate s
 
 $$\sigma_{\text{sym}} \equiv \forall x\, \forall y\, (E(x,y) \to E(y,x))$$
 
-And the formula expressing the existence of a *vertex with no self-loop*:
+And the formula expressing that no vertex has a self-loop:
 
 $$\sigma_{\text{no-loop}} \equiv \forall x\, \neg E(x, x)$$
 

@@ -16,7 +16,7 @@ Before developing the theory, it is worth anchoring this abstraction in a canoni
 
 $$\rho\bigl((12)\bigr) = \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 1 \end{pmatrix}, \qquad \rho\bigl((123)\bigr) = \begin{pmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{pmatrix}.$$
 
-One immediately verifies that $\rho\bigl((12)\bigr)\rho\bigl((123)\bigr) = \rho\bigl((12)(123)\bigr) = \rho\bigl((132)\bigr)$, confirming the homomorphism property. This three-dimensional representation, however, is *reducible*: the vector $v_0 = (1,1,1)^T$ is fixed by every $\rho(\sigma)$, so the one-dimensional subspace $\mathbb{F}\cdot v_0$ is an *invariant subspace*, and the representation decomposes into smaller, irreducible pieces. Understanding that decomposition — classifying the irreducible constituents and reconstructing any representation from them — is the central project of representation theory.
+One immediately verifies that $\rho\bigl((12)\bigr)\rho\bigl((123)\bigr) = \rho\bigl((12)(123)\bigr) = \rho\bigl((23)\bigr)$, confirming the homomorphism property. This three-dimensional representation, however, is *reducible*: the vector $v_0 = (1,1,1)^T$ is fixed by every $\rho(\sigma)$, so the one-dimensional subspace $\mathbb{F}\cdot v_0$ is an *invariant subspace*, and the representation decomposes into smaller, irreducible pieces. Understanding that decomposition — classifying the irreducible constituents and reconstructing any representation from them — is the central project of representation theory.
 
 ### Subrepresentations, Irreducibility, and the Problem of Decomposition
 
@@ -132,7 +132,7 @@ when $\mathbb{F}$ is algebraically closed, where the product runs over the $r$ i
 
 ### Constructing Representations Explicitly: Induced and Restricted Representations
 
-Beyond the irreducibles themselves, two fundamental constructions build new representations from old: restriction and induction. If $H \leq G$ is a subgroup and $(\rho, V)$ is a representation of $G$, the **restricted representation** $\mathrm{Res}^G_H(\rho)$ is simply $\rho$ viewed as a representation of $H$ by ignoring the elements of $G \setminus H$. The module-theoretic version is $\mathrm{Res}^G_H(V) = \mathbb{F}[H] \otimes_{\mathbb{F}[G]} V$... but more cleanly: $V$ becomes an $\mathbb{F}[H]$-module by restricting the action.
+Beyond the irreducibles themselves, two fundamental constructions build new representations from old: restriction and induction. If $H \leq G$ is a subgroup and $(\rho, V)$ is a representation of $G$, the **restricted representation** $\mathrm{Res}^G_H(\rho)$ is simply $\rho$ viewed as a representation of $H$ by ignoring the elements of $G \setminus H$. The module-theoretic version is straightforward: $V$ becomes an $\mathbb{F}[H]$-module by restricting the $\mathbb{F}[G]$-action to $\mathbb{F}[H]$, with no change to the underlying vector space.
 
 Induction runs in the opposite direction. Given a representation $(\sigma, W)$ of a subgroup $H \leq G$, the **induced representation** is
 

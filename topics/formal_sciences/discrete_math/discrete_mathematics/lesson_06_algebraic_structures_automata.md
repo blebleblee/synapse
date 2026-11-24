@@ -101,25 +101,19 @@ Next, we compute:
 
 $$
 \begin{align*}
-(a \land b) \lor (\neg a \lor \neg b) &= ((a \land b) \lor \neg a) \land ((a \land b) \lor \neg b) \quad \text{(distributivity)} \\
-&= ((a \lor \neg a) \land (b \lor \neg a)) \land ((a \lor \neg b) \land (b \lor \neg b)) \\
-&= (1 \land (b \lor \neg a)) \land ((a \lor \neg b) \land 1) \\
-&= (b \lor \neg a) \land (a \lor \neg b).
+(a \land b) \lor (\neg a \lor \neg b) &= (a \land b) \lor \neg a \lor \neg b \quad \text{(associativity)} \\
+&= ((a \land b) \lor \neg a) \lor \neg b \quad \text{(associativity)} \\
+&= ((a \lor \neg a) \land (b \lor \neg a)) \lor \neg b \quad \text{(distributivity)} \\
+&= (1 \land (b \lor \neg a)) \lor \neg b \quad \text{(complementation)} \\
+&= (b \lor \neg a) \lor \neg b \\
+&= b \lor \neg a \lor \neg b \quad \text{(associativity)} \\
+&= (b \lor \neg b) \lor \neg a \quad \text{(commutativity, associativity)} \\
+&= 1 \lor \neg a \quad \text{(complementation)} \\
+&= 1. \quad \text{(identity)}
 \end{align*}
 $$
 
-Expanding further:
-
-$$
-\begin{align*}
-(b \lor \neg a) \land (a \lor \neg b) &= ((b \lor \neg a) \land a) \lor ((b \lor \neg a) \land \neg b) \\
-&= (a \land b) \lor (a \land \neg a) \lor (\neg a \land \neg b) \lor (b \land \neg b) \\
-&= (a \land b) \lor 0 \lor (\neg a \land \neg b) \lor 0 \\
-&= (a \land b) \lor (\neg a \land \neg b).
-\end{align*}
-$$
-
-By further distributivity and complementation identities, this simplifies to $1$. Therefore, $\neg a \lor \neg b$ is the complement of $a \land b$, establishing $\neg(a \land b) = \neg a \lor \neg b$.
+Therefore, $\neg a \lor \neg b$ is the complement of $a \land b$, establishing $\neg(a \land b) = \neg a \lor \neg b$.
 
 Every Boolean function $f: \{0, 1\}^n \to \{0, 1\}$ can be represented in **disjunctive normal form (DNF)**: a disjunction (OR) of conjunctions (AND) of literals (variables or their negations). For each input assignment that makes $f$ true, form a conjunction of literals that is true exactly on that assignment, then take the disjunction of all such conjunctions. Dually, **conjunctive normal form (CNF)** is a conjunction of disjunctions of literals. The conversion between DNF and CNF involves applying De Morgan's Laws and distributivity.
 
@@ -283,6 +277,6 @@ Network intrusion detection (NIDS) matches thousands of regular expressions (sig
 - **Alphabet compression:** Partition the alphabet into equivalence classes (same transition behavior), reducing transition table size. For Unicode, byte ranges with identical transitions collapse to single symbols.
 - **Parallel matching:** Decompose automata into independent sub-automata executed on SIMD units or GPUs.
 
-Streaming algorithms maintain automaton state over unbounded inputs, outputting matches with bounded delay and memory. For approximate matching (allowing errors), Levenshtein automata accept strings within edit distance $k$, constructed in $O(k)$ size independent of string length.
+Streaming algorithms maintain automaton state over unbounded inputs, outputting matches with bounded delay and memory. For approximate matching (allowing errors), Levenshtein automata accept strings within edit distance $k$, constructed in $O((m+1)(k+1))$ size, where $m$ is the pattern length.
 
 The theory of algebraic structures, Boolean algebra, and finite automata is not an abstract curiosity but the operational substrate of digital computation, cryptographic security, and language processing. Every conditional branch in compiled code corresponds to a Boolean function; every authenticated message invokes finite field arithmetic; every parsed text traverses an automaton. Mastery of these formalisms equips the practitioner to design correct, efficient, and secure systems, to diagnose failures at the level of first principles, and to extend the computational frontier where brute force alone is insufficient. The elegance of the abstract reveals itself in the power of the concrete.

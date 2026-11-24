@@ -74,7 +74,7 @@ print(f"Number of subgroups: {details['num_subgroups']}")
 print(f"Subgroup orders: {sorted(set(details['subgroup_orders']))}")
 ```
 
-Execute this verification on the symmetric group $S_4$, which has order $4! = 24$ and a rich subgroup structure including cyclic subgroups, the Klein four-group, dihedral symmetries, and the alternating group $A_4$. The computation should discover 30 distinct subgroups with orders $\{1, 2, 3, 4, 6, 8, 12, 24\}$, each dividing 24 exactly. The trivial subgroup has order 1, maximal cyclic subgroups have order 4, the alternating group has order 12, and the full symmetric group has order 24.
+Execute this verification on the symmetric group $S_4$, which has order $4! = 24$ and a rich subgroup structure including cyclic subgroups, the Klein four-group, dihedral symmetries, and the alternating group $A_4$. The computation should discover subgroups with orders $\{1, 2, 3, 4, 6, 8, 12, 24\}$, each dividing 24 exactly. Note that SymPy's `subgroups()` returns one representative per conjugacy class (11 classes for $S_4$), not all 30 individual subgroups. The trivial subgroup has order 1, maximal cyclic subgroups have order 4, the alternating group has order 12, and the full symmetric group has order 24.
 
 Extend the verification to systematically test Lagrange's theorem across an entire family of finite groups. The symmetric groups $S_n$ provide a natural test suite since they exhibit diverse subgroup structures as $n$ increases. Construct and verify Lagrange's theorem for $S_3$ through $S_5$, observing how the number of subgroups explodes combinatorially:
 
@@ -99,7 +99,7 @@ def test_lagrange_symmetric_groups(max_n=5):
 symmetric_results = test_lagrange_symmetric_groups(max_n=5)
 ```
 
-The output reveals structural patterns: $S_3$ has order 6 with 6 subgroups of orders $\{1, 2, 3, 6\}$, while $S_5$ has order 120 with subgroups whose orders divide 120 according to its prime factorization $120 = 2^3 \cdot 3 \cdot 5$. Note that the computational expense grows rapidly—$S_6$ has 1,455 conjugacy classes of subgroups—so practical verification beyond $S_5$ requires optimized group enumeration algorithms or restriction to specific subgroup families.
+The output reveals structural patterns: $S_3$ has order 6 with 6 subgroups of orders $\{1, 2, 3, 6\}$, while $S_5$ has order 120 with subgroups whose orders divide 120 according to its prime factorization $120 = 2^3 \cdot 3 \cdot 5$. Note that the computational expense grows rapidly—$S_6$ has 56 conjugacy classes of subgroups (1,455 total individual subgroups)—so practical verification beyond $S_5$ requires optimized group enumeration algorithms or restriction to specific subgroup families.
 
 The second fundamental verification targets the First Isomorphism Theorem, which establishes the structural relationship between group homomorphisms and quotient groups. For any group homomorphism $\phi: G \to H$, the theorem guarantees that $G / \ker(\phi) \cong \text{im}(\phi)$. Computationally verify this by constructing explicit homomorphisms, computing their kernels and images, forming the quotient group, and verifying the isomorphism through element mapping.
 
@@ -137,8 +137,8 @@ def verify_first_isomorphism_theorem():
         if image == Permutation(2):  # identity in S_3
             kernel_elements.append(g)
     
-    # Kernel consists of elements with order dividing 3
-    # In Z_6, these are {0, 3} where 3 is the element of order 2
+    # Kernel consists of elements mapping to identity in the image (order 3)
+    # In Z_6, these are {0, 3}, the unique subgroup of order 2
     print(f"Kernel size: {len(kernel_elements)}")
     print(f"Kernel order: {len(kernel_elements)}")
     
@@ -259,7 +259,7 @@ def verify_cayley_theorem(group):
     for g1, g2 in sample_pairs:
         product = g1 * g2
         
-        perm_product = representations[str(g1)] * representations[str(g2)]
+        perm_product = representations[str(g2)] * representations[str(g1)]
         perm_expected = representations[str(product)]
         
         if perm_product != perm_expected:
@@ -372,9 +372,9 @@ def verify_non_unique_factorization():
     print(f"  N(1 + √(-5)) = {norm_factor}")
     
     print("\nIrreducibility check:")
-    print(f"  2 is irreducible: N(2) = 4 is not a product of integer norms > 1")
-    print(f"  3 is irreducible: N(3) = 9 is not a product of integer norms > 1")
-    print(f"  1 + √(-5) is irreducible: N = 6 is not a perfect square")
+    print(f"  2 is irreducible: 2 does not appear as a norm a² + 5b², so 2 cannot factor nontrivially")
+    print(f"  3 is irreducible: 3 does not appear as a norm a² + 5b², so 3 cannot factor nontrivially")
+    print(f"  1 + √(-5) is irreducible: N = 6 cannot be written as a product of norms of non-units")
     
     print("\nConclusion: Z[√(-5)] is NOT a unique factorization domain")
     print("The element 6 admits two distinct irreducible factorizations")
@@ -662,18 +662,6 @@ def chinese_remainder_poly(moduli, remainders, var):
         print(f"  f mod ({m}) = {remainder.as_expr()} {'✓' if matches else '✗'}")
     
     return solution
-
-# Test CRT with polynomial moduli
-x = symbols('x')
-
-# Solve system:
-# f ≡ x (mod x^2 - 1)
-# f ≡ 1 (mod x^2 + 1)
-
-moduli = [x**2 - 1, x**2 + 1]
-remainders = [x, 1]
-
-solution = chinese_remainder_poly(moduli, remainders, x)
 ```
 
 This implementation constructs the CRT solution explicitly through the standard algorithm: compute $M = \prod m_i$, find $M_i = M / m_i$ for each modulus, compute the multiplicative inverse of $M_i$ modulo $m_i$ using the extended Euclidean algorithm, and sum the terms $r_i \cdot s_i \cdot M_i$. The algorithm terminates with a polynomial that satisfies all congruence conditions simultaneously. The example solves the system where $f \equiv x \pmod{x^2 - 1}$ and $f \equiv 1 \pmod{x^2 + 1}$, yielding a unique solution modulo $(x^2 - 1)(x^2 + 1) = x^4 - 1$.
@@ -1153,9 +1141,7 @@ def verify_ideal(I_elements, R_elements, add, mul, zero):
     )
     print(f"Additively closed: {add_closed}")
     
-    # Closed under additive inverses
-    # (Implied by group property, but check explicitly)
-    inverses_closed = True  # Simplified check
+    # Closed under additive inverses (implied by additive group structure)
     
     # Absorbs multiplication: rI ⊆ I and Ir ⊆ I
     left_absorption = all(

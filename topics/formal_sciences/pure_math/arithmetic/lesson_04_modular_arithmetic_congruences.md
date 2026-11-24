@@ -188,7 +188,7 @@ $$m \equiv \sum_{k=0}^d a_k (-1)^k = a_0 - a_1 + a_2 - a_3 + \cdots \pmod{11}.$$
 
 Hence $11 \mid m$ if and only if the alternating sum of digits is divisible by $11$.
 
-**Divisibility by 7, 11, 13 simultaneously.** Since $10^3 = 1000 \equiv 1 \pmod{7}$, $1000 \equiv 1 \pmod{11}$, and $1000 \equiv 1 \pmod{13}$ (as $1001 = 7 \cdot 11 \cdot 13$), one may group digits in blocks of three from the right and test whether their alternating sum is divisible by $7$, $11$, or $13$ respectively—a more obscure but fully rigorous test.
+**Divisibility by 7, 11, 13 simultaneously.** Since $10^3 = 1000 \equiv -1 \pmod{7}$, $1000 \equiv -1 \pmod{11}$, and $1000 \equiv -1 \pmod{13}$ (as $1001 = 7 \cdot 11 \cdot 13$), one may group digits in blocks of three from the right and test whether their alternating sum is divisible by $7$, $11$, or $13$ respectively—a more obscure but fully rigorous test.
 
 ---
 

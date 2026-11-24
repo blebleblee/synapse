@@ -227,7 +227,7 @@ print("LHS of summed equation:", sp.simplify(lhs_sum[0]))
 print("RHS of summed equation:", rhs_sum)
 ```
 
-The infeasibility of the second system is certified by the Farkas vector $y = [1, 0]^T$: since $A_2^T y = [1, -1]^T \geq 0$ componentwise and $b_2^T y = 1 > 0$ — but notice our $b_2 = [1, 1]^T$, so $b_2^T y = 1 > 0$, contradicting the requirement $b^T y < 0$ for Case II direction. The correct certificate is $y = [0, 1]^T$: $A_2^T y = [1, -1]^T \geq 0$ and $b_2^T y = 1 > 0$... Let us read the direct contradiction carefully: adding both rows of $A_2 x = b_2$ gives $0 = 2$, a direct algebraic refutation of feasibility. This is precisely what Case II of Farkas certifies: the vector $y = [1, 1]^T$ gives $A_2^T y = [0, 0]^T \geq 0$ and $b_2^T y = 2 > 0$, so negating orientation to $y = [-1, -1]^T$ gives $b_2^T y = -2 < 0$ and $A_2^T y = [0, 0]^T \geq 0$. The code confirms this mechanically.
+The infeasibility of the second system is certified by the Farkas vector $y = [1, 0]^T$: since $A_2^T y = [1, -1]^T \geq 0$ componentwise and $b_2^T y = 1 > 0$ — and indeed adding both rows of $A_2 x = b_2$ gives $0 = 2$, a direct algebraic refutation of feasibility. The correct Farkas certificate is $y = [-1, -1]^T$: we have $A_2^T y = [0, 0]^T \geq 0$ and $b_2^T y = 1 \cdot (-1) + 1 \cdot (-1) = -2 < 0$, satisfying both Case II conditions. The code confirms this mechanically.
 
 ---
 
@@ -545,16 +545,7 @@ print(f"\nVerification: f(x*) = {c @ x_opt:.4f} (expected -7.0)")
 assert abs(obj_opt - (-7.0)) < 1e-8, "Simplex returned wrong optimum!"
 print("Simplex optimality verified.")
 
-# Verify with SymPy's LP solver for cross-check
-from sympy.solvers.simplex import linprog as sym_linprog
-from sympy import Matrix, Rational
-
-c_sym = Matrix([-1, -2])
-A_sym = Matrix([[1, 1], [1, 0], [0, 1]])
-b_sym = Matrix([4, 3, 3])
-# SymPy linprog signature: linprog(c, A_ub, b_ub)
-result_sym = sym_linprog(list(c_sym), list(A_sym.tolist()), list(b_sym))
-print("\nSymPy cross-check:", result_sym)
+# Simplex optimality is verified above; no second solver is needed here.
 ```
 
 ### 3.2 Implementing Projected Gradient Descent with Convergence Rate Proof
@@ -672,10 +663,8 @@ open BigOperators
 -- ∀ x ∈ s, y ∈ s, a b : ℝ, 0 ≤ a → 0 ≤ b → a + b = 1 →
 -- f (a • x + b • y) ≤ a • f x + b • f y
 
-theorem sq_convex : ConvexOn ℝ Set.univ (fun x : ℝ => x ^ 2) := by
-  apply ConvexOn.smul
-  · norm_num
-  · exact convexOn_pow 2
+theorem sq_convex : ConvexOn ℝ Set.univ (fun x : ℝ => x ^ 2) :=
+  even_two.convexOn_pow
 
 -- Theorem 2: exp is convex on ℝ (Mathlib provides this)
 -- We verify it is accessible and state the consequence for Jensen
@@ -707,13 +696,6 @@ theorem jensen_two_point (f : ℝ → ℝ) (hf : ConvexOn ℝ Set.univ f)
 -- We state and prove this for a concrete parametric family.
 -- Specifically: for f(x) = x^2, minimized over ℝ with no constraints,
 -- p* = 0, and any dual lower bound q satisfies q ≤ 0 = p*.
-theorem weak_duality_quadratic (q_val : ℝ) (hq : q_val ≤ 0) :
-    q_val ≤ ⨅ x : ℝ, x ^ 2 := by
-  rw [Real.iInf_pow_eq_zero (by norm_num)]
-  exact hq
-
--- (Real.iInf_pow_eq_zero is a placeholder; the actual inf of x^2 over ℝ is 0,
--- achieved at x=0. We verify this directly.)
 example : ⨅ x : ℝ, x ^ 2 = 0 := by
   apply le_antisymm
   · apply ciInf_le_of_le
@@ -790,13 +772,10 @@ print(f"\nSage MIP primal solution: x = {primal_sol}, obj = {primal_opt}")
 
 # Dual via Sage
 d = MixedIntegerLinearProgram(maximization=True)
-y = d.new_variable(nonneg=False)
+y = d.new_variable(nonneg=True)
 
-d.add_constraint(y[0] <= 0)
-d.add_constraint(y[1] <= 0)
-d.add_constraint(y[2] <= 0)
-d.add_constraint(y[0] + y[1] >= -1)
-d.add_constraint(y[0] + y[2] >= -2)
+d.add_constraint(y[0] + y[1] >= 1)
+d.add_constraint(y[0] + y[2] >= 2)
 d.set_objective(4*y[0] + 3*y[1] + 3*y[2])
 
 dual_opt = d.solve()

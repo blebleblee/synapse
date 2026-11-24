@@ -173,7 +173,7 @@ sequenceDiagram
         GW-->>CL: "data: {partial content}"
     end
     MOD-->>GW: "finishReason: STOP"
-    GW-->>CL: "data: [DONE]"
+    GW-->>CL: "(stream closes)"
 
     Note over CL,STORE: Async Batch Flow
     CL->>GW: "POST batch:submit"
@@ -259,7 +259,6 @@ package main
 
 import (
     "bytes"
-    "context"
     "encoding/base64"
     "encoding/json"
     "fmt"
@@ -560,9 +559,8 @@ async fn run_batcher(
 }
 
 /// Collects up to `max_batch_size` requests within `max_wait_time`.
-/// The first request is always processed immediately (no wait).
-/// Subsequent requests are buffered until the batch is full or
-/// the timeout fires.
+/// The first request opens the batch window. All requests are buffered
+/// until the batch reaches `max_batch_size` or `max_wait_time` expires.
 async fn collect_batch(
     rx: &mut mpsc::Receiver<InferenceRequest>,
     config: &BatchConfig,
@@ -641,6 +639,9 @@ class MultimodalCache:
                 hasher.update(part["mime_type"].encode("utf-8"))
                 hasher.update(b":")
                 hasher.update(part["data"])  # raw bytes
+            elif isinstance(part, dict) and "uri" in part:
+                hasher.update(b"fileref:")
+                hasher.update(part["uri"].encode("utf-8"))
             hasher.update(b"|")
         return hasher.hexdigest()
 
@@ -769,7 +770,7 @@ The Gemini API exposes four harm categories with configurable block thresholds:
 | Sexually explicit | `HARM_CATEGORY_SEXUALLY_EXPLICIT` | Sexually explicit or pornographic content |
 | Dangerous content | `HARM_CATEGORY_DANGEROUS_CONTENT` | Content that facilitates or encourages dangerous activities |
 
-Each category accepts a threshold: `BLOCK_NONE`, `BLOCK_ONLY_HIGH`, `BLOCK_MEDIUM_AND_ABOVE`, `BLOCK_LOW_AND_ABOVE`, or `BLOCK_ALL`. The threshold determines the model's behavior when it detects content at or above the specified severity level. Setting `BLOCK_NONE` for a category means the model will not block on that category but will still return safety ratings in the response.
+Each category accepts a threshold: `HARM_BLOCK_THRESHOLD_UNSPECIFIED`, `BLOCK_NONE`, `BLOCK_ONLY_HIGH`, `BLOCK_MEDIUM_AND_ABOVE`, or `BLOCK_LOW_AND_ABOVE`. The threshold determines the model's behavior when it detects content at or above the specified severity level. Setting `BLOCK_NONE` for a category means the model will not block on that category but will still return safety ratings in the response.
 
 Multimodal safety is particularly challenging because policy-violating content can be distributed across modalities. An image may contain text that is benign when read in isolation but threatening when combined with the accompanying text prompt. The safety classifiers must evaluate the full multimodal context, not each modality in isolation.
 
@@ -922,7 +923,10 @@ import google.generativeai as genai
 genai.configure(api_key="YOUR_API_KEY")
 
 # Enable Google Search grounding via the tools parameter.
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel(
+    "gemini-2.0-flash",
+    tools="google_search_retrieval",
+)
 
 landmark_image = open("building.jpg", "rb").read()
 
@@ -932,7 +936,6 @@ response = model.generate_content(
         "What building is this? When was it constructed? "
         "Provide the architect and current use.",
     ],
-    tools=[{"google_search": {}}],
 )
 
 print(response.text)
@@ -940,11 +943,11 @@ print(response.text)
 # Access grounding metadata for source citations.
 if hasattr(response.candidates[0], "grounding_metadata"):
     metadata = response.candidates[0].grounding_metadata
-    if metadata and metadata.get("grounding_chunks"):
+    if metadata and metadata.grounding_chunks:
         print("\nSources:")
-        for chunk in metadata["grounding_chunks"]:
-            source = chunk.get("web", {})
-            print(f"  - {source.get('title', 'Unknown')}: {source.get('uri', '')}")
+        for chunk in metadata.grounding_chunks:
+            if chunk.web:
+                print(f"  - {chunk.web.title}: {chunk.web.uri}")
 ```
 
 ### Architecture Review: Putting It All Together

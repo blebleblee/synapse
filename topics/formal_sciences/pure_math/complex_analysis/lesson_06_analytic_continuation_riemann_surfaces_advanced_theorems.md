@@ -152,8 +152,9 @@ The classical factorization theorem for polynomials — that a degree-$n$ polyno
 **Weierstrass Elementary Factors.** Define, for $p \geq 0$:
 $$E_0(z) = 1 - z, \qquad E_p(z) = (1-z)\exp\!\left(z + \frac{z^2}{2} + \cdots + \frac{z^p}{p}\right) \text{ for } p \geq 1.$$
 
-Each $E_p$ is entire, with a single zero at $z = 1$, and satisfies the crucial estimate: for $|z| \leq 1$,
-$$|1 - E_p(z)| \leq |z|^{p+1}.$$
+Each $E_p$ is entire, with a single zero at $z = 1$, and satisfies the crucial estimate: for $|z| \leq 1/2$,
+$$|1 - E_p(z)| \leq C_p|z|^{p+1}$$
+for a constant $C_p$ depending only on $p$.
 
 *Proof of estimate.* Write $\log E_p(z) = \log(1-z) + z + z^2/2 + \cdots + z^p/p$. Using the Taylor series $\log(1-z) = -\sum_{k=1}^\infty z^k/k$, we get $\log E_p(z) = -\sum_{k=p+1}^\infty z^k/k$. Therefore $|\log E_p(z)| \leq \sum_{k=p+1}^\infty |z|^k/k \leq |z|^{p+1}/(1-|z|)$ for $|z| < 1$. Since $|1 - E_p(z)| \leq |e^{\log E_p(z)} - 1| \leq |\log E_p(z)| e^{|\log E_p(z)|}$ and for $|z| \leq 1/2$ this gives $|1 - E_p(z)| \leq C|z|^{p+1}$, the estimate holds. $\blacksquare$
 
@@ -161,7 +162,7 @@ $$|1 - E_p(z)| \leq |z|^{p+1}.$$
 
 $$\prod_{n=1}^\infty E_{p_n}\!\left(\frac{z}{a_n}\right)$$
 
-converges uniformly on compact sets to an entire function whose zero set is exactly $\{a_n\}$ with the prescribed multiplicities. In particular, if $p_n = n-1$ always works (which it does when $\sum |a_n|^{-n} < \infty$), one may take all $p_n$ equal.
+converges uniformly on compact sets to an entire function whose zero set is exactly $\{a_n\}$ with the prescribed multiplicities. In particular, $p_n = n - 1$ always works, and if $\sum |a_n|^{-(p+1)} < \infty$ for some integer $p \ge 0$, one may take all $p_n = p$.
 
 For the general case: if $f$ is any entire function with zeros at $\{a_n\}$ (with $a_n \neq 0$ for all $n$) and a zero of order $m$ at the origin, then
 
@@ -229,7 +230,7 @@ For the Gamma function, the standard definition via Weierstrass is
 
 $$\frac{1}{\Gamma(z)} = z e^{\gamma z} \prod_{n=1}^\infty \left(1 + \frac{z}{n}\right)e^{-z/n},$$
 
-where $\gamma = \lim_{n\to\infty}(1 + 1/2 + \cdots + 1/n - \ln n)$ is the Euler-Mascheroni constant. The zeros of $1/\Gamma(z)$ are at $z = 0, -1, -2, \ldots$, confirming that $\Gamma(z)$ is entire-free of zeros (it has poles at the nonpositive integers). The convergence of this product uses $p_n = 1$ throughout, with the factor $e^{-z/n}$ providing cancellation for the sum $\sum 1/n$, which diverges without it.
+where $\gamma = \lim_{n\to\infty}(1 + 1/2 + \cdots + 1/n - \ln n)$ is the Euler-Mascheroni constant. The zeros of $1/\Gamma(z)$ are at $z = 0, -1, -2, \ldots$, confirming that $\Gamma(z)$ is meromorphic with no zeros, having simple poles at the nonpositive integers. The convergence of this product uses $p_n = 1$ throughout, with the factor $e^{-z/n}$ providing cancellation for the sum $\sum 1/n$, which diverges without it.
 
 **Common failure in Mittag-Leffler applications.** The theorem guarantees that the correcting polynomials $q_n$ can always be chosen to enforce convergence, but it does not prescribe them uniquely. In a concrete computation — say, deriving the partial fraction expansion of $\pi\csc^2(\pi z)$ — one must verify that the natural expansion already converges without correction (which it does, since $1/(z-n)^2 \to 0$ uniformly on compact sets away from the poles). The Mittag-Leffler structure is then:
 

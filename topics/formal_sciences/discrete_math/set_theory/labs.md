@@ -475,7 +475,7 @@ This stress test confirms that symbolic set engines preserve empty set algebraic
 Singleton sets exhibit unique algebraic properties as minimal non-empty structures. For any singleton $\{a\}$ and set $A$ containing $a$, intersection yields the singleton when $a \in A$ and the empty set otherwise. We stress-test singleton membership, subset relationships, and cardinality arithmetic:
 
 ```python
-from sympy import FiniteSet
+from sympy import FiniteSet, ProductSet
 import random
 
 def verify_singleton_properties(num_trials=1000, max_size=15):

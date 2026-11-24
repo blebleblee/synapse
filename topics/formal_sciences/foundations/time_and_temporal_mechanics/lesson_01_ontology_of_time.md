@@ -91,7 +91,7 @@ The correspondence between first-order conditions on $<$ and validities of the t
 | Density | $F\phi \to FF\phi$ |
 | No last moment | $\top \to F\top$ |
 | No first moment | $\top \to P\top$ |
-| Discreteness (successor exists) | $\phi \to GP\phi \vee G(\neg P\phi \wedge P\phi)$ |
+| Discreteness (successor exists) | $(F\top \wedge \phi \wedge H\phi) \to FH\phi$ |
 
 Each row encodes a theorem of the form: axiom schema $\alpha$ is valid over all frames satisfying condition $\sigma$ if and only if $\sigma$ holds. The proof strategy is uniform. To show validity ($\Rightarrow$): assume $\sigma$ holds, take any model $\mathcal{M}$ on that frame and any evaluation point $t$, and show $\mathcal{M}, t \models \alpha$ by direct semantic calculation. To show necessity ($\Leftarrow$): assume $\sigma$ fails at some $t_0, t_1, \ldots$ in a frame, construct a countermodel by assigning $V(p)$ to exactly the times where the antecedent of $\alpha$ forces truth, and verify that the consequent fails at the designated point.
 
@@ -173,7 +173,7 @@ A subtle instance of the McTaggart regress arises in the operational semantics o
 
 If the semantics naively treats "now" as a free variable that is substituted by the runtime clock, the two occurrences of `now` in the above expression will refer to different times depending on how the `at` operator is implemented — a direct instance of the A-series indexicality problem. If the semantics uses a **static time parameter** threaded through the evaluation (analogous to the two-dimensional $(t_c, t_e)$ structure), then `now` in the outer context always refers to $t_c$, while the temporal operators shift $t_e$, and the semantics is unambiguous.
 
-The correct resolution — mirroring the two-dimensional semantic response to McTaggart — is to implement time-shift operators as shifting only the **evaluation time** $t_e$ while leaving the **context time** $t_c$ fixed, and to interpret `now` as $t_c$ throughout. This design is embodied in the semantics of the `@` operator in hybrid automata and in the `now` function in SQL's snapshot isolation model, where "now" is bound at transaction start and held constant for the duration of the transaction regardless of when individual operations within the transaction are physically executed.
+The correct resolution — mirroring the two-dimensional semantic response to McTaggart — is to implement time-shift operators as shifting only the **evaluation time** $t_e$ while leaving the **context time** $t_c$ fixed, and to interpret `now` as $t_c$ throughout. This design is embodied in the semantics of the `@` operator in temporal logics designed for hybrid systems and in the `now` function in SQL's snapshot isolation model, where "now" is bound at transaction start and held constant for the duration of the transaction regardless of when individual operations within the transaction are physically executed.
 
 ### Optimization: Choosing the Minimal Ontological Commitment
 

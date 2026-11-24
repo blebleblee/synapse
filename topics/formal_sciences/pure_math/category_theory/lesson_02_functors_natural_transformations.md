@@ -215,7 +215,7 @@ where $\circ$ here denotes vertical composition. These two orderings are equal b
 
 The following problems are graded in difficulty. The first verifies basic definitions, the second forces engagement with naturality, and the third develops the structural theory of functor categories.
 
-**Problem 1.** Let $\mathcal{C}$ be a category and $f : A \to B$ a morphism. Show that the assignment $C \mapsto \mathcal{C}(C, A)$ on objects and $g \mapsto (- \circ g)$ on morphisms defines a contravariant functor $\mathcal{C}(-, A) : \mathcal{C}^{op} \to \mathbf{Set}$. Verify both functoriality axioms explicitly.
+**Problem 1.** Let $\mathcal{C}$ be a category. Show that the assignment $C \mapsto \mathcal{C}(C, A)$ on objects and $g \mapsto (- \circ g)$ on morphisms defines a contravariant functor $\mathcal{C}(-, A) : \mathcal{C}^{op} \to \mathbf{Set}$. Verify both functoriality axioms explicitly.
 
 **Problem 2.** Let $\text{det} : \mathbf{Vect}_k \to \mathbf{Vect}_k$ be the functor (defined on finite-dimensional spaces) sending $V$ to $\Lambda^{\dim V} V$, the top exterior power, and sending $T : V \to W$ (when $\dim V = \dim W = n$) to the linear map $\Lambda^n T : \Lambda^n V \to \Lambda^n W$ induced by $T$. Determine whether the natural map $\text{Id} \Rightarrow \text{det}^{\otimes 2}$ (if one can be defined) is a natural transformation, and if not, identify where naturality fails.
 

@@ -4,7 +4,7 @@
 
 ### The Information-Theoretic Foundation
 
-A single-modality model approximates a marginal distribution `P(Y | X_text)` or `P(Y | X_image)`. A multimodal model targets the joint conditional `P(Y | X_text, X_image, X_audio, ...)`. The fundamental claim of multimodality is that this joint conditional is *strictly more informative* than any marginal, a consequence of the data-processing inequality: no transformation of a subset of inputs can recover information discarded by ignoring other inputs. This is not aspirational—it is a theorem. The practical question is whether a given architecture has sufficient capacity and training signal to exploit that mutual information.
+A single-modality model approximates a marginal distribution `P(Y | X_text)` or `P(Y | X_image)`. A multimodal model targets the joint conditional `P(Y | X_text, X_image, X_audio, ...)`. The fundamental claim of multimodality is that this joint conditional is *at least as informative* as any marginal, with strict improvement when the extra modalities carry unique information: no transformation of a subset of inputs can recover information discarded by ignoring other inputs. This is not aspirational—it is a theorem. The practical question is whether a given architecture has sufficient capacity and training signal to exploit that mutual information.
 
 Formally, let `X₁, ..., Xₙ` be n modalities and `Y` a target. The mutual information `I(Y; X₁, ..., Xₙ) ≥ I(Y; Xᵢ)` for any single i. The *multimodal advantage* is the gap `I(Y; X₁,...,Xₙ) - max_i I(Y; Xᵢ)`. When this gap is small, multimodal architectures add cost without commensurate benefit. When it is large—as in medical imaging paired with clinical notes, or video with speech—multimodal models produce qualitatively different predictions.
 
@@ -27,7 +27,7 @@ Prior architectures—CNNs for vision, LSTMs for sequences—were modality-speci
 - Text → sequence of subword token embeddings
 - Video → sequence of spatiotemporal patch embeddings
 
-Once all modalities are expressed as token sequences, a single transformer stack can process them jointly. This is the architectural basis of Gemini, GPT-4V, and Flamingo.
+Once all modalities are expressed as token sequences, a single transformer stack can process them jointly. This is the architectural basis of Gemini and GPT-4V; Flamingo uses cross-attention over separately encoded modality tokens.
 
 ---
 
@@ -149,7 +149,7 @@ Rotary Positional Encoding (RoPE, Su et al., 2021) encodes position by rotating 
 
 ### 2.5 The Gemini API: Technical Mechanics
 
-Gemini exposes its multimodal capabilities through Google's Generative Language API (`generativelanguage.googleapis.com`). The core abstraction is the `Content` object, which is a sequence of `Part` objects. A `Part` can be a `TextPart`, an `InlineDataPart` (base64-encoded bytes with a MIME type), a `FileDataPart` (a URI from the File API), or a `FunctionCallPart`/`FunctionResponsePart` for tool use. This design cleanly separates the sequencing of multimodal content from the encoding of individual modalities.
+Gemini exposes its multimodal capabilities through Google's Generative Language API (`generativelanguage.googleapis.com`). The core abstraction is the `Content` object, which is a sequence of `Part` objects. A `Part` is a single object with optional fields: `text` (string), `inline_data` (base64-encoded bytes with MIME type), `file_data` (URI from the File API), `function_call`, or `function_response`. This design cleanly separates the sequencing of multimodal content from the encoding of individual modalities.
 
 The request lifecycle:
 
@@ -814,7 +814,7 @@ struct Content {
 #[serde(untagged)]
 enum Part {
     Text { text: String },
-    InlineData { inline_data: InlineData },
+    InlineData { #[serde(rename = "inlineData")] inline_data: InlineData },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -1151,7 +1151,7 @@ gantt
 
 Time-to-first-token (TTFT) is dominated by the prefill phase, which scales linearly with prompt token count. For long multimodal prompts (high-resolution images produce ~1000–4000 tokens; long videos produce tens of thousands), TTFT can reach multiple seconds. Strategies to reduce TTFT:
 
-1. Use lower image resolution when spatial detail is not required (Gemini's API accepts a `resizeMode` parameter).
+1. Downscale or crop images client-side before sending if spatial detail is not required.
 2. Use the streaming API (`streamGenerateContent`) so the client receives tokens immediately after the first is generated, hiding generation latency behind prefill.
 3. For repeated queries against the same large asset (document, video), use the File API and context caching (where available) to avoid re-encoding.
 
@@ -1271,7 +1271,7 @@ class MultimodalRetriever:
         embeddings = self.model.get_embeddings(
             image=image,
             contextual_text=caption,  # None → pure image embedding
-            dimension=1408,
+            dimension=128,
         )
         vec = np.array(embeddings.image_embedding, dtype=np.float32)
         self._index.append((image_path, vec))
@@ -1284,12 +1284,11 @@ class MultimodalRetriever:
         """
         embeddings = self.model.get_embeddings(
             contextual_text=text,
-            dimension=1408,
         )
         query_vec = np.array(embeddings.text_embedding, dtype=np.float32)
 
         scored = [
-            (path, cosine_similarity(query_vec, img_vec))
+            (path, cosine_similarity(query_vec, img_vec.astype(np.float32)))
             for path, img_vec in self._index
         ]
         scored.sort(key=lambda x: x[1], reverse=True)

@@ -169,7 +169,7 @@ graph LR
     L2 --> BT2 --> PB9
 ```
 
-This enables **copy-on-write prefix sharing**: sequences with identical prompt prefixes can share physical KV blocks, reducing memory proportionally. For a system-prompt shared across 1,000 concurrent requests at 512 tokens, this reclaims ~160 MB per model (using the LLaMA-3 70B numbers above).
+This enables **copy-on-write prefix sharing**: sequences with identical prompt prefixes can share physical KV blocks, reducing memory proportionally. For a system-prompt shared across 1,000 concurrent requests at 512 tokens, this reclaims ~160 GB (one ~164 MB copy instead of 1,000) (using the LLaMA-3 70B numbers above).
 
 ### 2.5 KV-Cache Eviction Policies
 
@@ -247,7 +247,7 @@ This makes AWQ faster to apply than GPTQ (minutes vs. hours for 70B models) with
 
 ### 3.5 FP8 on H100/H200
 
-The H100 natively supports FP8 (E4M3 and E5M2 formats) in its tensor cores, enabling `~2×` throughput over BF16 for compute-bound operations. FP8 E4M3 has dynamic range `[-448, 448]` — insufficient for raw activations which may require per-tensor or per-token scaling. TensorRT-LLM and vLLM implement **delayed scaling** (computing scaling factors from prior batch statistics) to handle this without blocking on activation statistics.
+The H100 natively supports FP8 (E4M3 and E5M2 formats) in its tensor cores, enabling `~2×` throughput over BF16 for compute-bound operations. FP8 E4M3 has dynamic range `[-448, 448]` — insufficient for raw activations which may require per-tensor or per-token scaling. TensorRT-LLM (via Transformer Engine) implements **delayed scaling**, while vLLM uses per-tensor weight scaling with dynamic per-token activation scaling (computing scaling factors from prior batch statistics) to handle this without blocking on activation statistics.
 
 ---
 
@@ -392,8 +392,6 @@ def speculative_decode(
             bonus = torch.multinomial(bonus_probs, num_samples=1)
             generated = torch.cat([generated, draft_sequence, bonus], dim=1)
             continue
-
-        generated = torch.cat([generated, draft_sequence[:, :accepted_len]], dim=1)
 
     return generated
 ```
@@ -633,7 +631,7 @@ Before replacing a production model, **shadow mode** runs the new model in paral
 
 ### 7.1 FP16 Overflow and Loss Scaling
 
-FP16 has a maximum representable value of 65,504. Gradient magnitudes during backpropagation frequently exceed this, causing **overflow to ∞** and cascading NaN propagation. **Loss scaling** multiplies the loss by a large scalar `S` before `.backward()`, proportionally amplifying gradient magnitudes into the FP16 representable range, then divides by `S` before the optimizer step.
+FP16 has a maximum representable value of 65,504. Gradient magnitudes during backpropagation frequently fall below the minimum FP16 value (~6×10⁻⁸ subnormal), causing **underflow to zero**. **Loss scaling** multiplies the loss by a large scalar `S` before `.backward()`, proportionally amplifying gradient magnitudes into the FP16 representable range, then divides by `S` before the optimizer step.
 
 Dynamic loss scaling (default in `torch.cuda.amp`) uses a growth/reduction heuristic: if no overflow occurs for `growth_interval` steps, multiply `S` by `growth_factor`; if overflow occurs, divide `S` by `backoff_factor` and skip the optimizer step.
 
@@ -668,7 +666,7 @@ for inputs, labels in dataloader:
 
 ### 7.2 Accumulation Precision
 
-Even with FP16 compute, accumulation in matrix multiplications uses FP32 internally on NVIDIA hardware (the "tensor core + accumulator" design). This prevents catastrophic cancellation in large dot products. PyTorch's `torch.matmul` in FP16 uses FP32 accumulators when `torch.backends.cuda.matmul.allow_tf32 = True` (default on Ampere+).
+Even with FP16 compute, accumulation in matrix multiplications uses FP32 internally on NVIDIA hardware (the "tensor core + accumulator" design). This prevents catastrophic cancellation in large dot products. FP16 matmuls on NVIDIA tensor cores unconditionally accumulate in FP32. The flag `torch.backends.cuda.matmul.allow_tf32` (default False) only controls whether FP32 matmuls may use TF32 mode.
 
 ---
 
@@ -753,11 +751,11 @@ def profile_inference_step(model, input_ids, past_key_values=None):
     mem_stats = torch.cuda.memory_stats()
     bytes_read = mem_stats.get("active_bytes.all.peak", 1)
 
-    achieved_intensity = total_flops / bytes_read
-    print(f"\nAchieved arithmetic intensity: {achieved_intensity:.2f} FLOP/byte")
-    print(f"H100 bandwidth roof: 3350 GB/s")
+    # Note: active_bytes.all.peak is total allocator memory, not step-wise bytes transferred.
+    # Accurate arithmetic intensity requires parsing profiler traces or hardware counters.
+    print(f"\nH100 bandwidth roof: 3350 GB/s")
     print(f"H100 compute roof (BF16): 989 TFLOP/s")
-    print(f"Bottleneck: {'COMPUTE' if achieved_intensity > 295 else 'MEMORY BANDWIDTH'}")
+    print(f"For bottleneck analysis, compare profiler FLOPS to actual HBM bytes accessed.")
 
     return prof
 ```

@@ -194,7 +194,7 @@ flowchart TD
 
     UPDATE["<b>Update Variables</b><br/>x ← x + α_p·Δx<br/>s ← s + α_p·Δs<br/>λ ← λ + α_d·Δλ<br/>μ ← μ + α_d·Δμ"]
 
-    BARRIER["<b>Update Barrier Parameter</b><br/>τₖ₊₁ = σ·(sᵀμ / p),&nbsp;&nbsp;σ ∈ (0.1, 0.5)"]
+    BARRIER["<b>Update Barrier Parameter</b><br/>τₖ₊₁ = σ·τₖ,&nbsp;&nbsp;σ chosen based on centering measure sᵀμ / p"]
 
     CONVERGE{"<b>Convergence Check</b><br/>‖r_d‖, ‖r_p‖, ‖sᵀμ/p‖ ≤ ε_tol ?"}
 

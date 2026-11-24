@@ -145,7 +145,7 @@ print("det(Hessian):", det_Hessian)   # Must be > 0 for positive definiteness
 print("H_xx at E*:", sp.simplify(H_xx))  # Must be > 0
 ```
 
-The symbolic output `dH/dt = 0` is a formal proof that $H$ is conserved. The Hessian computation confirms that $E^*$ is a strict local minimum of $H$ on the positive quadrant: $H_{xx} = \gamma\delta/\gamma^2 = \delta/\gamma > 0$ and $\det(\text{Hess}) = \beta\delta/(\alpha\gamma) > 0$. Strict convexity of a conserved quantity at an equilibrium is exactly the condition under which the Lyapunov stability theorem (using $H - H(E^*)$ as the Lyapunov function) certifies that $E^*$ is Lyapunov stable — a result much stronger than what linearization alone can deliver.
+The symbolic output `dH/dt = 0` is a formal proof that $H$ is conserved. The Hessian computation confirms that $E^*$ is a strict local minimum of $H$ on the positive quadrant: $H_{xx} = \delta^2/\gamma > 0$ and $\det(\text{Hess}) = \beta\delta/(\alpha\gamma) > 0$. Strict convexity of a conserved quantity at an equilibrium is exactly the condition under which the Lyapunov stability theorem (using $H - H(E^*)$ as the Lyapunov function) certifies that $E^*$ is Lyapunov stable — a result much stronger than what linearization alone can deliver.
 
 ### 1.3 Lyapunov Function Verification for a Nonlinear Spiral
 
@@ -174,7 +174,7 @@ print("dV/dt (expanded):", dV_dt_expanded)
 
 # Factor in terms of r^2 = x^2 + y^2
 r2 = sp.Symbol('r2', positive=True)
-dV_dt_substituted = dV_dt_expanded.subs(x**2 + y**2, r2)
+dV_dt_substituted = dV_dt.subs(x**2 + y**2, r2)
 print("dV/dt in terms of r^2:", dV_dt_substituted)
 # Expected: -2*r2^2  (which is strictly negative for r2 > 0)
 
@@ -192,7 +192,7 @@ print("dV/dt on unit circle (x^2 + y^2 = 1):", sp.simplify(dV_on_unit_circle))
 # Should simplify to -2
 ```
 
-The key computation is $\dot{V} = 2x\dot{x} + 2y\dot{y} = 2x(-y - x(x^2+y^2)) + 2y(x - y(x^2+y^2)) = -2(x^2+y^2)^2$. Since $x^2 + y^2 \geq 0$ with equality only at the origin, we have $\dot{V} = -2(x^2+y^2)^2 \leq 0$ with equality only at $(0,0)$. This is a computational certificate of Lyapunov asymptotic stability: the origin is globally asymptotically stable on $\mathbb{R}^2 \setminus \{0\}$ in the sense that every trajectory converges to the origin as $t \to \infty$.
+The key computation is $\dot{V} = 2x\dot{x} + 2y\dot{y} = 2x(-y - x(x^2+y^2)) + 2y(x - y(x^2+y^2)) = -2(x^2+y^2)^2$. Since $x^2 + y^2 \geq 0$ with equality only at the origin, we have $\dot{V} = -2(x^2+y^2)^2 \leq 0$ with equality only at $(0,0)$. This is a computational certificate of Lyapunov asymptotic stability: the origin is globally asymptotically stable on $\mathbb{R}^2$, meaning every trajectory converges to the origin as $t \to \infty$.
 
 ---
 
@@ -665,8 +665,7 @@ theorem V_zero : V (0, 0) = 0 := by
 theorem V_pos_def (p : ℝ × ℝ) (hp : p ≠ (0, 0)) : V p > 0 := by
   simp [V]
   -- V(p) = p.1^2 + p.2^2 > 0 iff (p.1, p.2) ≠ (0, 0)
-  rcases ne_iff_exists_ne.mp hp with ⟨_, _⟩
-  · have h1 : p.1 ≠ 0 ∨ p.2 ≠ 0 := by
+  have h1 : p.1 ≠ 0 ∨ p.2 ≠ 0 := by
       intro h
       push_neg at h
       exact hp (Prod.ext h.1 h.2)

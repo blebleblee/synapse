@@ -184,7 +184,7 @@ For matrices where partial pivoting is known to fail, such as those arising from
 
 ### 3.3 Iterative Refinement
 
-When the condition number is large but not so large that the solution is entirely lost, iterative refinement can recover digits of accuracy that were lost in the initial solve. Given the computed factorization $\hat{L}\hat{U} \approx PA$ and the initial solution $\hat{x}^{(0)}$, one step of refinement computes the residual $r^{(k)} = b - A\hat{x}^{(k)}$, solves the correction equation $PAd^{(k)} = r^{(k)}$ using the existing factors, and updates $\hat{x}^{(k+1)} = \hat{x}^{(k)} + d^{(k)}$.
+When the condition number is large but not so large that the solution is entirely lost, iterative refinement can recover digits of accuracy that were lost in the initial solve. Given the computed factorization $\hat{L}\hat{U} \approx PA$ and the initial solution $\hat{x}^{(0)}$, one step of refinement computes the residual $r^{(k)} = b - A\hat{x}^{(k)}$, solves the correction equation $Ad^{(k)} = r^{(k)}$ using the existing factors as $\hat{L}\hat{U}d^{(k)} = Pr^{(k)}$, and updates $\hat{x}^{(k+1)} = \hat{x}^{(k)} + d^{(k)}$.
 
 The critical implementation detail is the precision of the residual computation. If $r^{(k)}$ is computed in the same precision as the solve, the residual is contaminated by rounding errors of size $\|A\|\|\hat{x}^{(k)}\| u$, and the correction $d^{(k)}$ has relative error $\kappa(A) u$. Each step reduces the error by a factor of approximately $\kappa(A) u$, so convergence requires $\kappa(A) u < 1$ and takes $O(\log(1/(u\kappa(A))) / \log(\kappa(A)u))$ steps to reach full precision.
 
@@ -198,7 +198,7 @@ The rank-revealing property is that if $\text{rank}(A) = r < n$, then $|r_{r+1, 
 
 $$AP = Q \begin{pmatrix} R_{11} & R_{12} \\ 0 & R_{22} \end{pmatrix}, \quad \text{with} \quad \|R_{22}\| \text{ small},$$
 
-and the least-squares solution is obtained by solving $R_{11} x_1 = c_1 - R_{12} x_2$ with $x_2 = 0$ (the minimum-norm solution). Column-pivoted QR is the standard method for rank determination in least-squares problems and is implemented in LAPACK as `xGEQP3`. For problems where the rank determination must be reliable, more sophisticated rank-revealing factorizations (such as the URV or ULV decompositions) provide guaranteed bounds on $\|R_{22}\|$ at higher cost.
+and a particular least-squares solution is obtained by solving $R_{11} x_1 = c_1 - R_{12} x_2$ with $x_2 = 0$; the minimum-norm solution requires minimizing $\|x\|$ subject to the least-squares conditions. Column-pivoted QR is the standard method for rank determination in least-squares problems and is implemented in LAPACK as `xGEQP3`. For problems where the rank determination must be reliable, more sophisticated rank-revealing factorizations (such as the URV or ULV decompositions) provide guaranteed bounds on $\|R_{22}\|$ at higher cost.
 
 ### 3.5 Failure Modes of Cholesky and Regularization
 

@@ -62,7 +62,7 @@ print("Bézout Identity Verification:")
 print("=" * 80)
 for a, b in test_pairs:
     g, x, y = extended_euclidean(a, b)
-    g_sympy, x_sympy, y_sympy = sp.gcdex(a, b)
+    x_sympy, y_sympy, g_sympy = sp.gcdex(a, b)
     
     # Verify identity holds
     identity_check = a * x + b * y
@@ -82,7 +82,7 @@ Execute this verification suite and observe how the algorithm handles the bounda
 Fermat's Little Theorem states that if $p$ is prime and $a$ is not divisible by $p$, then $a^{p-1} \equiv 1 \pmod{p}$. Euler generalized this to arbitrary moduli: for any integer $a$ coprime to $n$, we have $a^{\phi(n)} \equiv 1 \pmod{n}$, where $\phi(n)$ denotes Euler's totient function counting integers in $\{1, 2, \ldots, n\}$ coprime to $n$. Verify these theorems computationally across a spectrum of moduli, testing both the prime case and composite moduli with nontrivial factorizations.
 
 ```python
-from sympy import isprime, totient, primefactors, factorint
+from sympy import isprime, totient, primefactors, factorint, gcd
 from sympy.ntheory.modular import crt
 import random
 
@@ -210,7 +210,6 @@ theorem bezout_identity (a b : ℤ) : ∃ x y : ℤ, a * x + b * y = Int.gcd a b
 -- Verification for concrete instances
 example : ∃ x y : ℤ, 252 * x + 105 * y = Int.gcd 252 105 := by
   use Int.gcdA 252 105, Int.gcdB 252 105
-  norm_num
   exact Int.gcd_eq_gcd_ab 252 105
 
 #eval Int.gcd 252 105        -- Output: 21
@@ -230,7 +229,7 @@ Number-theoretic functions exhibit rich structural behavior at boundary values, 
 The Möbius function $\mu(n)$ is defined as $\mu(1) = 1$, $\mu(n) = 0$ if $n$ has a squared prime factor, and $\mu(n) = (-1)^k$ if $n$ is a product of $k$ distinct primes. The Möbius inversion formula provides a fundamental transformation between arithmetic functions: if $g(n) = \sum_{d \mid n} f(d)$, then $f(n) = \sum_{d \mid n} \mu(d) g(n/d)$. Verify this inversion formula computationally for various arithmetic functions, testing the boundary case where $f$ or $g$ vanish, and examining the behavior at prime powers.
 
 ```python
-from sympy import mobius, divisors, primefactors, divisor_count, divisor_sigma
+from sympy import mobius, divisors, primefactors, divisor_count, divisor_sigma, totient
 
 def mobius_inversion_forward(f, n):
     """
@@ -382,6 +381,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Non-interactive backend
 import matplotlib.pyplot as plt
+from sympy import divisor_count, totient, divisor_sigma, factorint
 
 def compute_asymptotic_statistics(max_n):
     """
@@ -471,6 +471,8 @@ The transition from theorem to algorithm demands careful attention to computatio
 The Miller-Rabin test improves upon Fermat's test by examining the structure of $n - 1 = 2^s d$ with $d$ odd, and testing whether $a^d \equiv 1 \pmod{n}$ or $a^{2^r d} \equiv -1 \pmod{n}$ for some $0 \leq r < s$. A composite number passing this test for a random base is called a strong pseudoprime. The error probability for a single iteration is at most $1/4$, yielding exponentially decreasing failure probability with repeated trials.
 
 ```python
+import random
+
 def miller_rabin_decomposition(n):
     """
     Write n - 1 = 2^s * d with d odd.
@@ -786,7 +788,7 @@ for P, D, Q, description in quadratic_irrationals:
         # Verify using SymPy
         if P == 0 and Q == 1:
             sympy_cf = continued_fraction_periodic(0, 1, sqrt(D))
-            sympy_period = list(sympy_cf)[1:]  # Skip the initial part
+            sympy_period = list(sympy_cf[1])  # Skip the initial part
             
             match = tuple(period) == tuple(sympy_period)
             status = "✓" if match else "✗"

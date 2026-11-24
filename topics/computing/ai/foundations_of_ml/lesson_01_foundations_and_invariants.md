@@ -144,7 +144,7 @@ Newton's method is scale-invariant and converges quadratically near a minimum, b
 
 This introduces noise into the optimization trajectory, which is paradoxically beneficial: the noise acts as an implicit regularizer, helping escape sharp local minima and converge to flatter minima that generalize better (Keskar et al., 2017). The optimal batch size and learning rate are coupled — a linear scaling rule (Goyal et al., 2017) states that if batch size is multiplied by k, the learning rate should also be multiplied by k to maintain training dynamics.
 
-**Automatic differentiation (autodiff)** is not symbolic differentiation and not numerical finite differences. It is the exact computation of derivatives through the **chain rule**, applied systematically to the computational graph of the program. In **reverse-mode autodiff** (backpropagation), a forward pass computes the function value while recording intermediate activations; a backward pass propagates gradient information from the output back through the graph using stored activations. The cost of a backward pass is O(1) times the cost of the forward pass in memory and time — a remarkable fact that makes training deep networks computationally feasible.
+**Automatic differentiation (autodiff)** is not symbolic differentiation and not numerical finite differences. It is the exact computation of derivatives through the **chain rule**, applied systematically to the computational graph of the program. In **reverse-mode autodiff** (backpropagation), a forward pass computes the function value while recording intermediate activations; a backward pass propagates gradient information from the output back through the graph using stored activations. The cost of a backward pass is roughly 2x the cost of the forward pass in time — a remarkable fact that makes training deep networks computationally feasible. However, memory cost is substantially higher, requiring storage of all intermediate activations.
 
 ---
 
@@ -308,7 +308,7 @@ def kl_divergence(p: np.ndarray, q: np.ndarray, eps: float = 1e-12) -> float:
     KL(P || Q) = sum_x P(x) log(P(x) / Q(x)).
 
     Non-symmetric: KL(P||Q) != KL(Q||P) in general.
-    Returns inf if Q assigns zero probability where P does not.
+    Uses epsilon-smoothing so finite result is always returned; large if Q assigns very small probability where P does not.
     """
     p = np.asarray(p, dtype=np.float64)
     q = np.asarray(q, dtype=np.float64)
@@ -679,7 +679,7 @@ L(logits, y_true) = -log( exp(logits[y_true]) / sum_j exp(logits[j]) )
 ```
 Implement its analytic gradient with respect to `logits`, then verify correctness using central-difference numerical gradients (Exercise: why is central-difference preferred over forward-difference for gradient checking?).
 
-**Exercise 4 — MLE as ERM.** Show algebraically that maximizing the log-likelihood of n i.i.d. observations from a Gaussian with unknown mean μ is equivalent to minimizing MSE. Then show that placing a Gaussian prior N(0, λ⁻¹) on μ and maximizing the log-posterior is equivalent to minimizing MSE with L2 regularization coefficient λ. Identify the form of Ω(θ) in each case.
+**Exercise 4 — MLE as ERM.** Show algebraically that maximizing the log-likelihood of n i.i.d. observations from a Gaussian with unknown mean μ is equivalent to minimizing MSE. Then show that placing a Gaussian prior N(0, σ²/λ) on μ (prior precision λ/σ²) and maximizing the log-posterior is equivalent to minimizing summed squared error plus λ||μ||², or equivalently MSE plus (λ/n)||μ||². Identify the form of Ω(θ) in each case.
 
 **Exercise 5 — Learning Rate Sensitivity.** Using the linear regression training loop above, sweep learning rates η ∈ {1e-4, 1e-3, 1e-2, 1e-1, 1.0} with no momentum and no scheduling. For each η, record whether training converges, diverges, or oscillates. Relate your observations to the stability condition η < 2/λ_max(H), where H is the Hessian of the MSE loss (which equals (2/n)XᵀX for linear regression).
 

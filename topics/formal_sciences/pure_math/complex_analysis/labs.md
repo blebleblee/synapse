@@ -963,7 +963,7 @@ A map $w = f(z)$ is conformal at $z_0$ if and only if $f'(z_0) \neq 0$ and $f$ i
 
 | Source domain | Target domain | Map | Conformality condition |
 |---|---|---|---|
-| $\mathbb{H}$ (upper half-plane) | $\mathbb{D}$ (unit disk) | $w = (z-i)/(z+i)$ | $f'(z) = -2i/(z+i)^2 \neq 0$ for $z \in \mathbb{H}$ |
+| $\mathbb{H}$ (upper half-plane) | $\mathbb{D}$ (unit disk) | $w = (z-i)/(z+i)$ | $f'(z) = 2i/(z+i)^2 \neq 0$ for $z \in \mathbb{H}$ |
 | $\mathbb{D}$ | $\mathbb{H}$ | $w = i(1-z)/(1+z)$ | $f'(z) = -2i/(1+z)^2 \neq 0$ for $z \in \mathbb{D}$ |
 | Strip $0 < \text{Im}(z) < \pi$ | $\mathbb{H}$ | $w = e^z$ | $f'(z) = e^z \neq 0$ everywhere |
 | Exterior of $[-2,2]$ | Exterior of unit disk | $w = z + 1/z$ | $f'(z) = 1 - 1/z^2 = 0$ at $z = \pm 1$ |

@@ -12,7 +12,7 @@ Install the foundational Python environment through a dedicated virtual environm
 
 SageMath installation varies by platform. On Debian-based Linux systems, install via `sudo apt-get install sagemath`, while macOS users should utilize Homebrew with `brew install --cask sage`. Windows users should download the Windows Subsystem for Linux WSL2-based SageMath distribution from the official website. Verify SageMath operational status by launching the interactive shell with `sage` and executing `from sage.logic.propcalc import formula; f = formula("a & b -> c"); print(f.truthtable())` to confirm propositional logic infrastructure.
 
-For interactive theorem proving, install Lean 4 through the official `elan` toolchain manager. Execute `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh` on Unix systems, then initialize a new Lean project with `lake new logic_verification` and open the project in Visual Studio Code with the Lean 4 extension for real-time proof state visualization. Coq installation proceeds through OPAM, the OCaml package manager: `opam init` followed by `opam install coq` installs Coq 8.17, verifiable with `coqc --version`. The CoqIDE graphical interface or Proof General Emacs mode provides interactive proof development environments.
+For interactive theorem proving, install Lean 4 through the official `elan` toolchain manager. Execute `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh` on Unix systems, then initialize a new Lean project with `lake new logic_verification` and open the project in Visual Studio Code with the Lean 4 extension for real-time proof state visualization. Coq installation proceeds through OPAM, the OCaml package manager: `opam init` followed by `opam install coq.8.17.1` installs Coq 8.17, verifiable with `coqc --version`. The CoqIDE graphical interface or Proof General Emacs mode provides interactive proof development environments.
 
 The verification workflow follows a systematic progression from computational enumeration of finite cases to symbolic manipulation of infinite structures, culminating in formally verified metalogical proofs. Initial exercises construct truth tables, normal forms, and satisfiability checks for propositional formulas through exhaustive enumeration. Intermediate exercises implement unification algorithms, Herbrand universe construction, and resolution-based theorem proving for first-order logic. Advanced exercises formalize and verify completeness theorems, compactness arguments, and model-theoretic constructions through interactive proof assistants.
 
@@ -477,7 +477,7 @@ Stress test the propositional SAT infrastructure with benchmark formulas from th
 ```python
 import time
 from collections import deque
-from typing import List, Optional, Set, Dict
+from typing import List, Optional, Set, Dict, Tuple
 
 class DPLLSolver:
     """
@@ -970,7 +970,7 @@ Modal logic extends classical logic with necessity operator $\Box$ and possibili
 Implement a complete Kripke model checker with frame validity verification across modal systems.
 
 ```python
-from typing import Set, Dict, FrozenSet
+from typing import Set, Dict, FrozenSet, Tuple
 from dataclasses import dataclass
 
 @dataclass(frozen=True)

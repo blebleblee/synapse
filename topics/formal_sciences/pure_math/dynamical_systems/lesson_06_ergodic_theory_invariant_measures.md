@@ -26,7 +26,7 @@ $$\lim_{n \to \infty} \mu(T^{-n}(A) \cap B) = \mu(A) \mu(B).$$
 
 This condition asserts that the correlation between observables decorrelates as time progresses: the conditional probability $\mu(T^{-n}(A) \cap B) / \mu(B)$ of finding the system in $A$ given that it was in $B$ at time $n$ approaches the unconditional probability $\mu(A)$ as $n \to \infty$. Mixing implies ergodicity, for if $A$ is invariant, then $T^{-n}(A) = A$ for all $n$, so mixing gives $\mu(A) = \mu(A)^2$, forcing $\mu(A) \in \{0, 1\}$.
 
-An even stronger property is weak mixing, which requires that the Cesàro averages of the correlation decay to zero:
+A weaker property than mixing is weak mixing, which requires that the Cesàro averages of the correlation decay to zero:
 
 $$\lim_{n \to \infty} \frac{1}{n} \sum_{k=0}^{n-1} |\mu(T^{-k}(A) \cap B) - \mu(A) \mu(B)| = 0.$$
 

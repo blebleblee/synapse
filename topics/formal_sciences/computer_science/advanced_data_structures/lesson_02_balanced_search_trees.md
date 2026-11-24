@@ -128,13 +128,13 @@ After split:
      y:[k_1..k_{t-1}] z:[k_{t+1}..k_{2t-1}]
 ```
 
-The choice of $t$ in practice is driven by the disk block size $B_{\text{block}}$ and the node record size $R$: set $t = \lfloor (B_{\text{block}} / R + 1) / 2 \rfloor$. For PostgreSQL's default 8KB page and a 16-byte key-pointer pair, $t \approx 250$, giving a tree of height at most 3 for tables with up to $10^9$ rows.
+The choice of $t$ in practice is driven by the disk block size $B_{\text{block}}$ and the node record size $R$: set $t = \lfloor (B_{\text{block}} / R + 1) / 2 \rfloor$. For PostgreSQL's default 8KB page and a 16-byte key-pointer pair, $t \approx 256$, giving a tree of height at most 3 for tables with up to $10^9$ rows.
 
 ### Weight-Balanced Trees and Scapegoat Trees
 
 A BB$[\alpha]$ tree augments each node with its subtree size $w$, computed as $w(x) = w(\text{left}(x)) + w(\text{right}(x)) + 1$, which costs $O(1)$ to maintain through any single rotation. The balance check at a node $x$ is:
 
-$$\alpha \cdot w(x) \leq w(\text{left}(x)) \leq (1-\alpha) \cdot w(x)$$
+$$\alpha \cdot w(x) \leq w(\text{left}(x)), w(\text{right}(x)) \leq (1-\alpha) \cdot w(x)$$
 
 A single rotation restores the invariant when $\alpha \leq 1 - 1/\sqrt{2}$, and a double rotation is needed in a narrow range near the boundary. The weight field also enables order-statistic operations: $\text{rank}(x)$ and $\text{select}(k)$ run in $O(\log n)$ without any additional augmentation, since the size of the left subtree gives the rank of the root within its subtree directly.
 
@@ -148,7 +148,7 @@ A scapegoat tree stores no balance information at all, only the keys, children, 
 
 The dominant performance factor in production BST implementations is not the asymptotic operation count but cache behavior. A naive pointer-based BST with separately heap-allocated nodes causes one L1 cache miss per node visited during search, since there is no guarantee that parent and child reside in the same cache line. For a balanced BST of depth 20 on $10^6$ nodes, a lookup touches 20 nodes scattered across memory, potentially incurring 20 cache misses at 100ns each — a total of 2 microseconds, dominated by memory latency rather than computation.
 
-The standard mitigation is **van Emde Boas layout** (also called cache-oblivious layout or recursive layout): arrange the nodes of the tree in memory in the order they appear in the recursive van Emde Boas tree decomposition, where the top $\lfloor h/2 \rfloor$ levels form one block and the bottom subtrees each form a contiguous block. This layout guarantees that any subtree of height $k$ fits within $O(2^k)$ contiguous cache lines, minimizing cache misses for any cache-line size without needing to know the cache parameters at build time. For a static or bulk-loaded tree, this layout is straightforward to implement during construction. For dynamic trees, it requires periodic rebuilding, which is natural for scapegoat trees but adds complexity to AVL or red-black implementations.
+The standard mitigation is **van Emde Boas layout** (also called cache-oblivious layout or recursive layout): arrange the nodes of the tree in memory in the order they appear in the recursive van Emde Boas tree decomposition, where the top $\lfloor h/2 \rfloor$ levels form one block and the bottom subtrees each form a contiguous block. This layout guarantees that any subtree of height $k$ contains $O(2^k)$ nodes that fit within a contiguous memory region, minimizing cache misses for any cache-line size without needing to know the cache parameters at build time. For a static or bulk-loaded tree, this layout is straightforward to implement during construction. For dynamic trees, it requires periodic rebuilding, which is natural for scapegoat trees but adds complexity to AVL or red-black implementations.
 
 An alternative approach used in high-performance databases and B-tree libraries is **node chunking**: store four to eight keys per node in a small sorted array, with one pointer per key-interval boundary. This is effectively a B-tree with a small $t$, and the in-node linear scan over $2t-1 \leq 15$ keys fits entirely within two or three cache lines, reducing pointer indirection. The Intel x86 `SIMD` integer comparison instructions make the in-node search branchless and extremely fast in practice.
 
@@ -174,7 +174,7 @@ The proactive split strategy during insertion has an analogous **proactive merge
 
 ### Scapegoat Tree Rebuild Timing and Memory Reclamation
 
-The scapegoat tree's $O(\log n)$ amortized bound relies on the invariant that $n \leq n_{\max}$, where $n_{\max}$ is the size after the last rebuild. If a workload consists of alternating single insertions and single deletions, $n_{\max}$ can grow without bound relative to $n$, never triggering a full rebuild but steadily increasing the allowed depth threshold $\lfloor \log_{1/\alpha} n_{\max} \rfloor$. The standard fix is to trigger a full tree rebuild whenever $n < n_{\max} / 2$, resetting $n_{\max} = n$. This ensures that $n_{\max} \leq 2n$ at all times, keeping the depth threshold at $O(\log n)$. Without this deletion trigger, a scapegoat tree degrades to $O(\log n_{\max})$ search time, which may grow to $O(n)$ over a long sequence of interleaved insertions and deletions.
+The scapegoat tree's $O(\log n)$ amortized bound relies on the invariant that $n \leq n_{\max}$, where $n_{\max}$ is the size after the last rebuild. If a workload consists of alternating single insertions and single deletions, $n_{\max}$ can grow without bound relative to $n$, never triggering a full rebuild but steadily increasing the allowed depth threshold $\lfloor \log_{1/\alpha} n_{\max} \rfloor$. The standard fix is to trigger a full tree rebuild whenever $n < n_{\max} / 2$, resetting $n_{\max} = n$. This ensures that $n_{\max} \leq 2n$ at all times, keeping the depth threshold at $O(\log n)$. Without this deletion trigger, a scapegoat tree's search time remains $O(\log n_{\max})$, since $n_{\max}$ never decreases and continues to bound the insertion depth threshold.
 
 The memory layout of the flattened-and-rebuilt subtree also warrants attention. A naive rebuild allocates the new nodes independently, reproducing the same cache-scattered layout as the original tree. A high-performance implementation allocates the entire rebuilt subtree as a single contiguous array, ordered by the van Emde Boas traversal described earlier. When the scapegoat is the root, this amounts to a full tree rebuild into a cache-optimal layout, which is a significant practical advantage: a workload that periodically triggers root-level scapegoat rebuilds will naturally maintain good cache locality without any explicit layout management.
 

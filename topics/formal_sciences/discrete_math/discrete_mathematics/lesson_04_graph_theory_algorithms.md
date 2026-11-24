@@ -18,7 +18,7 @@ A sequence of nonnegative integers $(d_1, d_2, \ldots, d_n)$ is called graphic i
 
 $$\sum_{i=1}^k d_i \le k(k-1) + \sum_{i=k+1}^n \min(d_i, k).$$
 
-The left side counts the total degree contributed by the $k$ highest-degree vertices; the right side bounds how many edges those vertices can accommodate among themselves (at most $k(k-1)$, since the $k$ vertices form a clique of size $k$) and toward the remaining $n - k$ vertices (each of which can supply at most $\min(d_i, k)$ edges into the first group).
+The left side counts the total degree contributed by the $k$ highest-degree vertices; the right side bounds how many edges those vertices can accommodate among themselves (at most $k(k-1)$, since the $k$ vertices form a clique of size $k$ with at most $k(k-1)/2$ edges among them) and toward the remaining $n - k$ vertices (each of which can supply at most $\min(d_i, k)$ edges into the first group).
 
 ### Walks, Trails, Paths, and Cycles
 
@@ -50,7 +50,7 @@ The adjacency matrix of a graph $G = (V, E)$ with $|V| = n$ is an $n \times n$ m
 
 The adjacency list representation stores, for each vertex $v$, the list of its neighbors $N(v) = \{u \in V : \{u, v\} \in E\}$. Total storage is $O(|V| + |E|)$, which makes it vastly more economical for sparse graphs where $|E| \ll |V|^2$. The penalty is edge queries, which now require scanning the neighbor list of a vertex and cost $O(\deg(v))$ in the worst case. For the dense graphs of linear programming relaxations or algebraic topology, the matrix wins; for the sparse internet graphs, social networks, and dependency DAGs that characterize most applied problems, the adjacency list dominates.
 
-A third representation, the incidence matrix $B$, is an $|V| \times |E|$ matrix where $B[v][e] = 1$ if vertex $v$ is incident to edge $e$ and $0$ otherwise. The product $B B^\top$ yields $D - A$, where $D$ is the diagonal degree matrix — this combination, $L = D - A$, is the graph Laplacian, an object central to spectral graph theory, random walks, and the analysis of electrical resistor networks.
+A third representation, the incidence matrix $B$, is an $|V| \times |E|$ matrix where $B[v][e] = 1$ if vertex $v$ is incident to edge $e$ and $0$ otherwise (the signed incidence matrix, used for directed graphs, has entries $\pm 1$ and satisfies $B B^\top = D - A$). The graph Laplacian is defined as $L = D - A$, where $D$ is the diagonal degree matrix — this combination, an object central to spectral graph theory, random walks, and the analysis of electrical resistor networks.
 
 ```text
 Adjacency Matrix (G on 4 vertices: edges {1,2},{1,3},{2,4},{3,4})
@@ -85,7 +85,7 @@ The Königsberg graph has four vertices of odd degree (3, 3, 3, 5 respectively),
 
 ### Hamiltonian Graphs
 
-A Hamiltonian cycle visits every vertex exactly once and returns to its origin; a Hamiltonian path visits every vertex exactly once without the return. Despite the superficial resemblance to the Eulerian problem — replace "every edge" with "every vertex" — the two problems sit in entirely different complexity classes. No clean necessary-and-sufficient characterization of Hamiltonian graphs is known, and determining whether a given graph is Hamiltonian is NP-complete (it subsumes the Traveling Salesman Problem).
+A Hamiltonian cycle visits every vertex exactly once and returns to its origin; a Hamiltonian path visits every vertex exactly once without the return. Despite the superficial resemblance to the Eulerian problem — replace "every edge" with "every vertex" — the two problems sit in entirely different complexity classes. No clean necessary-and-sufficient characterization of Hamiltonian graphs is known, and determining whether a given graph is Hamiltonian is NP-complete (the Traveling Salesman Problem subsumes it).
 
 What we have instead are sufficient conditions. Dirac's theorem (1952) states that if $G$ is a simple graph on $n \ge 3$ vertices and every vertex satisfies $\deg(v) \ge n/2$, then $G$ is Hamiltonian. The proof constructs a longest path, then shows the degree condition forces a cycle covering all vertices. Ore's theorem (1960) generalizes this: if for every pair of nonadjacent vertices $u, v$ we have $\deg(u) + \deg(v) \ge n$, then $G$ is Hamiltonian. Both conditions are sufficient but not necessary; the Petersen graph, with $n = 10$ vertices all of degree 3, is non-Hamiltonian despite being highly symmetric and regular.
 
@@ -175,7 +175,7 @@ For any connected planar graph embedded in the plane, Euler's formula establishe
 
 $$n - m + f = 2.$$
 
-*Proof by induction on $m$.* If $m = 0$, then $G$ consists of isolated vertices; connectivity forces $n = 1$, $f = 1$, and indeed $1 - 0 + 1 = 2$. For $m \ge 1$, let $e$ be any edge. If $e$ is a bridge, contracting it merges two components into one and reduces $n$ by 1, $m$ by 1, while $f$ remains unchanged (the bridge bounded no independent face); the formula is preserved by induction. If $e$ is not a bridge, removing it merges two faces into one, reducing $f$ by 1 and $m$ by 1, while $n$ is unchanged; again the formula is preserved. $\blacksquare$
+*Proof by induction on $m$.* If $m = 0$, then $G$ consists of isolated vertices; connectivity forces $n = 1$, $f = 1$, and indeed $1 - 0 + 1 = 2$. For $m \ge 1$, let $e$ be any edge. If $e$ is a bridge, it bounds no face. Contracting it reduces $n$ by 1 and $m$ by 1 while $f$ remains unchanged; the formula is preserved by induction. If $e$ is not a bridge, removing it merges two faces into one, reducing $f$ by 1 and $m$ by 1, while $n$ is unchanged; again the formula is preserved. $\blacksquare$
 
 From Euler's formula we extract a crucial sparsity bound. In a simple connected planar graph with $n \ge 3$, every face is bounded by at least 3 edges, and each edge borders at most 2 faces, so $3f \le 2m$. Substituting $f = 2 - n + m$ gives $3(2 - n + m) \le 2m$, hence
 
@@ -275,7 +275,7 @@ The random graph $G(n, p)$ includes each of the $\binom{n}{2}$ possible edges in
 
 For $p = c/n$ with $c < 1$, the graph consists almost surely of trees and unicyclic components, each of size $O(\log n)$. At $c = 1$, a giant component of size $\Theta(n^{2/3})$ begins to emerge. For $c > 1$, the giant component has size $\Theta(n)$ and absorbs a constant fraction of all vertices; the remaining vertices belong to components of size $O(\log n)$.
 
-This phase transition is sharp: the width of the transition window in $p$ is $O(n^{-4/3})$. It has direct implications for the analysis of random graph algorithms and for the study of percolation, epidemic spreading, and network resilience. The connectivity threshold is higher: the graph becomes connected almost surely when $p = (\ln n + c)/n$ for $c \to \infty$, specifically at $p = \ln n / n$, beyond which the probability of an isolated vertex drops below $1/n$ and the graph is connected with high probability.
+This phase transition is sharp: the width of the transition window in $p$ is $O(n^{-4/3})$. It has direct implications for the analysis of random graph algorithms and for the study of percolation, epidemic spreading, and network resilience. The connectivity threshold is higher: the graph becomes connected almost surely when $p = (\ln n + \omega(1))/n$, approximately $p = \ln n / n$. Beyond this threshold the probability of an isolated vertex drops below $1/n$ and the graph is connected with high probability.
 
 ### Matching in Practice: The Augmenting Path Framework
 

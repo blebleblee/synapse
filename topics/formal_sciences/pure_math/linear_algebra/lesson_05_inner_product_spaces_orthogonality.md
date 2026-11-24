@@ -34,7 +34,7 @@ To prove this claim, take any $w \in W^\perp$, so $\langle w, u_1 \rangle = 0$. 
 $$\|N(u_1) - \lambda_1 u_1\|^2 = \langle N(u_1) - \lambda_1 u_1, N(u_1) - \lambda_1 u_1 \rangle = \langle N(u_1), N(u_1) \rangle - \lambda_1 \langle u_1, N(u_1) \rangle - \overline{\lambda_1} \langle N(u_1), u_1 \rangle + |\lambda_1|^2.$$
 Since $N(u_1) = \lambda_1 u_1$, this expression equals zero. Now consider $\|N^*(u_1) - \overline{\lambda_1} u_1\|^2$:
 $$\|N^*(u_1) - \overline{\lambda_1} u_1\|^2 = \langle N^*(u_1), N^*(u_1) \rangle - \overline{\lambda_1} \langle u_1, N^*(u_1) \rangle - \lambda_1 \langle N^*(u_1), u_1 \rangle + |\lambda_1|^2.$$
-Using the fact that $\langle N^*(u_1), u_1 \rangle = \langle u_1, N(u_1) \rangle = \lambda_1$ and normality ($N N^* = N^* N$), we have
+Using the fact that $\langle N^*(u_1), u_1 \rangle = \langle u_1, N(u_1) \rangle = \overline{\lambda_1}$ and normality ($N N^* = N^* N$), we have
 $$\langle N^*(u_1), N^*(u_1) \rangle = \langle N N^*(u_1), u_1 \rangle = \langle N^* N(u_1), u_1 \rangle = \langle N^*(\lambda_1 u_1), u_1 \rangle = \lambda_1 \langle N^*(u_1), u_1 \rangle = |\lambda_1|^2.$$
 Substituting back, we obtain $\|N^*(u_1) - \overline{\lambda_1} u_1\|^2 = |\lambda_1|^2 - |\lambda_1|^2 - |\lambda_1|^2 + |\lambda_1|^2 = 0$, confirming $N^*(u_1) = \overline{\lambda_1} u_1$. Thus $\langle N(w), u_1 \rangle = \langle w, \overline{\lambda_1} u_1 \rangle = \overline{\lambda_1} \langle w, u_1 \rangle = 0$, proving $N(w) \in W^\perp$.
 

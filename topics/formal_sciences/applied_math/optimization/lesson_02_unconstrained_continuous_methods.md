@@ -40,7 +40,7 @@ $$\alpha_k = \frac{\nabla f(x_k)^T \nabla f(x_k)}{\nabla f(x_k)^T Q \nabla f(x_k
 
 After tedious but elementary algebra, the error update becomes
 
-$$e_{k+1} = e_k - \alpha_k Q e_k = \left(I - \frac{Q^2}{e_k^T Q^3 e_k / e_k^T Q^2 e_k}\right) e_k$$
+$$e_{k+1} = e_k - \alpha_k Q e_k = \left(I - \frac{e_k^T Q^2 e_k}{e_k^T Q^3 e_k} Q\right) e_k$$
 
 In the worst case, when $e_k$ aligns with eigenvectors corresponding to extreme eigenvalues $\lambda_{\min}$ and $\lambda_{\max}$, the convergence factor approaches
 
@@ -102,7 +102,7 @@ suggesting that a Hessian approximation should satisfy the secant equation $B_{k
 
 The Broyden-Fletcher-Goldfarb-Shanno (BFGS) method constructs symmetric positive definite inverse Hessian approximations through the rank-two update formula
 
-$$H_{k+1} = H_k - \frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k} + \frac{s_k s_k^T}{y_k^T s_k}$$
+$$H_{k+1} = \left(I - \frac{s_k y_k^T}{y_k^T s_k}\right) H_k \left(I - \frac{y_k s_k^T}{y_k^T s_k}\right) + \frac{s_k s_k^T}{y_k^T s_k}$$
 
 This formula emerges from minimizing the weighted Frobenius norm $\|H_{k+1} - H_k\|_W^2$ subject to the secant equation constraint $H_{k+1} y_k = s_k$ and symmetry $H_{k+1} = H_{k+1}^T$. To verify that $H_{k+1}$ satisfies the secant equation, compute
 

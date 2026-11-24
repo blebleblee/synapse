@@ -324,7 +324,7 @@ $$\int_a^b g(t) \, dt \approx \frac{h}{2} [g(t_0) + 2 g(t_1) + 2 g(t_2) + \cdots
 
 For smooth periodic integrands, the trapezoidal rule achieves spectral accuracy—exponential convergence in $N$—due to Euler-Maclaurin summation and the decay of Fourier coefficients. This fortunate circumstance often applies to contour integrals over circular paths where $\gamma(\theta) = z_0 + r e^{i\theta}$ for $\theta \in [0, 2\pi]$, provided $f(\gamma(\theta)) \gamma'(\theta)$ is smooth and periodic in $\theta$.
 
-Adaptive quadrature routines dynamically refine the partition by subdividing intervals where the integrand exhibits rapid variation or near-singularities. Error estimation compares coarse and fine approximations; if the difference exceeds a tolerance, further subdivision is triggered. Modern libraries such as SciPy's `scipy.integrate.quad` for real integrals and manual complex extension, or specialized complex quadrature packages, implement adaptive schemes efficiently.
+Adaptive quadrature routines dynamically refine the partition by subdividing intervals where the integrand exhibits rapid variation or near-singularities. Error estimation compares coarse and fine approximations; if the difference exceeds a tolerance, further subdivision is triggered. Modern libraries implement adaptive schemes efficiently: SciPy's `scipy.integrate.quad` handles real integrals and can be applied separately to real and imaginary parts of complex integrands, while specialized complex quadrature packages provide unified handling.
 
 ### Failure Modes and Edge Cases
 

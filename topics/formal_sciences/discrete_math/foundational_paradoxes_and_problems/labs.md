@@ -144,7 +144,7 @@ def powerset_list(s: list) -> list[frozenset]:
     """Returns all subsets of s as a list of frozensets."""
     return [frozenset(c) for r in range(len(s) + 1) for c in combinations(s, r)]
 
-def cantors_diagonal(base: list, f: dict[any, frozenset]) -> frozenset:
+def cantors_diagonal(base: list, f: dict[Any, frozenset]) -> frozenset:
     """
     Constructs the Cantor diagonal set D for a function f: base -> P(base).
     D = { x in base | x not in f(x) }
@@ -426,7 +426,7 @@ import textwrap
 # We model "programs" as Python callables and "halt/loop" behavior as return/no-return.
 # The diagonal argument constructs a program D that defeats any candidate halts-decider H.
 
-def simulate_halt_decider(program_source: str, input_value: any) -> bool:
+def simulate_halt_decider(program_source: str, input_value: Any) -> bool:
     """
     A HYPOTHETICAL halting decider. In reality, no such function can exist.
     For simulation, we use a simple heuristic: check whether the source contains
@@ -604,7 +604,7 @@ The Knaster-Tarski Fixed-Point Theorem states that every monotone function on a 
 ```python
 from sympy import symbols, And, Or, Not, Implies, simplify_logic, Symbol
 from functools import reduce
-from itertools import product
+from itertools import product, combinations
 
 # Model a complete lattice as the powerset of a finite set, ordered by inclusion.
 # Monotone operator T: P(S) -> P(S) represents a one-step consequence operator,

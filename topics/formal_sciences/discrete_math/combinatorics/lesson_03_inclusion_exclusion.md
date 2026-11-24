@@ -157,7 +157,7 @@ $$\sum_{k=0}^{2m+1} (-1)^k S_k \leq N(\bar{P}_1 \cdots \bar{P}_n) \leq \sum_{k=0
 
 where $S_k = \sum_{|S|=k} N(S)$.
 
-The proof follows from the combinatorial weight argument: for an element in exactly $j$ bad sets, the partial sum $\sum_{k=0}^{r} (-1)^k \binom{j}{k}$ alternates between 0 and 1, and the error after $r$ terms is exactly $(-1)^{r+1} \binom{j}{r+1} / \ldots$, which one bounds by its absolute value. The Bonferroni inequalities are practically indispensable in probabilistic combinatorics and extremal graph theory, where exact evaluation of all $2^n$ intersection sizes is infeasible and one settles for upper and lower bounds from the first few layers of the lattice.
+The proof follows from the combinatorial weight argument: for an element in exactly $j$ bad sets, the partial sum $\sum_{k=0}^{r} (-1)^k \binom{j}{k}$ alternates between 0 and 1, and the error after $r$ terms is exactly $(-1)^{r+1} \binom{j}{r+1}$, which one bounds by its absolute value. The Bonferroni inequalities are practically indispensable in probabilistic combinatorics and extremal graph theory, where exact evaluation of all $2^n$ intersection sizes is infeasible and one settles for upper and lower bounds from the first few layers of the lattice.
 
 In the sieve method of analytic number theory, the Bonferroni inequalities appear as the Legendre sieve (using all layers, exact) and its truncations: the Brun sieve uses a fixed number of layers and the resulting upper and lower bounds to constrain the count of primes in arithmetic progressions and twin primes. The simple algebraic oscillation of the Inclusion-Exclusion alternating sum thus has direct consequences for some of the deepest problems in number theory.
 

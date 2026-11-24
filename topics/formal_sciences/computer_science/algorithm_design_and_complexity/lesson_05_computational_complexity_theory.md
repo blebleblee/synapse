@@ -201,7 +201,7 @@ The third concern is *polynomial-time constructibility*. A reduction that runs i
 
 When a problem is NP-hard, practitioners turn to approximation algorithms: polynomial-time algorithms that find solutions guaranteed to be within a known factor of optimal. The vertex cover problem admits a clean 2-approximation: repeatedly find any edge $\{u, v\}$ not yet covered, add both $u$ and $v$ to the cover, and remove all edges incident to either. The resulting cover has size at most $2 \cdot \text{OPT}$ because every selected edge contributes both endpoints while any optimal cover must include at least one endpoint per edge, and selected edges form a matching (no two share a vertex, since we remove all incident edges after each selection).
 
-The frontier between approximability and inapproximability is governed by hardness results rooted in PCP theory. The PCP theorem (Arora, Lund, Motwani, Sudan, Szegedy, 1992) states that every language in $\mathbf{NP}$ has a proof system where a verifier reads $O(\log n)$ bits of an $O(n)$-length proof and decides with constant soundness gap. Formally:
+The frontier between approximability and inapproximability is governed by hardness results rooted in PCP theory. The PCP theorem (Arora and Safra, 1992; strengthened by Arora, Lund, Motwani, Sudan, and Szegedy, 1998) states that every language in $\mathbf{NP}$ has a proof system where a verifier reads $O(\log n)$ bits of an $O(n)$-length proof and decides with constant soundness gap. Formally:
 
 $$\mathbf{NP} = \mathbf{PCP}(\log n, 1)$$
 

@@ -25,7 +25,7 @@ lake exe cache get
 lake build
 ```
 
-The file `Real_analysis_labs/Basic.lean` is where all Lean proofs in this guide belong.
+The file `RealAnalysisLabs/Basic.lean` is where all Lean proofs in this guide belong.
 
 ### Conceptual Frame
 
@@ -134,7 +134,7 @@ The following code generates a bounded but pathological sequence, extracts a con
 import numpy as np
 from sympy import (
     Float, Abs, Rational, oo, Symbol, limit,
-    sequence, summation, cos as scos
+    summation, cos as scos
 )
 
 def bolzano_weierstrass_extract(seq_array, bound, depth=50):
@@ -494,7 +494,7 @@ print(f"Empirical Hölder constant C (max ratio): {C_empirical:.4f}")
 print(f"Hölder condition satisfied uniformly: {np.all(ratios <= C_empirical + 1e-6)}")
 ```
 
-The Hölder exponent $\alpha = -\log a / \log b$ quantifies exactly how rough the function is. For $a = 0.9$, $b = 7$, we get $\alpha \approx 0.109$, meaning the function is barely better than merely continuous: its increments grow like $|x - y|^{0.109}$, which tends to zero but extremely slowly. This places $W$ in the Hölder space $C^{0.109}([0,1])$ but outside $C^{\beta}$ for any $\beta > 0.109$. The numerical verification checks the Hölder constant directly across $10^5$ random pairs.
+The Hölder exponent $\alpha = -\log a / \log b$ quantifies exactly how rough the function is. For $a = 0.9$, $b = 7$, we get $\alpha \approx 0.054$, meaning the function is barely better than merely continuous: its increments grow like $|x - y|^{0.054}$, which tends to zero but extremely slowly. This places $W$ in the Hölder space $C^{0.054}([0,1])$ but outside $C^{\beta}$ for any $\beta > 0.054$. The numerical verification checks the Hölder constant directly across $10^5$ random pairs.
 
 ---
 
@@ -521,11 +521,7 @@ open Filter Topology Real
    ============================================================ -/
 theorem inv_nat_tendsto_zero :
     Filter.Tendsto (fun n : ℕ => (1 : ℝ) / (n : ℝ)) Filter.atTop (nhds 0) := by
-  rw [show (0 : ℝ) = (0 : ℝ) from rfl]
-  exact tendsto_const_nhds_iff.mpr (by norm_num) |>.of_tendsto_nhds
-    (tendsto_nhds_zero_of_abs_tendsto_zero _ (by
-      simp only [abs_div, abs_one]
-      exact tendsto_one_div_atTop_nhds_0_nat))
+  exact tendsto_one_div_atTop_nhds_0_nat
 
 /- ============================================================
    Theorem 2: Cauchy sequences converge in ℝ (completeness)
@@ -566,8 +562,6 @@ theorem ivt_application
   | inl h =>
     exact intermediate_value_Icc hab hf ⟨h.1, h.2⟩
   | inr h =>
-    have hba : f b ≤ f a := le_of_lt_or_eq (Or.inl (lt_of_le_of_lt h.1
-      (lt_of_le_of_lt h.2 (lt_of_le_of_lt (le_refl _) (lt_irrefl _|>.elim)))))
     -- Use the symmetric form for decreasing functions
     obtain ⟨c, hc_mem, hc_eq⟩ :=
       intermediate_value_Icc hab hf (by constructor <;> [exact h.2; exact h.1])
@@ -676,10 +670,8 @@ def m_test_verification(f_n_numpy, M_n_sympy, N_max=200, E_points=5000, label="f
     M_n_sympy  : SymPy expression in n_sym for M_n
     """
     import sympy as sp
-    n_int = symbols('n', positive=True, integer=True)
-
     # 1. Sum of M_n
-    M_vals = np.array([float(SN(M_n_sympy.subs(n_int, k), 20)) for k in range(1, N_max+1)])
+    M_vals = np.array([float(SN(M_n_sympy.subs(n_sym, k), 20)) for k in range(1, N_max+1)])
     M_total = M_vals.sum()
     print(f"\n--- Weierstrass M-test for {label} ---")
     print(f"  sum_{{n=1}}^{{{N_max}}} M_n ≈ {M_total:.10f}  (partial sum, should converge)")
@@ -689,7 +681,7 @@ def m_test_verification(f_n_numpy, M_n_sympy, N_max=200, E_points=5000, label="f
     violations = 0
     for k in range(1, min(50, N_max) + 1):
         fn_vals = f_n_numpy(k, xs)
-        Mk = float(SN(M_n_sympy.subs(n_int, k), 20))
+        Mk = float(SN(M_n_sympy.subs(n_sym, k), 20))
         if np.any(fn_vals > Mk + 1e-12):
             violations += 1
             print(f"  VIOLATION at n={k}: max|f_n(x)| = {fn_vals.max():.6e} > M_n = {Mk:.6e}")

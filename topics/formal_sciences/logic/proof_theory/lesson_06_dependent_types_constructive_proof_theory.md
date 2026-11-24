@@ -145,8 +145,8 @@ flowchart TD
     D["Reduction Engine<br/>Normalization<br/><br/>β, η, ι (iota for inductives),<br/>δ (δ-unfolding of definitions)"]
     E["Kernel TCB<br/><br/>Minimal trusted code base;<br/>only this must be correct"]
     
-    A -->|"Fully elaborated term<br/>explicit types everywhere"| B
-    B -->|"Needs definitional<br/>equality check"| C
+    A -->|"User input:<br/>raw proof term"| B
+    B -->|"Fully elaborated term<br/>explicit types everywhere"| C
     C -->|"Normal forms compared<br/>for syntactic equality"| D
     D --> E
 ```
@@ -171,7 +171,7 @@ Each universe $\mathcal{U}_i$ contains the types of the previous level and is it
 
 The central metatheoretical theorem for dependent type theory is **strong normalization**: every well-typed term reduces to a unique normal form in a finite number of steps, regardless of the order in which reductions are applied. This is not a convenience; it is the very foundation of the decidability of type checking. The type checker can only decide definitional equality because it has a terminating, confluent reduction system. Were normalization to fail for even a single well-typed term, the type checker would diverge on that term's normal form computation, and the entire basis for mechanized verification would collapse.
 
-The proof of strong normalization for dependent type theory is substantially harder than for the simply typed lambda calculus. The standard proof technique is *logical relations* (also called the *reducibility candidates* method, introduced by Girard for System F). The core idea is to define, by induction on types, a predicate $\text{Red}(A)$ that specifies which terms of type $A$ are "reducible," meaning they satisfy a strong normalization property with enough structural regularity to prove the fundamental lemma by induction. The proof proceeds in three stages.
+The proof of strong normalization for dependent type theory is substantially harder than for the simply typed lambda calculus. The standard proof technique is *logical relations* (also called the *reducibility candidates* method, introduced by Tait for the simply typed lambda calculus and extended by Girard to System F). The core idea is to define, by induction on types, a predicate $\text{Red}(A)$ that specifies which terms of type $A$ are "reducible," meaning they satisfy a strong normalization property with enough structural regularity to prove the fundamental lemma by induction. The proof proceeds in three stages.
 
 First, one shows that every element of $\text{Red}(A)$ is strongly normalizing. Second, one shows that every neutral term (a term that cannot $\beta$-reduce, such as a free variable applied to arguments) of type $A$ whose arguments are all reducible is itself reducible; this is the "anti-reduction" direction, which prevents reducibility from being trivially empty. Third, the fundamental lemma asserts that every well-typed term in a substitution of reducible values is reducible. The conclusion that every well-typed term is strongly normalizing follows immediately.
 

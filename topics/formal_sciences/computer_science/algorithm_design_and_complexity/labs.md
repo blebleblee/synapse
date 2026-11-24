@@ -22,7 +22,7 @@ required = {
 for module, min_ver in required.items():
     mod = importlib.import_module(module)
     installed = mod.__version__
-    status = "OK" if installed >= min_ver else f"UPGRADE NEEDED (found {installed})"
+    status = "OK" if tuple(map(int, installed.split('.'))) >= tuple(map(int, min_ver.split('.'))) else f"UPGRADE NEEDED (found {installed})"
     print(f"{module:>10} {installed:>10}  {status}")
 
 print(f"\nPython {sys.version}")

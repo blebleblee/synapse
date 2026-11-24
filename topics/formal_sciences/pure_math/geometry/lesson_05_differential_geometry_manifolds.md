@@ -99,9 +99,9 @@ though the Christoffel symbol formulation often proves more tractable computatio
 
 Gaussian curvature classifies local surface geometry. Points where $K > 0$ are elliptic (locally convex, like a sphere); $K < 0$ indicates hyperbolic geometry (saddle points). $K = 0$ signifies parabolic points (cylinders, cones, planes). A surface of revolution $\mathbf{r}(u,v) = (f(u)\cos v, f(u)\sin v, g(u))$ has Gaussian curvature
 
-$$K = -\frac{f''(u)}{f(u)(f'(u)^2 + g'(u)^2)},$$
+$$K = -\frac{f''(u)}{f(u)(f'(u)^2 + g'(u)^2)}.$$
 
-assuming unit-speed profile curve. For a sphere of radius $r$, $K = 1/r^2$; for a cylinder, $K = 0$; for a pseudosphere (surface of constant negative curvature), $K = -1/a^2$ for some constant $a$.
+For a unit-speed profile curve (where $f'(u)^2 + g'(u)^2 = 1$), this simplifies to $K = -f''(u)/f(u)$. For a sphere of radius $r$, $K = 1/r^2$; for a cylinder, $K = 0$; for a pseudosphere (surface of constant negative curvature), $K = -1/a^2$ for some constant $a$.
 
 The local Gauss-Bonnet theorem relates curvature to geodesic curvature along curves. For a simple closed curve $\gamma$ bounding a region $R$ on surface $S$, the geodesic curvature $\kappa_g$ measures how much $\gamma$ bends relative to geodesics on $S$. The theorem states:
 
@@ -247,11 +247,11 @@ recovering Gauss-Bonnet in the piecewise-flat setting. This discrete formulation
 
 On manifolds with bounded sectional curvature $|K| \le C$, geodesics exhibit controlled deviation. The Rauch comparison theorem asserts that Jacobi fields (infinitesimal variations of geodesics) grow at rates bounded by solutions to constant-curvature model spaces (sphere for $K > 0$, plane for $K = 0$, hyperbolic space for $K < 0$). For numerical geodesic shooting (solving boundary value problems by iterating initial velocities), comparison theorems provide convergence guarantees: Newton's method converges quadratically when curvature bounds ensure Jacobi field invertibility.
 
-Negative curvature induces exponential sensitivity to initial conditions. On hyperbolic surfaces, geodesics diverge at rate $e^{\sqrt{|K|}t}$, necessitating high-precision integration for long-time behavior. In contrast, positive curvature causes geodesics to reconverge (conjugate points), creating caustics. Detecting conjugate points—zeros of Jacobi field determinants—prevents geodesic minimality failures: beyond the first conjugate point, geodesics cease to be locally shortest paths.
+Negative curvature induces exponential sensitivity to initial conditions. On hyperbolic surfaces with constant curvature $-|K|$, geodesic separation grows as $\sinh(\sqrt{|K|}t)$, which is asymptotically exponential for large $t$; this necessitates high-precision integration for long-time behavior. In contrast, positive curvature causes geodesics to reconverge (conjugate points), creating caustics. Detecting conjugate points—zeros of Jacobi field determinants—prevents geodesic minimality failures: beyond the first conjugate point, geodesics cease to be locally shortest paths.
 
 ### Metric Completion and Boundary Behavior
 
-Incomplete metrics (geodesics escaping to infinity in finite time) signal missing boundary points. The flat punctured plane $\mathbb{R}^2 \setminus \{0\}$ with Euclidean metric is incomplete: geodesics aimed at the origin reach it in finite arc length, yet the origin is excluded. Completing the metric appends boundary points, forming a closed manifold. For surfaces of revolution "pinching off" (like a cone apex or pseudosphere cusp), completion distinguishes true singularities from removable coordinate artifacts.
+Incomplete metrics (geodesics escaping to infinity in finite time) signal missing boundary points. The flat punctured plane $\mathbb{R}^2 \setminus \{0\}$ with Euclidean metric is incomplete: geodesics aimed at the origin reach it in finite arc length, yet the origin is excluded. Completing the metric appends missing limit points to form a complete metric space, which may contain singular points and need not be a manifold. For surfaces of revolution "pinching off" (like a cone apex or pseudosphere cusp), completion distinguishes true singularities from removable coordinate artifacts.
 
 Geodesic completeness (the Hopf-Rinow theorem) guarantees that any two points can be joined by a minimizing geodesic, essential for global optimization algorithms. On incomplete manifolds, geodesic minimization may fail to converge: iterative schemes (e.g., gradient descent on path energy functionals) can drift toward boundary singularities. Compactness assumptions (closed, bounded manifolds) ensure geodesic minimizers exist, enabling variational methods like direct geodesic triangulation.
 
@@ -261,7 +261,7 @@ Christoffel symbols involve derivatives of metric components, amplifying numeric
 
 High-frequency noise in discrete metrics corrupts curvature computations (which involve second derivatives). Smoothing techniques—Gaussian filtering, moving least squares, or spectral decomposition (truncating high-frequency Laplacian eigenmodes)—regularize metrics before differentiation. However, excessive smoothing obliterates genuine geometric features (sharp ridges, saddles). Anisotropic diffusion, which smooths along principal curvature directions while preserving edges, offers an adaptive compromise.
 
-For tensor calculus in high dimensions, sparse storage of metric and curvature tensors becomes critical. Most components often vanish due to symmetry (e.g., diagonal metrics, homogeneous spaces). Exploiting sparsity through compressed row storage or symbolic simplification reduces memory footprint from $O(n^4)$ (full Riemann tensor) to manageable scales. Automatic differentiation libraries (e.g., Sympy, Maxima) generate optimized Christoffel and curvature routines from metric specifications, avoiding manual error-prone algebra.
+For tensor calculus in high dimensions, sparse storage of metric and curvature tensors becomes critical. Most components often vanish due to symmetry (e.g., diagonal metrics, homogeneous spaces). Exploiting sparsity through compressed row storage or symbolic simplification reduces memory footprint from $O(n^4)$ (full Riemann tensor) to manageable scales. Computer algebra systems (e.g., SymPy, Maxima) generate symbolic Christoffel and curvature routines from metric specifications, avoiding manual error-prone algebra.
 
 ### Edge Cases in Frenet-Serret Frames
 
@@ -275,7 +275,7 @@ Curves with varying parametrization speed ($\|\gamma'(t)\|$ non-constant) requir
 
 Differential geometry underpins modern geometric processing pipelines. Mesh smoothing algorithms (Laplacian smoothing, mean curvature flow) evolve surface vertices along $\mathbf{v}_t = -H \mathbf{n}$, minimizing surface area while preserving topology. Explicit time-stepping requires tiny time steps to maintain stability ($\Delta t \sim \Delta x^2$); implicit integration (backward Euler) solves linear systems per step but handles large time steps stably.
 
-Surface parametrization (UV mapping for texture coordinates) seeks low-distortion maps from surfaces to planar domains. Conformal parametrization preserves angles, achieved by solving Laplace's equation with Dirichlet boundary conditions (harmonic maps). The existence of conformal maps follows from the uniformization theorem: every simply connected surface admits a conformal parametrization to the plane, sphere, or disk, depending on Euler characteristic.
+Surface parametrization (UV mapping for texture coordinates) seeks low-distortion maps from surfaces to planar domains. Conformal parametrization preserves angles, achieved by solving Laplace's equation with Dirichlet boundary conditions (harmonic maps). The existence of conformal maps follows from the uniformization theorem: every simply connected Riemann surface is conformally equivalent to the Riemann sphere, the complex plane, or the open unit disk, corresponding to constant positive, zero, or negative curvature, respectively.
 
 Geodesic computation on meshes employs Dijkstra's algorithm on edge-weighted graphs (weights = edge lengths) for approximate geodesics. Exact geodesics (Mitchell-Mount-Papadimitriou algorithm) unfold surface patches into the plane, computing straight-line distances, then refining iteratively. For real-time applications (path planning in virtual environments), fast marching methods solve the eikonal equation $\|\nabla d\| = 1$ for distance function $d$, propagating wavefronts across the mesh.
 

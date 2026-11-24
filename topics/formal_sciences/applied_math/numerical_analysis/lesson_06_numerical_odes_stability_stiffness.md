@@ -188,7 +188,7 @@ def pece_adams_step(f, t, y_hist, f_hist, h):
     y_pred = y_hist[0] + h * (55/24*f_hist[0] - 59/24*f_hist[1]
                                + 37/24*f_hist[2] - 9/24*f_hist[3])
     f_pred = f(t + h, y_pred)
-    # Correct (AM4)
+    # Correct (3-step AM, order 4)
     y_corr = y_hist[0] + h * (9/24*f_pred + 19/24*f_hist[0]
                                - 5/24*f_hist[1] + 1/24*f_hist[2])
     f_corr = f(t + h, y_corr)
@@ -356,7 +356,7 @@ The table below summarizes the method selection decision for a practitioner conf
 | Problem characteristic | Recommended method | Rationale |
 |----------------------|---------------------|-----------|
 | Non-stiff, moderate accuracy | DOPRI5 (adaptive RK pair) | Self-starting, efficient, error-controlled |
-| Non-stiff, high accuracy | DOPRI8 or Verner pair | Higher order reduces step count at tight tolerances |
+| Non-stiff, high accuracy | DOP853 or Verner pair | Higher order reduces step count at tight tolerances |
 | Mildly stiff, smooth | Trapezoidal rule or SDIRK | A-stable, moderate cost per step |
 | Stiff, need damping | BDF (order 2–5) or Radau IIA | A($\alpha$)-stable/A-stable, L-stable variants available |
 | Very stiff, discontinuous | BDF order 1 (backward Euler) | L-stable, robust to nonsmoothness |

@@ -152,7 +152,7 @@ $$p(x) = \frac{\sum_{j=0}^n \frac{w_j y_j}{x - x_j}}{\sum_{j=0}^n \frac{w_j}{x -
 
 This form is numerically stable, avoiding the catastrophic cancellation that can occur in the Vandermonde approach. The denominator normalizes the formula, ensuring that polynomial constants interpolate correctly.
 
-For Chebyshev nodes, the barycentric weights admit a closed form:
+For Chebyshev points of the second kind (the extrema $\cos(j\pi/n)$), the barycentric weights admit a closed form:
 
 $$w_j = (-1)^j \delta_j,$$
 
@@ -212,7 +212,7 @@ The choice of polynomial degree is a critical tuning parameter that balances app
 
 The discrete Chebyshev transform via the FFT is a powerful tool for high-degree polynomial approximation, but it introduces subtle failure modes related to aliasing. When the underlying function has significant Fourier content beyond the Nyquist frequency $\pi/(2\Delta \theta)$, where $\Delta \theta$ is the angular spacing between Chebyshev nodes, the DCT will fold high-frequency components into the low-frequency spectrum, corrupting the computed coefficients. This aliasing error is controlled by oversampling: use $n \gg m$ Chebyshev nodes to compute a degree-$m$ polynomial, effectively applying a low-pass filter in frequency space. The aliasing error decays exponentially with the oversampling ratio for analytic functions, making this strategy highly effective in practice.
 
-Adaptive interpolation algorithms dynamically adjust the polynomial degree and node distribution to achieve a prescribed error tolerance. The simplest adaptive strategy is hierarchical refinement: start with a low-degree interpolant, evaluate the error at a dense set of test points, and recursively subdivide intervals where the error exceeds the tolerance. Nested node sequences, such as the Clenshaw-Curtis quadrature nodes (which include Chebyshev nodes of the first kind), enable efficient reuse of function evaluations when refining the interpolant. The error estimate can be obtained from the magnitude of the highest-degree Chebyshev coefficient, leveraging the exponential decay property.
+Adaptive interpolation algorithms dynamically adjust the polynomial degree and node distribution to achieve a prescribed error tolerance. The simplest adaptive strategy is hierarchical refinement: start with a low-degree interpolant, evaluate the error at a dense set of test points, and recursively subdivide intervals where the error exceeds the tolerance. Nested node sequences, such as the Clenshaw-Curtis quadrature nodes (which are the Chebyshev extrema $\cos(k\pi/n)$, distinct from the Chebyshev nodes of the first kind), enable efficient reuse of function evaluations when refining the interpolant. The error estimate can be obtained from the magnitude of the highest-degree Chebyshev coefficient, leveraging the exponential decay property.
 
 For multivariate polynomial interpolation in dimensions $d > 1$, the curse of dimensionality imposes severe constraints on feasible polynomial degrees. A full polynomial of total degree $n$ in $d$ variables contains $\binom{n+d}{d}$ terms, which grows factorially with $d$ for fixed $n$. Sparse polynomial interpolation, which selects a subset of terms based on anisotropic smoothness or sparsity priors, mitigates this explosion. Adaptive sparse grids and hyperbolic cross approximations reduce the sample complexity from $O(N^d)$ to $O(N (\log N)^{d-1})$ for achieving accuracy $N^{-1}$, a dramatic improvement for $d \gtrsim 3$.
 
