@@ -165,7 +165,6 @@ class OpenAIClient:
         self,
         api_key: Optional[str] = None,
         organization: Optional[str] = None,
-        max_retries: int = 5,
         timeout: float = 60.0
     ):
         """
@@ -191,7 +190,7 @@ class OpenAIClient:
         self.timeout = timeout
     
     @retry(
-        retry=retry_if_exception_type((RateLimitError, APIConnectionError, APIError)),
+        retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
         wait=wait_exponential(multiplier=1, min=2, max=60),
         stop=stop_after_attempt(5),
         before_sleep=before_sleep_log(logger, logging.WARNING),
@@ -399,7 +398,7 @@ if __name__ == "__main__":
 
 3. **Token Accounting**: Every response includes usage metrics, enabling cost tracking at arbitrary granularity.
 
-4. **Type Safety**: Using `dataclass` and `Enum` provides compile-time guarantees about message structure.
+4. **Type Safety**: Using `dataclass` and `Enum` documents the response and model parameter shapes; type hints and the runtime validation loop catch malformed messages at call time.
 
 ## Lab 2: Function Calling and Tool Integration
 

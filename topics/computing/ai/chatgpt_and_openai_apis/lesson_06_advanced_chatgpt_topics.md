@@ -87,7 +87,6 @@ Counting tokens accurately before an API call is essential for avoiding truncati
 
 ```python
 import tiktoken
-from typing import list
 
 def count_tokens_for_messages(messages: list[dict], model: str = "gpt-4o") -> int:
     """

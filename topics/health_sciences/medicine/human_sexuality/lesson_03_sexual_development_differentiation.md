@@ -62,5 +62,5 @@ flowchart TD
 
     style A fill:#2d3748,color:#fff
     style F fill:#2b4c7e,color:#fff
-    style G fill:#5c3d6
+    style G fill:#5c3d6e
 ```

@@ -55,7 +55,7 @@ Measure and record the following against the target specification:
 | pH of finished mayo | 3.8–4.2 | Calibrated pH meter | |
 | Texture (peak test) | Holds soft peak ≥2 cm for 10 sec | Visual observation | |
 | Oil sheen on surface | None visible | Visual observation | |
-| Total yield (g) | 335–345 g | Digital scale | |
+| Total yield (g) | 345–350 g | Digital scale | |
 | Color | Pale ivory to light yellow | Munsell or visual rubric | |
 | Aroma | Clean, slightly acidic, no rancid notes | Sensory rubric (1–10) | |
 
@@ -153,7 +153,7 @@ The Dijon mustard in mayonnaise contributes mucilage compounds (from mustard see
 
 ### Lab 2B: Bread Hydration Scaling — 65%, 75%, and 80% Hydration Doughs
 
-Using the same bread flour and identical process from Lab 1B, produce three separate doughs at different hydration levels. This exercise quantitatively maps how water content affects gluten extensibility, fermentation rate, shaping behavior, and final crumb structure. All variables except water weight are held constant.
+Using the same bread flour and identical process from Lab 1B, produce four separate doughs at different hydration levels. This exercise quantitatively maps how water content affects gluten extensibility, fermentation rate, shaping behavior, and final crumb structure. All variables except water weight are held constant.
 
 **Formulation Table for Lab 2B**
 
@@ -323,7 +323,7 @@ Run through each item and mark it confirmed before you touch your first ingredie
 
 1. pH meter has been calibrated against two-point buffer solution (pH 4.0 and pH 7.0) within the last 48 hours. Electrode is clean and stored in electrode storage solution between uses.
 2. Digital scale has been zeroed (tared) with an empty bowl and verified with a known reference weight (100.0 g calibration weight to ±0.1 g).
-3. Instant-read thermometer has been verified against an ice-water bath (0°C ± 0.5°C) and a boiling-water reference (adjust for altitude: 100°C at sea level, 98.6°C at 450 m, 97.1°C at 900 m).
+3. Instant-read thermometer has been verified against an ice-water bath (0°C ± 0.5°C) and a boiling-water reference (adjust for altitude: 100°C at sea level, 98.8°C at 450 m, 97.1°C at 900 m).
 4. Immersion circulator temperature has been cross-checked with the instant-read thermometer in the water bath before sealing any sous-vide bag.
 5. Ingredients are at specified temperatures — eggs at 20°C (unless specified otherwise), butter measured in liquid state, water measured with thermometer before incorporation.
 6. All ingredient weights have been recorded in the LOR before any mixing begins.

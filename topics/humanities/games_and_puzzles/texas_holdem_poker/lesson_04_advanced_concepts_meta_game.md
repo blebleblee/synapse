@@ -54,11 +54,11 @@ The mathematics here are borrowed from optimal betting theory, specifically the 
 
 The formula is elegantly simple: **Optimal Bet Size = (Edge × Odds) / Odds Against**
 
-In poker vernacular, if you are in a situation where you have a 55% equity edge and you are offered even money odds (you risk $100 to win $100), then your edge is 5% and your optimal Kelly bet is 5% of your bankroll. If you consistently bet 5% of your total capital on each hand with this edge, your long-term capital growth follows a logarithmic curve and is mathematically maximized.
+In poker vernacular, if you are in a situation where you have a 55% equity edge and you are offered even money odds (you risk $100 to win $100), then your edge is 10% and the full Kelly bet is 10% of your bankroll (p − q for an even-money bet); many players use half Kelly. If you consistently bet 5% of your total capital on each hand with this edge, your long-term capital growth follows a logarithmic curve and is mathematically maximized.
 
 However, the full Kelly strategy is rarely recommended in practice, for a critical reason: it assumes perfect information and no variance in the edge itself. In reality, poker edges are estimates with confidence intervals; you might think you have a 55% edge when you actually have a 50% edge due to hidden opponent skills, and that miscalibration can lead to catastrophic downswings. Professional players typically employ fractional Kelly strategies—betting perhaps 25% or 50% of full Kelly—as a variance mitigation technique. This trade-off reduces long-term growth rates slightly but dramatically improves the stability of the bankroll and reduces the probability of ruin.
 
-Bankroll sizing follows directly from this. If a professional poker player uses half-Kelly strategies and faces typical poker rake and variance, a rule of thumb is that you need 30 to 50 buy-ins for your chosen stakes to weather a realistic downswing without going broke. A player entering $1/$2 cash games with a $3,000 bankroll is dangerously under-rolled; a realistic downswing of 15 buy-ins ($30 in value) could wipe them out. The same player with a $15,000 bankroll has adequate cushion to continue playing through variance while learning and adjusting.
+Bankroll sizing follows directly from this. If a professional poker player uses half-Kelly strategies and faces typical poker rake and variance, a rule of thumb is that you need 30 to 50 buy-ins for your chosen stakes to weather a realistic downswing without going broke. A player entering $1/$2 cash games with a $3,000 bankroll is dangerously under-rolled; a realistic downswing of 15 buy-ins ($3,000 in value) could wipe them out. The same player with a $15,000 bankroll has adequate cushion to continue playing through variance while learning and adjusting.
 
 This constraint is often the binding one for aspiring professionals. Technical skill—understanding position, hand ranges, pot odds—might be sufficient to generate a small edge, but without adequate capitalization, that edge cannot be realized profitably. Bankroll management is therefore not a side topic; it is the infrastructure upon which all professional poker careers are built.
 
@@ -102,7 +102,7 @@ This requires cultivating a realistic self-assessment. It is tempting to believe
 
 ### Constructing and Maintaining Psychological Resilience
 
-Variance in poker is inevitable, and downswings are not aberrations but expected features of the game. A player with a 3 BB/h edge over 100 hours should expect to win about 300 BB, but with realistic variance, they might win only 50 BB or even lose 100 BB over that same stretch. A swath of 200 BB representing the difference between expectation and reality is within normal variance for most games.
+Variance in poker is inevitable, and downswings are not aberrations but expected features of the game. A player with a 3 BB/h edge over 100 hours should expect to win about 300 BB, but with realistic variance, they might win only 50 BB or even lose 100 BB over that same stretch. A swath of 150 BB representing the difference between expectation and reality is within normal variance for most games.
 
 The psychological challenge is maintaining confidence in your strategy and your edge when you are experiencing a downswing. The natural human response to loss is to assume something is wrong—either the strategy is flawed or you are executing it poorly. Sometimes this is true, but more often it is simple variance. Distinguishing between the two requires data.
 

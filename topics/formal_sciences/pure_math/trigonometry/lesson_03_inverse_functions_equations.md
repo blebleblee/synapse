@@ -46,7 +46,7 @@ $$\arctan(\tan(\theta)) = \theta \quad \text{if and only if } \theta \in \left(-
 
 The asymmetry matters enormously in practice. A practitioner who writes $\arcsin(\sin(5\pi/6)) = 5\pi/6$ has committed an error because $5\pi/6 \notin \left[-\frac{\pi}{2}, \frac{\pi}{2}\right]$. The correct computation recognizes that $\sin(5\pi/6) = \sin(\pi/6) = 1/2$, and $\arcsin(1/2) = \pi/6$. The function $\theta \mapsto \arcsin(\sin(\theta))$ is not the identity on $\mathbb{R}$; it is a sawtooth function that folds the real line back into $\left[-\frac{\pi}{2}, \frac{\pi}{2}\right]$ with period $2\pi$.
 
-There is a beautiful and practically useful family of identities connecting $\arcsin$, $\arccos$, and $\arctan$ to each other and to right-triangle geometry. Because $\sin\theta + \cos(\frac{\pi}{2}-\theta) = 0$ vanishes trivially — more precisely, because $\cos(\frac{\pi}{2}-\theta) = \sin\theta$ — if $x \in [-1,1]$ and $\alpha = \arcsin(x)$, then $\cos(\frac{\pi}{2}-\alpha) = x$ and $\frac{\pi}{2}-\alpha \in [0, \pi]$, so by the definition of $\arccos$ we obtain the complementary angle identity:
+There is a beautiful and practically useful family of identities connecting $\arcsin$, $\arccos$, and $\arctan$ to each other and to right-triangle geometry. Because $\cos(\frac{\pi}{2}-\theta) = \sin\theta$ by the cofunction identity — if $x \in [-1,1]$ and $\alpha = \arcsin(x)$, then $\cos(\frac{\pi}{2}-\alpha) = x$ and $\frac{\pi}{2}-\alpha \in [0, \pi]$, so by the definition of $\arccos$ we obtain the complementary angle identity:
 
 $$\arcsin(x) + \arccos(x) = \frac{\pi}{2} \quad \text{for all } x \in [-1, 1].$$
 

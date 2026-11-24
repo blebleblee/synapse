@@ -270,8 +270,8 @@ for expr, var, point, expected, label in fundamental_limits:
 
 # --- One-sided limits at tan singularities ---
 print("\n--- One-Sided Limits at tan Singularities ---")
-tan_lim_right = sp.limit(sp.tan(x), x, sp.pi/2, '-')
-tan_lim_left  = sp.limit(sp.tan(x), x, sp.pi/2, '+')
+tan_lim_right = sp.limit(sp.tan(x), x, sp.pi/2, '+')
+tan_lim_left  = sp.limit(sp.tan(x), x, sp.pi/2, '-')
 print(f"  lim(x→π/2⁻) tan(x)  = {tan_lim_right}")
 print(f"  lim(x→π/2⁺) tan(x)  = {tan_lim_left}")
 assert tan_lim_right ==  sp.oo, "Expected +∞ from left"
@@ -334,7 +334,7 @@ assert float(residual_5th) <= float(lagrange_bound), "Lagrange remainder bound v
 print("  Lagrange bound satisfied: VERIFIED")
 ```
 
-The branch cut behavior in the final block is particularly important for practitioners working in complex analysis or signal processing. When $\arcsin$ receives an argument with $|x| > 1$, the function exits the real branch and returns a complex value. SymPy handles this correctly by analytic continuation: $\arcsin(x) = -i \ln(ix + \sqrt{1-x^2})$ for $x \in \mathbb{C}$. The imaginary part of $\arcsin(2)$ is $\ln(2 + \sqrt{3})$, which SymPy can verify symbolically.
+The branch cut behavior in the final block is particularly important for practitioners working in complex analysis or signal processing. When $\arcsin$ receives an argument with $|x| > 1$, the function exits the real branch and returns a complex value. SymPy handles this correctly by analytic continuation: $\arcsin(x) = -i \ln(ix + \sqrt{1-x^2})$ for $x \in \mathbb{C}$. The imaginary part of $\arcsin(2)$ is $-\ln(2 + \sqrt{3})$, which SymPy can verify symbolically.
 
 The Lagrange remainder bound for the Taylor series is a critical computational stability property. If you are implementing $\sin$ in fixed-point arithmetic for an embedded system or approximating it with a polynomial kernel in a shader, you need to know that the truncation error is bounded by $|x|^{n+2}/(n+2)!$ for the $n$-th order approximation. The verification above confirms that SymPy's exact arithmetic respects this analytic bound, which provides confidence that the symbolic engine is internally consistent.
 

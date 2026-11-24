@@ -265,7 +265,6 @@ class StackedLSTM(nn.Module):
     """
     Multi-layer LSTM with:
       - variational (locked) dropout between layers
-      - weight tying option for language modelling
       - gradient clipping ready (call torch.nn.utils.clip_grad_norm_ externally)
     """
 
@@ -275,17 +274,14 @@ class StackedLSTM(nn.Module):
         hidden_size: int,
         num_layers: int,
         dropout: float = 0.3,
-        bidirectional: bool = False,
     ) -> None:
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers  = num_layers
-        self.bidirectional = bidirectional
-        directions = 2 if bidirectional else 1
 
         self.cells = nn.ModuleList([
             nn.LSTMCell(
-                input_size  if layer == 0 else hidden_size * directions,
+                input_size  if layer == 0 else hidden_size,
                 hidden_size,
             )
             for layer in range(num_layers)
@@ -541,7 +537,7 @@ for batch in dataloader:
     scaler.update()
 ```
 
-BF16 (bfloat16) uses the same 8-bit exponent as FP32, so it cannot overflow — it is the preferred format on TPUs and Ampere+ GPUs for stability. `torch.autocast(dtype=torch.bfloat16)` requires no loss scaling.
+BF16 (bfloat16) uses the same 8-bit exponent as FP32, so it cannot overflow — it is the preferred format on TPUs and Ampere+ GPUs for stability. `torch.autocast(device_type="cuda", dtype=torch.bfloat16)` requires no loss scaling.
 
 ### Data Parallelism vs. Model Parallelism
 
@@ -593,7 +589,7 @@ Overfitting is not merely "the model memorizes training data." Formally, it is a
 
 **L1/L2 Weight Decay.** L2 regularization adds λ·‖W‖₂² to the loss, equivalent to placing a Gaussian prior on weights and corresponds to MAP estimation under a Gaussian prior. L1 adds λ·‖W‖₁, inducing sparsity by driving small weights to exactly zero (corresponds to a Laplace prior). Note that in adaptive optimizers like Adam, weight decay should be applied directly to the weights (*decoupled weight decay*, AdamW; Loshchilov & Hutter, 2017) rather than added to the gradient — the two are not equivalent when gradients are adaptively scaled.
 
-**Data Augmentation.** For images: random horizontal flip, crop, color jitter (simple, cheap), and CutMix/MixUp (mix two images and interpolate labels — produces significant gains). RandAugment and TrivialAugment automatically search augmentation policy spaces.
+**Data Augmentation.** For images: random horizontal flip, crop, color jitter (simple, cheap), and CutMix/MixUp (mix two images and interpolate labels — produces significant gains). RandAugment replaces the policy search with two hyperparameters, and TrivialAugment applies a single randomly chosen augmentation with a random magnitude, requiring no search.
 
 **Label Smoothing.** Replace hard one-hot targets with `y_smooth = (1 - ε) · y_onehot + ε / K`. This prevents the model from driving logits to ±∞ and improves calibration. Standard ε = 0.1.
 
@@ -654,7 +650,7 @@ def cosine_schedule_with_warmup(
     return min_lr + (peak_lr - min_lr) * cosine_decay
 ```
 
-**OneCycleLR.** Smith & Touvron's (2017, 2019) *super-convergence* uses a single cycle: ramp up, then anneal, reaching very high LRs that act as implicit regularization by escaping sharp minima. `torch.optim.lr_scheduler.OneCycleLR` implements this directly.
+**OneCycleLR.** Smith's (2017) and Smith & Topin's (2019) *super-convergence* uses a single cycle: ramp up, then anneal, reaching very high LRs that act as implicit regularization by escaping sharp minima. `torch.optim.lr_scheduler.OneCycleLR` implements this directly.
 
 **Inverse square root decay** (Transformer paper default): `lr = d_model^{-0.5} · min(step^{-0.5}, step · warmup_steps^{-1.5})`.
 

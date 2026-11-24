@@ -2,7 +2,7 @@
 
 ## 1. First-Principles Intuition & Invariants
 
-The human communication channel operates as a multi-modal transmission system where linguistic content represents merely thirty to forty percent of total information transfer. The remaining sixty to seventy percent flows through paralinguistic vectors—vocal quality, temporal patterning, spatial positioning, and kinesthetic signaling. This asymmetry creates a fundamental invariant in public speaking: **technical mastery of delivery mechanisms exerts disproportionate influence on audience persuasion compared to content optimization alone**.
+The human communication channel operates as a multi-modal transmission system where linguistic content combines with paralinguistic vectors—vocal quality, temporal patterning, spatial positioning, and kinesthetic signaling—to create multimodal communication whose relative contribution varies significantly by context. This asymmetry creates a fundamental invariant in public speaking: **technical mastery of delivery mechanisms exerts disproportionate influence on audience persuasion compared to content optimization alone**.
 
 Neurological research into mirror neuron systems reveals why nonverbal channels dominate cognitive processing. When an audience member observes a speaker's physical gesture, their premotor cortex activates the same neural pathways as if executing that gesture themselves. This automatic embodied simulation creates visceral empathy that bypasses rational filtering. A speaker who masters kinesthetic communication essentially hijacks the audience's motor cortex, generating felt understanding before conscious analysis begins.
 
@@ -42,7 +42,7 @@ Vocal Production Pipeline:
 
 Pitch encodes semantic emphasis, sentence modality, and emotional valence. English employs pitch movement rather than absolute pitch for linguistic meaning. Declarative sentences terminate with falling pitch, signaling completion and certainty. Interrogatives employ rising pitch, signaling information-seeking. Monotonic pitch—absent contour variation—produces the characteristic robotic delivery of inexperienced speakers reading prepared text.
 
-The fundamental frequency of phonation ranges approximately eighty to two hundred fifty hertz for adult males and one hundred fifty to four hundred hertz for adult females, though these distributions overlap considerably. Optimal pitch resides near the lower third of an individual's range, where phonation requires minimal effort and resonance maximizes. Speakers under anxiety unconsciously elevate pitch through laryngeal tension, producing the thin, strained quality audiences associate with nervousness.
+The fundamental frequency of phonation ranges approximately eighty-five to one hundred eighty hertz for adult males and one hundred sixty-five to two hundred fifty-five hertz for adult females, though these distributions overlap considerably. Optimal pitch resides near the lower third of an individual's range, where phonation requires minimal effort and resonance maximizes. Speakers under anxiety unconsciously elevate pitch through laryngeal tension, producing the thin, strained quality audiences associate with nervousness.
 
 Strategic pitch variation emphasizes key terms and structures information hierarchy. Rising pitch signals important upcoming information, creating anticipation. Falling pitch marks closure and allows cognitive processing. Skilled speakers employ pitch steps—discrete jumps between tonal levels—to demarcate major structural transitions. A three-step pitch architecture suffices for most speaking contexts: baseline for exposition, elevated for emphasis, and reduced for subordinate clauses.
 
@@ -196,7 +196,7 @@ Timing calibration requires measured rehearsal with stopwatch validation. Speake
 
 ### Embodied Cognition and Somatic Priming
 
-Pre-performance physical state primes subsequent cognitive and emotional function through embodied cognition mechanisms. Power posing—adopting expansive, open postures for two minutes—elevates testosterone and reduces cortisol, increasing feelings of power and willingness to take risks. The mechanism operates through proprioceptive feedback: the body signals dominance, which the brain interprets as environmental confirmation of status.
+Pre-performance physical state primes subsequent cognitive and emotional function through embodied cognition mechanisms. Power posing—adopting expansive, open postures for two minutes—increases feelings of power and willingness to take risks through proprioceptive feedback. The mechanism operates through proprioceptive feedback: the body signals dominance, which the brain interprets as environmental confirmation of status.
 
 Conversely, contracted postures—hunched shoulders, crossed arms, downward gaze—prime submission and anxiety through identical pathways. Speakers waiting in holding areas before performance should deliberately maintain expansive posture and avoid contracted positions that amplify pre-existing anxiety.
 

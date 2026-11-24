@@ -62,7 +62,7 @@ flowchart LR
 
 ### Gated Recurrent Unit (GRU): A Structural Comparison
 
-The GRU (Cho et al. 2014) merges the forget and input gates into a single **update gate** and eliminates the separate cell state, reducing parameter count by approximately one-third:
+The GRU (Cho et al. 2014) merges the forget and input gates into a single **update gate** and eliminates the separate cell state, reducing parameter count by approximately one-quarter:
 
 $$z_t = \sigma(W_z [h_{t-1}, x_t])$$  — update gate  
 $$r_t = \sigma(W_r [h_{t-1}, x_t])$$  — reset gate  
@@ -150,7 +150,7 @@ def generate_sine_wave(
     noise_std : float
         Standard deviation of additive Gaussian noise. Zero produces a clean sine.
     freq : float
-        Angular frequency multiplier. freq=1.0 produces one full cycle over [0, 2π].
+        Angular frequency multiplier. freq=1.0 produces two full cycles over [0, 4π].
 
     Returns
     -------
@@ -325,11 +325,11 @@ total_params = sum(p.numel() for p in model.parameters())
 trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 print(f"Total parameters:     {total_params:,}")
 print(f"Trainable parameters: {trainable_params:,}")
-# For a 2-layer LSTM: 4 * (input+hidden+1) * hidden per layer
-# Layer 1: 4*(1+64+1)*64 = 16,640
-# Layer 2: 4*(64+64+1)*64 = 33,024
+# For a 2-layer LSTM: 4 * (input+hidden+2) * hidden per layer (PyTorch gives each gate two biases)
+# Layer 1: 4*(1+64+2)*64 = 17,152
+# Layer 2: 4*(64+64+2)*64 = 33,280
 # FC:      64*1 + 1 = 65
-# Total ≈  49,729
+# Total ≈  50,497
 ```
 
 ### Training Loop with Validation
@@ -471,7 +471,7 @@ plt.show()
 
 ### Why Grid Search is Inadequate at Scale — and What to Use Instead
 
-Grid search over 3 × 3 × 3 = 27 configurations × 150 epochs × ~1,600 training steps is computationally expensive and treats the hyperparameter space as if it were fully separable, which it is not. For this lab we keep grid search to illustrate the mechanics, but in production use **random search** (Bergstra & Bengio 2012) or **Bayesian optimization** (e.g., Optuna or Ax). Random search is strictly dominant over grid search when some hyperparameters matter far more than others — and in LSTMs, `hidden_size` and `learning_rate` typically dominate `num_layers`.
+Grid search over 3 × 2 × 3 × 2 = 36 configurations × 50 epochs × ~1,600 training steps is computationally expensive and treats the hyperparameter space as if it were fully separable, which it is not. For this lab we keep grid search to illustrate the mechanics, but in production use **random search** (Bergstra & Bengio 2012) or **Bayesian optimization** (e.g., Optuna or Ax). Random search is strictly dominant over grid search when some hyperparameters matter far more than others — and in LSTMs, `hidden_size` and `learning_rate` typically dominate `num_layers`.
 
 ```mermaid
 flowchart TD
@@ -644,7 +644,7 @@ class VanillaRNNForecaster(nn.Module):
 benchmark_configs = {
     "LSTM":        LSTMForecaster(hidden_size=64, num_layers=2, dropout=0.2),
     "GRU":         GRUForecaster(hidden_size=74, num_layers=2, dropout=0.2),   # ~same params as LSTM
-    "VanillaRNN":  VanillaRNNForecaster(hidden_size=90, num_layers=2, dropout=0.2),
+    "VanillaRNN":  VanillaRNNForecaster(hidden_size=128, num_layers=2, dropout=0.2),
 }
 
 benchmark_results = {}
@@ -719,7 +719,7 @@ flowchart LR
 ```python
 import warnings
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s — %(message)s")
 logger = logging.getLogger(__name__)

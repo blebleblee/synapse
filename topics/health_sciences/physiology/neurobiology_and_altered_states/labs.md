@@ -68,7 +68,7 @@ This protocol models the cognitive degradation observed during rapid ascent to h
 
 ## Exercise 3: Stress Testing, Boundary Failure & Recovery Protocol—Sleep Deprivation and Cognitive Resilience Boundaries
 
-Sleep deprivation represents one of the most operationally relevant altered states, encountered during multi-day wilderness rescue missions, military operations, ultra-endurance events, and emergency medical rotations. Progressive sleep restriction degrades prefrontal cortex function, reduces sympathetic cardiovascular reactivity, and impairs glucose metabolism, culminating in microsleep episodes and catastrophic performance collapse. This exercise establishes the empirical relationship between cumulative sleep debt and cognitive performance decline, identifies individual failure thresholds, and tests recovery kinetics under controlled partial sleep restriction.
+Sleep deprivation represents one of the most operationally relevant altered states, encountered during multi-day wilderness rescue missions, military operations, ultra-endurance events, and emergency medical rotations. Progressive sleep restriction degrades prefrontal cortex function, increases resting sympathetic tone, and impairs glucose metabolism, culminating in microsleep episodes and catastrophic performance collapse. This exercise establishes the empirical relationship between cumulative sleep debt and cognitive performance decline, identifies individual failure thresholds, and tests recovery kinetics under controlled partial sleep restriction.
 
 **Protocol Design and Ethical Constraints:**
 

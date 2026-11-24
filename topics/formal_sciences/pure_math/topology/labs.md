@@ -14,12 +14,12 @@ python -c 'import numpy; print(numpy.__version__)'
 python -c 'from sage.all import *; print(version())'
 ```
 
-The expected output is SymPy 1.12 or later, NumPy 1.26 or later, and SageMath 10.x. If SageMath is unavailable as a system package, the fastest path is the conda route: `conda install -c conda-forge sagemath`. For the Lean 4 formal verification segment in Exercise 3, install via `elan` (the Lean version manager): `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh`, then initialize a new Mathlib project with `lake new topology_lab math.lean` and add `require mathlib from git "https://github.com/leanprover-community/mathlib4"` to your `lakefile.lean`.
+The expected output is SymPy 1.12 or later, NumPy 1.26 or later, and SageMath 10.x. If SageMath is unavailable as a system package, the fastest path is the conda route: `conda install -c conda-forge sagemath`. For the Lean 4 formal verification segment in Exercise 3, install via `elan` (the Lean version manager): `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh`, then initialize a new Mathlib project with `lake new topology_lab math`, whose `math` template already adds Mathlib as a dependency.
 
 The working Python environment requires three additional packages beyond the standard scientific stack:
 
 ```text
-pip install sympy numpy networkx itertools-more
+pip install sympy numpy networkx more-itertools
 ```
 
 NetworkX will carry the graph-theoretic representation of simplicial complexes in Exercise 3. The `more-itertools` library supplies combinatorial utilities for generating simplicial faces without manual nested loops.
@@ -397,6 +397,7 @@ Compactness is the topological generalization of "closed and bounded": a space $
 ```python
 import numpy as np
 from itertools import combinations
+from functools import reduce
 
 def covers(open_sets, X):
     """Return True if the union of open_sets contains all points of X."""
@@ -810,7 +811,7 @@ def torus_triangulation():
                 edges.add((tri[k], tri[l]))
     
     return {
-        0: [tuple([v]) for v in sorted(vertices)],
+        0: sorted(list(vertices)),
         1: sorted(list(edges)),
         2: sorted(list(triangles))
     }

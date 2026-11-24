@@ -96,7 +96,7 @@ graph LR
     SP --> H1 --> A1 --> H2 --> A2
 ```
 
-Context window sizes vary by model family. As of 2024, Claude 3 models (Haiku, Sonnet, Opus) support 200,000-token context windows. This is not a soft limit — tokens beyond the context window are truncated (oldest tokens first in most truncation strategies), producing silent context loss unless the caller manages windowing explicitly.
+Context window sizes vary by model family. As of 2024, Claude 3 models (Haiku, Sonnet, Opus) support 200,000-token context windows. This is a hard limit — requests exceeding the context window fail with a 400 `invalid_request_error` ("prompt is too long"). The caller must manage windowing and truncation explicitly before submitting.
 
 **Token budget estimation** is critical for cost and reliability. The Anthropic tokenizer is based on a byte-pair encoding (BPE) scheme. English prose tokenizes at roughly 3–4 characters per token; code tokenizes denser (more tokens per line due to symbols and whitespace).
 
@@ -433,7 +433,7 @@ graph TD
 
 **Causal masking:** The self-attention mechanism uses a lower-triangular mask ensuring token $t$ can only attend to tokens $1 \ldots t$. This is what makes the model autoregressive and is why there is no "edit a previous token" operation — each generation step is a fresh forward pass over the entire (prefix + generated so far) sequence.
 
-**KV-Cache:** During autoregressive decoding, the key (K) and value (V) projections for all previously processed tokens are cached in GPU SRAM. Only the new token's K/V are computed at each decode step. This reduces decode-step complexity from $O(n^2)$ to $O(n)$ per step in computation, but requires $O(n \cdot d)$ memory per sequence (where $d$ is the model dimension). This is why long contexts increase both latency (prefill cost grows quadratically with prompt length) and cost (input tokens are more expensive than output tokens per-unit in Anthropic's pricing, partly reflecting prefill compute).
+**KV-Cache:** During autoregressive decoding, the key (K) and value (V) projections for all previously processed tokens are cached in GPU device memory (HBM). Only the new token's K/V are computed at each decode step. This reduces decode-step complexity from $O(n^2)$ to $O(n)$ per step in computation, but requires $O(n \cdot d)$ memory per sequence (where $d$ is the model dimension). This is why long contexts increase both latency (prefill cost grows quadratically with prompt length) and cost (input tokens are more expensive than output tokens per-unit in Anthropic's pricing, partly reflecting prefill compute).
 
 **Prefill vs. Decode phases:** The *prefill* phase processes the entire input prompt in a single batched forward pass, populating the KV cache. The *decode* phase generates one token per step. Time-to-first-token (TTFT) is dominated by prefill; tokens-per-second (TPS) is determined by decode throughput. Streaming APIs expose decode tokens as they are produced, which is why streaming dramatically reduces *perceived* latency for long outputs even though total wall-clock time is similar.
 
@@ -443,7 +443,7 @@ graph TD
 
 ### Prompt Caching
 
-Anthropic's prompt caching feature allows you to mark a portion of the prompt (e.g., a large system prompt or static document) as cacheable. The serving infrastructure stores the KV cache for that prefix and reuses it across requests, dramatically reducing prefill cost and latency for repeated use of the same prefix.
+Anthropic's prompt caching feature allows you to mark a portion of the prompt (e.g., a large system prompt or static document) as cacheable. The serving infrastructure stores the KV cache for that prefix and reuses it across requests, dramatically reducing prefill cost and latency for repeated use of the same prefix. The minimum cacheable prefix is 1024 tokens for Claude 3.5 Sonnet and Claude 3 Opus, but 2048 tokens for Claude 3 Haiku.
 
 ```python
 import anthropic
@@ -615,14 +615,14 @@ graph TD
     FM --> HF["Hallucination\n(factual errors in output)"]
     FM --> IC["Instruction Following\n(incomplete compliance)"]
     FM --> PR["Prompt Injection\n(adversarial context override)"]
-    FM --> CW["Context Window Overflow\n(silent truncation)"]
+    FM --> CW["Context Window Overflow\n(400 invalid_request_error)"]
     FM --> RL["Rate Limiting\n(429 / 529 errors)"]
     FM --> RF["Refusal\n(over- or under-triggering)"]
 
     HF --> H1["Mitigation: Retrieval-Augmented Generation (RAG)\nGroound outputs in retrieved documents"]
     IC --> I1["Mitigation: Structured output + validation\nJSON mode + schema checking"]
     PR --> P1["Mitigation: Privileged system prompt isolation\nNever interpolate untrusted data into system prompt"]
-    CW --> C1["Mitigation: Explicit token accounting\nTruncate history before submitting"]
+    CW --> C1["Mitigation: Explicit token accounting\nBudget and truncate history client-side before submitting"]
     RL --> R1["Mitigation: Exponential backoff + request queuing"]
     RF --> R2["Mitigation: Constitutional prompt engineering\nTest against refusal regression suite"]
 ```

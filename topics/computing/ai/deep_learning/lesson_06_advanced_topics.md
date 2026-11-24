@@ -66,7 +66,7 @@ The choice of how many layers to freeze is determined by two factors: (1) the **
 """
 Fine-tuning a Vision Transformer (ViT-B/16) on a custom classification task.
 Demonstrates: differential learning rates, layer freezing, label smoothing,
-cosine LR schedule with warmup, and mixed-precision training.
+cosine LR schedule, and mixed-precision training.
 """
 import torch
 import torch.nn as nn
@@ -119,7 +119,7 @@ val_dl   = DataLoader(val_ds,   batch_size=BATCH_SIZE, shuffle=False,
                       num_workers=4, pin_memory=True)
 
 # ── Model Construction ─────────────────────────────────────────────────────────
-# timm loads ImageNet-21k pre-trained weights by default for vit_base_patch16_224
+# timm loads ImageNet-1k pre-trained weights by default for vit_base_patch16_224
 model = timm.create_model(
     "vit_base_patch16_224",
     pretrained=True,
@@ -274,8 +274,8 @@ graph LR
 
 ```python
 """
-Adversarial training with PGD (Madry et al., 2018).
-Includes: TRADES loss variant, evaluation under AutoAttack (black-box),
+Adversarial training with PGD (Madry et al., 2018) and TRADES loss variant.
+Includes: a generic evaluate_robust hook for attack-based robustness evaluation,
 and proper handling of batch normalization during attack.
 """
 import torch
@@ -354,8 +354,6 @@ def trades_loss(
     # Generate adversarial examples by maximizing KL divergence from natural output
     # (not cross-entropy) — this is the key difference from standard PGD-AT
     model.eval()  # Use running BN statistics for perturbation generation
-    with torch.no_grad():
-        p_natural = F.softmax(natural_images.clone().detach(), dim=1)
 
     delta = torch.empty_like(natural_images).uniform_(-epsilon, epsilon)
     delta = torch.clamp(natural_images + delta, 0.0, 1.0) - natural_images
@@ -414,7 +412,7 @@ A fundamental result (Tsipras et al., 2019; Zhang et al., 2019) is that adversar
 
 Empirically, on CIFAR-10 with $\epsilon = 8/255$:
 - Standard training: ~95% clean accuracy, ~0% PGD-10 accuracy.
-- PGD-AT (Madry): ~83% clean, ~56% PGD-10 accuracy.
+- PGD-AT (Madry): ~87% clean, ~45% PGD-10 accuracy.
 - TRADES ($\beta=6$): ~84% clean, ~56% PGD-10 accuracy with better calibration.
 - RobustBench (state-of-art, 2024): ~93% clean, ~73% PGD-100 accuracy (WideResNet-70-16 + additional unlabeled data).
 
@@ -538,7 +536,7 @@ class IntegratedGradients:
         # Gradients at each interpolated point: (n_steps, C, H, W)
         grads = interpolated.grad.detach()
 
-        # Riemann approximation of the path integral (trapezoidal rule)
+        # Riemann approximation of the path integral (rectangular rule)
         avg_grads = grads.mean(dim=0, keepdim=True)  # (1, C, H, W)
         ig = (input_tensor - baseline) * avg_grads
 
@@ -773,9 +771,9 @@ All results from RobustBench (Croce et al., 2021) — these are the definitive, 
 | Method | Clean Acc | AutoAttack Acc | Reference |
 |---|---|---|---|
 | Standard training | 95.3% | 0.0% | Baseline |
-| PGD-AT (Madry et al., 2018) | 84.9% | 51.3% | ICLR 2018 |
-| TRADES (Zhang et al., 2019) | 84.9% | 56.6% | ICML 2019 |
-| AWP (Wu et al., 2020) | 85.4% | 58.1% | NeurIPS 2020 |
+| PGD-AT (Madry et al., 2018) | 84.9% | 44.0% | ICLR 2018 |
+| TRADES (Zhang et al., 2019) | 84.9% | 53.4% | ICML 2019 |
+| AWP (Wu et al., 2020) | 85.4% | 56.2% | NeurIPS 2020 |
 | WideResNet-70-16 + extra data (2024 SOTA) | 92.9% | 73.7% | RobustBench leaderboard |
 
 ---

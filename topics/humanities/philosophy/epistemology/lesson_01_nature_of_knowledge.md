@@ -100,7 +100,7 @@ flowchart TD
     failure --> cases
 ```
 
-## 3. High-Performance Optimization & Failure Modes
+## 3. Failure Modes and Defensive Strategies
 
 ### Failure Mode I: Internal Justification Without External Tracking
 

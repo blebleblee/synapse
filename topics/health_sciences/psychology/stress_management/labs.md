@@ -100,7 +100,7 @@ cat(sprintf("Post-Intervention LF/HF Ratio: %.2f (%.1f%% recovery)\n",
             100 * (stressor_ratio - intervention_ratio) / (stressor_ratio - baseline_ratio)))
 ```
 
-This analysis quantifies autonomic balance shifts across the stress-intervention-recovery cycle. A typical response pattern shows baseline LF/HF ratio of 1.2, stressor elevation to 3.5 reflecting sympathetic dominance and vagal withdrawal, and post-intervention recovery to 1.6 representing 86% return toward baseline autonomic equilibrium. The magnitude of the stressor response (ratio increase) and the completeness of intervention-mediated recovery provide objective metrics of stress reactivity and intervention efficacy, respectively.
+This analysis quantifies autonomic balance shifts across the stress-intervention-recovery cycle. A typical response pattern shows baseline LF/HF ratio of 1.2, stressor elevation to 3.5 reflecting sympathetic dominance and vagal withdrawal, and post-intervention recovery to 1.6 representing 83% return toward baseline autonomic equilibrium. The magnitude of the stressor response (ratio increase) and the completeness of intervention-mediated recovery provide objective metrics of stress reactivity and intervention efficacy, respectively.
 
 Complete the exercise by having the subject practice the diaphragmatic breathing technique independently for five minutes without verbal pacing, relying on their kinesthetic awareness of abdominal expansion and the internalized 4-2-6-2 rhythm. Verify technique adequacy by observing respiratory rate remaining at or below six breaths per minute and confirming continued RMSSD elevation compared to spontaneous breathing. Provide the subject with a written home practice protocol prescribing three daily ten-minute diaphragmatic breathing sessions at consistent times (morning upon waking, midday, and evening before sleep) for a minimum fourteen-day practice period to establish skill automaticity and baseline autonomic tone improvement.
 
@@ -249,11 +249,8 @@ for condition in ['standard_breathing', 'extended_exhale', 'resonance']:
         passive_data['rmssd_recovery_percent'].values
     )
     
-    mean_diff = (condition_data['rmssd_recovery_percent'].mean() - 
-                 passive_data['rmssd_recovery_percent'].mean())
-    pooled_sd = np.sqrt((condition_data['rmssd_recovery_percent'].std()**2 + 
-                         passive_data['rmssd_recovery_percent'].std()**2) / 2)
-    cohens_d = mean_diff / pooled_sd
+    diffs = condition_data['rmssd_recovery_percent'].values - passive_data['rmssd_recovery_percent'].values
+    cohens_d = np.mean(diffs) / np.std(diffs, ddof=1)
     
     print(f"\n{condition} vs passive control:")
     print(f"  Mean difference: {mean_diff:.2f}%")
@@ -271,6 +268,7 @@ Extend the empirical analysis by examining cardiovascular recovery curves using 
 
 ```python
 from scipy.optimize import curve_fit
+import numpy as np
 
 def exponential_decay(t, hr_baseline, hr_amplitude, k):
     """First-order exponential decay model for heart rate recovery"""
@@ -349,7 +347,7 @@ Document the stress dose achieved before termination, calculated as the percenta
 
 Implement a three-tier recovery intervention protocol matched to failure severity, with automatic tier progression if restoration targets are not achieved within specified time windows. Tier 1 consists of immediate stressor cessation and deployment of resonance frequency breathing for six minutes with real-time HRV biofeedback displayed to the subject showing their current RMSSD value and a target zone representing 70% of baseline RMSSD. Success criteria for Tier 1 include: heart rate reduction to within 10 bpm of pre-stress baseline, RMSSD recovery to at least 50% of baseline value, blood pressure reduction below 140/90 mmHg, and SUDS rating decreasing to 40 or lower within the six-minute window.
 
-If Tier 1 restoration targets are not achieved within six minutes, progress to Tier 2: guided progressive muscle relaxation using a structured 12-muscle-group protocol. Beginning with the dominant hand and forearm, instruct the subject to create maximal tension for five seconds by making a tight fist while monitoring for muscle tremor indicating full contraction, followed by immediate release and 15 seconds of focused attention on the sensation of relaxation spreading through the hand and forearm. Progress systematically through upper arm (biceps contraction with elbow flexion), shoulder and neck (shoulder elevation toward ears), face (furrowed brow and tightened facial muscles), chest (deep inhalation and hold), abdomen (abdominal wall contraction), lower back (gentle arching), buttocks and thighs (gluteal and quadriceps contraction), calves (plantar flexion standing on toes), and feet (toe flexion and curling). The complete 12-muscle-group sequence requires approximately 10 minutes and produces measurable reductions in skeletal muscle electrical activity via surface EMG, with successful interventions showing 40-60% reduction in frontalis and trapezius muscle tension compared to peak stress values.
+If Tier 1 restoration targets are not achieved within six minutes, progress to Tier 2: guided progressive muscle relaxation using a structured 10-muscle-group protocol. Beginning with the dominant hand and forearm, instruct the subject to create maximal tension for five seconds by making a tight fist while monitoring for muscle tremor indicating full contraction, followed by immediate release and 15 seconds of focused attention on the sensation of relaxation spreading through the hand and forearm. Progress systematically through upper arm (biceps contraction with elbow flexion), shoulder and neck (shoulder elevation toward ears), face (furrowed brow and tightened facial muscles), chest (deep inhalation and hold), abdomen (abdominal wall contraction), lower back (gentle arching), buttocks and thighs (gluteal and quadriceps contraction), calves (plantar flexion standing on toes), and feet (toe flexion and curling). The complete 12-muscle-group sequence requires approximately 10 minutes and produces measurable reductions in skeletal muscle electrical activity via surface EMG, with successful interventions showing 40-60% reduction in frontalis and trapezius muscle tension compared to peak stress values.
 
 Tier 2 success criteria include all Tier 1 physiological targets plus subjective report of "feeling physically relaxed" and observed reduction in visible tension indicators such as shoulder elevation, jaw clenching, and hand gripping. If these targets are not achieved within 16 minutes total recovery time (6 minutes Tier 1 + 10 minutes Tier 2), escalate to Tier 3: cold face immersion and bilateral sensory stimulation. Cold face immersion activates the mammalian diving reflex through trigeminal nerve stimulation, producing rapid parasympathetic activation and heart rate reduction. Prepare a basin of 10°C water and instruct the subject to immerse their face from hairline to below the chin for 15 seconds while holding their breath, with the option to repeat up to three times at two-minute intervals if initial responses are insufficient.
 
@@ -419,13 +417,22 @@ class StressProtocolSession:
         baseline_hr = self.escalation_data[0]['heart_rate']
         baseline_rmssd = self.escalation_data[0]['rmssd_ms']
         
-        # Peak stress values (at failure point time)
-        failure_idx = int(self.failure_point['time_minutes'] / 2)
+        # Peak stress values (closest to failure point time)
+        failure_time = self.failure_point['time_minutes']
+        failure_idx = min(range(len(self.escalation_data)), 
+                         key=lambda i: abs(self.escalation_data[i]['time_minutes'] - failure_time))
         peak_hr = self.escalation_data[failure_idx]['heart_rate']
         peak_rmssd = self.escalation_data[failure_idx]['rmssd_ms']
         
         # Calculate recovery percentages at each tier transition
-        tier_transitions = recovery_df[recovery_df['recovery_time_minutes'].isin([6, 16, 26])]
+        # Find closest logged times to tier transitions at 6, 16, and 26 minutes
+        tier_targets = [6, 16, 26]
+        tier_transitions_list = []
+        for target in tier_targets:
+            closest_idx = (recovery_df['recovery_time_minutes'] - target).abs().idxmin()
+            if (recovery_df['recovery_time_minutes'] - target).abs().iloc[closest_idx] <= 2:
+                tier_transitions_list.append(closest_idx)
+        tier_transitions = recovery_df.loc[tier_transitions_list] if tier_transitions_list else recovery_df.iloc[0:0]
         
         results = {
             'subject_id': self.subject_id,
@@ -440,8 +447,8 @@ class StressProtocolSession:
         
         for idx, row in tier_transitions.iterrows():
             tier = row['recovery_tier']
-            hr_recovery_pct = 100 * (peak_hr - row['heart_rate']) / (peak_hr - baseline_hr)
-            rmssd_recovery_pct = 100 * (row['rmssd_ms'] - peak_rmssd) / (baseline_rmssd - peak_rmssd)
+            hr_recovery_pct = 100 * (peak_hr - row['heart_rate']) / (peak_hr - baseline_hr) if peak_hr != baseline_hr else 0
+            rmssd_recovery_pct = 100 * (row['rmssd_ms'] - peak_rmssd) / (baseline_rmssd - peak_rmssd) if baseline_rmssd != peak_rmssd else 0
             
             results[f'tier{tier}_hr_recovery_pct'] = hr_recovery_pct
             results[f'tier{tier}_rmssd_recovery_pct'] = rmssd_recovery_pct
@@ -526,7 +533,7 @@ Interpret HRV metrics within appropriate clinical context using the following no
 Implement weekly assessment sessions during the initial four-week skill acquisition phase, collecting full physiological stress reactivity profiles and intervention response data at weeks 0, 2, 4, and 8. Define minimal clinically important improvement as 15% increase in post-stressor RMSSD recovery (e.g., from 25 ms to 29 ms) or 10% reduction in peak stress heart rate response (e.g., from 95 bpm to 86 bpm) by week 4. Subjects not achieving these benchmarks require protocol modification including increased home practice frequency (from three to five daily sessions), extended session duration (from 10 to 15 minutes per session), or advancement from standard to resonance frequency breathing. Track home practice adherence through daily practice logs or app-based monitoring, establishing minimum adherence threshold of 80% of prescribed sessions (e.g., 17 of 21 sessions in a week with three daily sessions prescribed). Non-adherent subjects require motivational interviewing and barrier assessment before assuming intervention inefficacy.
 
 **Troubleshooting Common Failure Modes:**
-When subjects report dizziness or lightheadedness during breathing exercises, assess for hyperventilation through observation of chest versus abdominal movement and respiratory rate counting. Hyperventilation syndrome presents with respiratory rates above 12 breaths per minute and excessive chest movement, causing hypocapnia (reduced blood CO2) and cerebral vasoconstriction. Correct by slowing breathing rate, adding breath holds after exhalation to retain CO2, and retraining diaphragmatic mechanics with hand placement feedback. When subjects demonstrate paradoxical anxiety increases during breathing practice, suspect anxious reactivity to interoceptive sensations and implement gradual exposure hierarchy beginning with 30-second breathing trials with immediate return to normal breathing, progressively extending duration as tolerance improves. When HRV biofeedback shows no improvement despite technically correct breathing, verify device accuracy, check for excessive movement artifact, and assess for medication effects including beta-blockers which mechanically suppress HRV independent of autonomic regulation. When post-intervention recovery appears complete by HRV metrics but subjective distress remains elevated (SUDS discordance), investigate cognitive factors including catastrophic thinking patterns and implement cognitive restructuring targeting stress-related cognitions before assuming physiological intervention failure.
+When subjects report dizziness or lightheadedness during breathing exercises, assess for hyperventilation through observation of chest versus abdominal movement and respiratory rate counting. Hyperventilation syndrome presents with respiratory rates substantially elevated above baseline (typically 20 or more breaths per minute) and excessive chest movement, causing hypocapnia (reduced blood CO2) and cerebral vasoconstriction. Correct by slowing breathing rate, adding breath holds after exhalation to retain CO2, and retraining diaphragmatic mechanics with hand placement feedback. When subjects demonstrate paradoxical anxiety increases during breathing practice, suspect anxious reactivity to interoceptive sensations and implement gradual exposure hierarchy beginning with 30-second breathing trials with immediate return to normal breathing, progressively extending duration as tolerance improves. When HRV biofeedback shows no improvement despite technically correct breathing, verify device accuracy, check for excessive movement artifact, and assess for medication effects including beta-blockers which mechanically suppress HRV independent of autonomic regulation. When post-intervention recovery appears complete by HRV metrics but subjective distress remains elevated (SUDS discordance), investigate cognitive factors including catastrophic thinking patterns and implement cognitive restructuring targeting stress-related cognitions before assuming physiological intervention failure.
 
 **Safety Protocol and Medical Referral Criteria:**
 Immediately terminate stress testing and refer for medical evaluation under the following conditions: sustained blood pressure exceeding 180/110 mmHg indicating hypertensive crisis risk, new-onset chest pain or pressure especially with radiation to arm or jaw, sudden severe headache with visual changes suggesting hypertensive encephalopathy or vascular event, sustained heart rate exceeding 85% of age-predicted maximum despite stressor cessation, cardiac arrhythmias beyond isolated premature beats including runs of ventricular tachycardia, atrial fibrillation, or heart block, or vasovagal syncope with loss of consciousness. Defer stress testing entirely in subjects with uncontrolled hypertension (resting BP above 160/100 mmHg), recent myocardial infarction (within three months), unstable angina, decompensated heart failure, severe aortic stenosis, acute myocarditis or pericarditis, known severe arrhythmias, or uncontrolled metabolic disorders including hyperthyroidism. Require medical clearance before stress testing in subjects with controlled cardiovascular disease, diabetes with autonomic neuropathy, or pregnancy beyond first trimester due to altered cardiovascular and hormonal stress response profiles.

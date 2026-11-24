@@ -171,7 +171,7 @@ def truncate_history(
 ) -> list[dict]:
     """
     Prune the oldest non-system messages until the context fits.
-    Always preserves the first user message and the most recent exchanges.
+    Always drops the oldest user/assistant pairs first; does not guarantee the first user message is retained.
     """
     while count_tokens(messages, system) > max_tokens and len(messages) > 2:
         # Drop the oldest user+assistant pair (indices 0 and 1)
@@ -597,7 +597,7 @@ flowchart TD
     B -->|"No"| D{Requires<br/>nuanced writing<br/>or complex code?}
     D -->|"Yes"| E["claude-sonnet-4-5<br/>(balanced)"]
     D -->|"No"| F{Simple<br/>classification,<br/>extraction, or Q&A?}
-    F -->|"Yes"| G["claude-haiku-3-5<br/>(lowest cost)"]
+    F -->|"Yes"| G["claude-haiku-4-5<br/>(lowest cost)"]
     F -->|"No"| E
 ```
 
@@ -634,7 +634,7 @@ SELECT
     model,
     SUM(input_tokens)             AS total_input_tokens,
     SUM(output_tokens)            AS total_output_tokens,
-    SUM(cost_microcents) / 100.0  AS cost_cents
+    SUM(cost_microcents) / 1000000.0  AS cost_cents
 FROM api_usage
 GROUP BY tenant_id, day, model
 ORDER BY day DESC, cost_cents DESC;
@@ -917,6 +917,6 @@ The following invariants govern every production Anthropic API integration, rega
 2. **`stop_reason` is a mandatory check.** A `max_tokens` stop reason is a silent truncation failure. Code that ignores it ships subtly broken behavior.
 3. **The API key is a backend secret, never a client-side credential.** All calls must be proxied through a server you control.
 4. **Token counting precedes submission for critical paths.** Use the `count_tokens` endpoint to validate context fits before spending tokens on a failed request.
-5. **Model routing is a cost multiplier.** Sending all traffic to `claude-opus-4-5` when `claude-haiku-3-5` suffices for 80% of requests can inflate costs by an order of magnitude.
+5. **Model routing is a cost multiplier.** Sending all traffic to `claude-opus-4-5` when `claude-haiku-4-5` suffices for 80% of requests can inflate costs by an order of magnitude.
 6. **Prompt caching is non-optional for large, stable prefixes.** Any system prompt or document context exceeding ~1,000 tokens that is reused across requests should carry a `cache_control` annotation.
 7. **Streaming is architecturally superior for responses over ~2 seconds.** The perceived latency improvement directly impacts user retention; never block the UI thread waiting for a complete response.

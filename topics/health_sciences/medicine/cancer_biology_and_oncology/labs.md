@@ -140,9 +140,9 @@ Your patient's weight is 78 kg, age 66, and serum creatinine from the labs is 1.
 
 **eGFR = 141 × (Scr/0.9)^(−1.209) × 0.993^Age**
 
-Working the calculation: (1.1/0.9) = 1.222; 1.222^(−1.209) = 1.222^(−1.209). Calculate this in your spreadsheet: enter in cell B12 the formula `=141*(1.1/0.9)^(-1.209)*(0.993^66)` and you will obtain approximately **72.4 mL/min/1.73m²**.
+Working the calculation: (1.1/0.9) = 1.222; 1.222^(−1.209) = 1.222^(−1.209). Calculate this in your spreadsheet: enter in cell B12 the formula `=141*(1.1/0.9)^(-1.209)*(0.993^66)` and you will obtain approximately **69.5 mL/min/1.73m²**.
 
-Now apply Calvert: Dose = 5 × (72.4 + 25) = 5 × 97.4 = **487 mg** carboplatin. Enter this in cell B13 with label A13 = "Carboplatin Dose (mg)".
+Now apply Calvert: Dose = 5 × (69.5 + 25) = 5 × 94.5 = **473 mg** carboplatin. Enter this in cell B13 with label A13 = "Carboplatin Dose (mg)".
 
 For pemetrexed, calculate body surface area first using the Mosteller formula: BSA = √((height_cm × weight_kg) / 3600). The patient is 175 cm tall and 78 kg. BSA = √((175 × 78) / 3600) = √(13650/3600) = √3.792 = **1.947 m²**. Pemetrexed 500 mg/m² × 1.947 = **973.5 mg**, rounded to **974 mg**. Enter these in cells B14 and A14 respectively.
 
