@@ -353,7 +353,8 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Open:** 7 public lessons were cut off mid-code by generation (the repair step closed the fence, so `ABRUPT_TRUNCATION` missed them). Their code blocks are now complete, but any sections planned after that point were missing: ai_safety_and_alignment lesson 3, chatgpt_and_openai_apis labs, tensorflow lesson 3, vibe_coding lesson 4, devsecops lessons 5 and 6, linux_device_drivers lesson 4.
 - **Endings: COMPLETED** (2026-11-24, owner: "do it now"). Written by local Ollama (qwen3.8 27B / qwen3.6 27B, no credit), then checked and corrected in-session before being appended: non-existent APIs (`tf.nn.softmax(dtype=)`, `tf.distribute.TFCluster`, `tf.global_norm`, wrong `x-ratelimit-*` header names, invalid `crash`/`perf`/`kselftest` commands), a generator used as a function (streaming lab), a symbol extractor that dropped keyword-only arguments, a broken pytest module (replaced with a test table), a Merkle tree without leaf/node separation, wrong arithmetic (0.999⁴, M/M/1), overstated regulatory and statistics claims, and a repetition loop at the end of one Key Terms table. Code blocks parse; the lab simulation, symbol extractor, Merkle verifier and SOAR executor were run.
 
-### Curriculum review (focused): IN PROGRESS
+### Curriculum review (focused): STOPPED (owner, 2026-11-24)
+- Stopped after fix round 6 (172 of 539 public courses fixed, PRs #12–#16); see status Batch 25. No further corpus review or regeneration; the owner wants to discuss a different approach.
 - Method, cost and the first 26 courses (329 findings): `.agent/reports/review_focused_2026-11-23.md`. Owner 2026-11-24: continue on aerolink until the remaining credit runs out (now `claude-opus-4.7`; Opus 5.5 failed on forced thinking); public courses first.
 - **Fixes for the first 26 courses applied** (2026-11-24, owner: "do it"): each finding was judged in-session; 211 applied (exact quote replaced, the reviewer's fix rewritten where it was itself wrong or only an instruction), 88 skipped as wrong, uncertain, or needing new content (empty sections, missing code). Open: 30 findings whose quote does not match the lesson text exactly. Public lint clean afterwards.
 - **Second round** (2026-11-24): agentic_swarms and ai_agents, 50 findings: 44 fixed (mostly code: undefined attribute, lost lock holder, failed tasks blocking their dependents, double-booked agents, unreachable dedup, XOR instead of power, an A* example contradicting its own diagram), 1 skipped as wrong (pgvector has array casts), 3 truncated sections left open. A seam check found 23 fixes from the first round that had been spliced in mid-sentence (doubled tails, instructions pasted as text, prose inside code); all repaired. Progress: `review_status.py` in the session scratch prints reviewed / pending / fixed courses.
@@ -389,3 +390,12 @@ This backlog documents prioritized, actionable findings from the user-facing fun
 - **Flashcard decks:** **COMPLETED** (All 539 shipped, final 29 generated via local Ollama in `977e16a`).
 
 - **FIND-75 Refactor branch-heavy code (owner, 2026-11-23).** Status: **COMPLETED** (`8901d75`). Decomposed `get_topic_details` into 4 helpers, `scope_topic_curriculum` prompt generation into 4 template builders, and `get_chat_provider` into a strategy resolution pattern. Guarded by full backend test suites.
+
+## Next Unattended Run (owner, 2026-11-24)
+
+Rule: an unattended run keeps going until this queue is empty or the owner stops it.
+
+1. **Real terminal (PTY) test:** add a bounded test that spawns a real shell inside `tmp_path`, writes a command, reads its output and closes it cleanly (no host files touched, short timeout). Today PTY allocation, signals and backpressure are only exercised with mocks.
+2. **Mentor stream reconnection E2E:** cover an abrupt connection drop while the mentor is streaming a reply.
+3. **Private flashcard decks:** 142 private courses added after the 860 decks were committed have no `flashcards.csv`; generate them with local Ollama (`scripts/generate_flashcard_decks.py --provider ollama`), commit in the private repository only.
+

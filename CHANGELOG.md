@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-11-24
+
+### Fixed
+- **Mentor Routing:** Restored mentor routing and exact model IDs on gateways, which the 1.3.2 refactor had broken; non-Claude model IDs now pass through unchanged.
+- **Course Outlines:** Restored the lesson-outline parsing that the 1.3.2 refactor had broken in the generator.
+- **Translations After Restart:** Queued and running translations resume after a server restart instead of being lost.
+- **Dropped Gateway Models:** When a gateway no longer offers a model, the error names the model and lists what the host offers, instead of retrying.
+
+### Added
+- **Translation State per Lesson:** The sidebar marks translated lessons, a Translate button starts one, and the app remembers your reading language.
+- **Python Block Lint:** `synapse lint` flags Python code blocks that do not parse or use names they never import.
+
+### Changed
+- **Status Bar:** App status and translation progress stay together on the left; the mentor's status and model moved to the mentor panel.
+- **Release Gate:** Releases are published only from a committed `gitea/main` whose CI passed.
+- **Curriculum Corrections:** Six review rounds corrected factual errors, broken code and cut-off sections in 172 public courses.
+
 ## [1.3.2] - 2026-11-23
 
 ### Added
