@@ -81,3 +81,51 @@ def test_update_release_notes_bad_flag_changes_nothing(monkeypatch, tmp_path, ar
     monkeypatch.setattr(mod.publish, "update_release_text", lambda *a, **k: (_ for _ in ()).throw(AssertionError("must not update")))
     with pytest.raises(SystemExit):
         mod.main(argv)
+
+
+class _FakeCI:
+    """Stands in for scripts/ci_status.py: no network."""
+    def __init__(self, run, head="abc1234def", main="abc1234def", dirty=""):
+        self._run, self.answers = run, {("rev-parse", "HEAD"): head, ("rev-parse", "gitea/main"): main,
+                                        ("status", "--porcelain", "--untracked-files=no"): dirty,
+                                        ("remote", "get-url", "gitea"): "https://gitea.example/o/r.git"}
+        self.REMOTE = "gitea"
+
+    def git(self, *args):
+        if args[0] == "fetch":
+            return ""
+        return self.answers[args]
+
+    def parse_remote(self, url):
+        return ("https://gitea.example/api/v1/repos/o/r", None, [])
+
+    class Client:
+        def __init__(self, *a):
+            pass
+
+    def find_run(self, client, run_id, sha):
+        return self._run
+
+
+@pytest.mark.parametrize("run, ok", [
+    ({"status": "completed", "conclusion": "success"}, True),
+    ({"status": "completed", "conclusion": "failure"}, False),
+    ({"status": "in_progress", "conclusion": None}, False),
+    (None, False),
+])
+def test_release_needs_green_ci_on_the_published_commit(publish, run, ok):
+    # AGENTS.md: never release while the latest CI run is red or still running
+    # (v1.3.2 was published on a red run, FIND-76).
+    ci = _FakeCI(run)
+    if ok:
+        publish._require_green_ci(ci)
+    else:
+        with pytest.raises(SystemExit):
+            publish._require_green_ci(ci)
+
+
+@pytest.mark.parametrize("kw", [{"main": "fff0000"}, {"dirty": " M x.py"}])
+def test_release_refuses_unmerged_or_uncommitted_work(publish, kw):
+    ci = _FakeCI({"status": "completed", "conclusion": "success"}, **kw)
+    with pytest.raises(SystemExit):
+        publish._require_green_ci(ci)

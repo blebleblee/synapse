@@ -472,6 +472,39 @@ def _require_clean_packs(paths=None):
         print("[✘] Aborting release: pack privacy check failed (see above).")
         sys.exit(1)
 
+def _load_ci_status():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ci_status", Path(__file__).resolve().parent / "ci_status.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _require_green_ci(ci=None):
+    """Refuses to publish anything but a committed `main` whose CI run passed.
+
+    AGENTS.md: never release while the latest CI run is red or still running.
+    """
+    ci = ci or _load_ci_status()
+    try:
+        if ci.git("status", "--porcelain", "--untracked-files=no"):
+            raise RuntimeError("uncommitted changes to tracked files")
+        ci.git("fetch", "-q", ci.REMOTE, "main")
+        head = ci.git("rev-parse", "HEAD")
+        if head != ci.git("rev-parse", f"{ci.REMOTE}/main"):
+            raise RuntimeError(f"HEAD {head[:7]} is not {ci.REMOTE}/main: land it through a pull request first")
+        client = ci.Client(*ci.parse_remote(ci.git("remote", "get-url", ci.REMOTE)))
+        run = ci.find_run(client, None, head)
+    except Exception as e:
+        print(f"[✘] Aborting release: {e}")
+        sys.exit(1)
+    if not run or run.get("status") != "completed" or run.get("conclusion") != "success":
+        state = "no CI run" if not run else f"{run.get('status')}/{run.get('conclusion')}"
+        print(f"[✘] Aborting release: CI for {head[:7]} is not green ({state}). See scripts/ci_status.py.")
+        sys.exit(1)
+    print(f"[✔] CI passed on {head[:7]} ({ci.REMOTE}/main).")
+
+
 def main(argv=None):
     import argparse
     # Explicit parsing: an unknown flag (even --help before this existed)
@@ -481,6 +514,7 @@ def main(argv=None):
     parser.add_argument("--curriculum", action="store_true",
                         help="update the `curriculum` release (core-domain packs) instead of the app release")
     args = parser.parse_args(argv)
+    _require_green_ci()
     if args.curriculum:
         sys.exit(0 if publish_curriculum() else 1)
     print("=" * 60)
