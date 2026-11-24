@@ -132,11 +132,11 @@ $$A_{\text{TM}} = \{\langle M, w \rangle : M \text{ accepts } w\}.$$
 
 **Theorem.** $A_{\text{TM}}$ is not recursive.
 
-*Proof.* We show $H \leq_m A_{\text{TM}}$. Define $f(\langle M, w \rangle) = \langle M', w \rangle$ where $M'$ is a machine that behaves exactly like $M$ except that whenever $M$ would enter $q_{\text{reject}}$, $M'$ instead loops forever. Formally: $M'$ simulates $M$; if $M$ accepts, $M'$ accepts; if $M$ rejects, $M'$ loops; if $M$ loops, $M'$ loops.
+*Proof.* We show $H \leq_m A_{\text{TM}}$. Define $f(\langle M, w \rangle) = \langle M', w \rangle$ where $M'$ is a machine that simulates $M$ on $w$ and accepts if $M$ halts (by any means: acceptance or rejection). Formally: $M'$ simulates $M$ one step at a time; if $M$ ever halts (enters $q_{\text{accept}}$ or $q_{\text{reject}}$), then $M'$ immediately halts and accepts; if $M$ loops, $M'$ loops.
 
-The construction of $M'$ from $M$ is computable (modify the transition function to redirect reject transitions into a looping state), so $f$ is a total computable function.
+The construction of $M'$ from $M$ is computable (modify $M$ to reroute both accept and reject states to a common halting-accept state), so $f$ is a total computable function.
 
-Now: $M$ halts on $w$ iff $M$ accepts or rejects $w$ iff $M'$ accepts $w$ (since $M'$'s only halting state is acceptance). Therefore $\langle M, w \rangle \in H$ iff $f(\langle M, w \rangle) \in A_{\text{TM}}$, establishing the reduction. Since $H$ is not recursive and $H \leq_m A_{\text{TM}}$, $A_{\text{TM}}$ is not recursive. $\square$
+Now: $M$ halts on $w$ iff $M'$ accepts $w$ (since $M'$ accepts precisely when $M$ halts). Therefore $\langle M, w \rangle \in H$ iff $f(\langle M, w \rangle) \in A_{\text{TM}}$, establishing the reduction correctly. Since $H$ is not recursive and $H \leq_m A_{\text{TM}}$, $A_{\text{TM}}$ is not recursive. $\square$
 
 ### The Execution Model: Dovetailing and Enumeration Operators
 
@@ -257,7 +257,7 @@ The key practical failure mode is **divergence on unsatisfiable inputs to semide
 
 **Restriction to decidable fragments** is the dominant strategy in applied logic. The monadic fragment of first-order logic (allowing only unary predicates) is decidable; Löwenheim showed in 1915 that satisfiability in this fragment reduces to satisfiability in finite structures, which is checkable. The two-variable fragment $\text{FO}^2$ (first-order logic with only two distinct variables, allowing arbitrary predicates) is decidable, with NEXPTIME-complete satisfiability. The **Bernays–Schönfinkel–Ramsey class** (formulas of the form $\exists^* \forall^* \psi$ where $\psi$ is quantifier-free) is decidable. These fragments arise constantly in description logics, database query languages (Datalog), and modal logics, which motivates their careful study.
 
-Understanding where the boundary of decidability lies within the quantifier prefix hierarchy requires tracking the **Gödel–Bernays–Kalmár classification**. The prefix $\exists^* \forall \exists^*$ (one universal quantifier surrounded by existentials) is decidable; $\exists^* \forall^2 \exists^*$ is already undecidable. The precise characterization of decidable prefix classes is a major achievement of twentieth-century logic, and knowing it prevents practitioners from accidentally attempting to decide undecidable subproblems in applications.
+Understanding where the boundary of decidability lies within the quantifier prefix hierarchy requires tracking the **Gödel–Bernays–Kalmár classification**. The prefix $\exists^* \forall^*$ (all existentials before all universals, the Bernays–Schönfinkel–Ramsey class) is decidable, and so is the Ackermann class $\exists^* \forall \exists^*$ (a single universal quantifier); by contrast, the prefix classes $\forall \exists \forall$ and $\forall^3 \exists$ are already undecidable. The precise characterization of decidable prefix classes is a major achievement of twentieth-century logic, and knowing it prevents practitioners from accidentally attempting to decide undecidable subproblems in applications.
 
 ### Reductions as Proof Infrastructure
 

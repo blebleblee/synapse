@@ -528,7 +528,7 @@ def verify_continuous_point_probability():
     
     # Attempt to compute P(X = 0)
     # In SymPy, this is handled through density evaluation, not probability
-    point_density = density(X).subs('X', 0)
+    point_density = density(X).subs(X, 0)
     
     print(f"Probability density at x=0: f(0) = {point_density} ≈ {float(point_density):.6f}")
     print(f"Point probability P(X = 0) = 0 (measure-theoretic definition)")
@@ -675,7 +675,7 @@ def verify_beta_distribution_boundary():
         print(f"  Var(X) = {float(variance):.6f}")
         
         # Density at x=0.5 (center)
-        density_at_half = density(X_beta).subs('X', sp.Rational(1, 2))
+        density_at_half = density(X_beta).subs(X_beta, sp.Rational(1, 2))
         print(f"  f(0.5) = {float(density_at_half):.6f}")
         print()
     
@@ -1033,7 +1033,7 @@ def importance_sampling_gaussian():
     
     # True value using SymPy (for comparison)
     x_sym = sp.Symbol('x', real=True)
-    true_prob_symbolic = 1 - sp.erf(threshold / sp.sqrt(2)) / 2
+    true_prob_symbolic = (1 - sp.erf(threshold / sp.sqrt(2))) / 2
     true_prob = float(true_prob_symbolic.evalf())
     
     print(f"Target: P(Z > {threshold}) where Z ~ N(0, 1)")
@@ -1338,11 +1338,12 @@ def verify_aperiodicity_and_irreducibility():
     
     # Compute powers of P
     P_power = P
-    accessibility_matrix = (P_power > 0)
+    accessibility_matrix = np.array(P_power).astype(float) > 0
     
     for power in range(2, n_states + 1):
         P_power = P_power * P
-        accessibility_matrix = accessibility_matrix | (P_power > 0)
+        P_power_array = np.array(P_power).astype(float) > 0
+        accessibility_matrix = np.logical_or(accessibility_matrix, P_power_array)
     
     print("Accessibility matrix (can state i reach state j?):")
     for i in range(n_states):

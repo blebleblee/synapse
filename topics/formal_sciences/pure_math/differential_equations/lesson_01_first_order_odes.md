@@ -160,7 +160,7 @@ $$\frac{\mu'}{\mu} = \frac{M_y - N_x}{N}.$$
 
 This is a separable ODE for $\mu$ with solution $\mu(x) = \exp\!\left(\int \frac{M_y - N_x}{N}\, dx\right)$, provided the right-hand side depends only on $x$.
 
-**Case 2: $\mu = \mu(y)$ depends only on $y$.** Setting $\mu_x = 0$, the condition becomes $\mu_y M - \mu(M_y - N_x) = 0$, giving
+**Case 2: $\mu = \mu(y)$ depends only on $y$.** Setting $\mu_x = 0$, the condition becomes $\mu_y M + \mu(M_y - N_x) = 0$, giving
 
 $$\frac{\mu'}{\mu} = \frac{N_x - M_y}{M},$$
 
@@ -294,8 +294,6 @@ which confirms the phase-line prediction: for all $y_0 > 0$, $\lim_{x\to\infty} 
 $$\frac{dy}{dx} + P(x)y = Q(x)y^n, \quad n \neq 0, 1,$$
 
 is nonlinear but reduces to a linear equation via the substitution $v = y^{1-n}$. Computing $v' = (1-n)y^{-n}y'$ and substituting:
-
-$$\frac{1}{1-n}v' + P(x)\frac{v^{1/(1-n)} \cdot (1-n)^{1/(1-n)}}{(1-n)^{1/(1-n)}} = Q(x) \cdot \left(\frac{v^{1/(1-n)}}{(1-n)^{1/(1-n)}}\right)^n.$$
 
 More cleanly: dividing the Bernoulli equation by $y^n$ gives $y^{-n}y' + P(x)y^{1-n} = Q(x)$. Setting $v = y^{1-n}$ so that $v' = (1-n)y^{-n}y'$:
 

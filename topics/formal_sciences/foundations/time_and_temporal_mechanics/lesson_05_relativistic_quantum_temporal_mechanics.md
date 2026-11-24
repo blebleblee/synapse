@@ -188,13 +188,7 @@ $$
 x = \gamma \left( \gamma (x - vt) + vt' \right)
 $$
 
-Solving for $t'$:
-
-$$
-t' = \gamma \left( t - \frac{v}{c^2} x \cdot \frac{c^2}{\gamma^2 v} + \frac{x}{v} - \frac{x}{v} \right)
-$$
-
-Actually, we proceed more carefully. The speed of light invariance requires that if $(ct)^2 - x^2 - y^2 - z^2 = 0$ in $S$, then $(ct')^2 - (x')^2 - (y')^2 - (z')^2 = 0$ in $S'$. By symmetry along the motion axis, we take $y' = y$ and $z' = z$. We then require:
+We proceed more carefully. The speed of light invariance requires that if $(ct)^2 - x^2 - y^2 - z^2 = 0$ in $S$, then $(ct')^2 - (x')^2 - (y')^2 - (z')^2 = 0$ in $S'$. By symmetry along the motion axis, we take $y' = y$ and $z' = z$. We then require:
 
 $$
 -c^2 t^2 + x^2 + y^2 + z^2 = -c^2 t'^2 + x'^2 + y'^2 + z'^2
@@ -533,7 +527,7 @@ $$
 \Phi_{\text{ground}} = -\frac{GM}{R_E}
 $$
 
-and at satellite altitude (approximately $r_{\text{sat}} \approx 20{,}200$ km):
+and at the GPS orbital radius (approximately $r_{\text{sat}} \approx 26{,}571$ km, i.e., Earth's radius plus the ~20,200 km altitude):
 
 $$
 \Phi_{\text{sat}} = -\frac{GM}{r_{\text{sat}}}
@@ -548,7 +542,7 @@ $$
 Numerically, with $GM \approx 3.986 \times 10^{14}$ m³/s²:
 
 $$
-\frac{GM}{c^2} \left( \frac{1}{20{,}200{,}000} - \frac{1}{6{,}371{,}000} \right) \approx 4.4 \times 10^{-10}
+\frac{GM}{c^2} \left( \frac{1}{26{,}571{,}000} - \frac{1}{6{,}371{,}000} \right) \approx 4.4 \times 10^{-10}
 $$
 
 This gravitational effect causes satellite clocks to run fast by approximately $45$ microseconds per day. The net effect, combining kinematic and gravitational corrections, is approximately $38$ microseconds per day fast. GPS satellite clocks are pre-adjusted before launch to compensate for this offset, and continuous monitoring ensures sub-nanosecond timing accuracy.

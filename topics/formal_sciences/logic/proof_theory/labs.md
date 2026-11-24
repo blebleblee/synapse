@@ -14,7 +14,7 @@ Verify your installation by launching a Python REPL and executing the diagnostic
 
 ### Sequent Calculus Implementation and Structural Properties
 
-The sequent calculus, introduced by Gerhard Gentzen in 1934, formalizes logical inference through sequents of the form $\Gamma \vdash \Delta$, where $\Gamma$ and $\Delta$ are finite multisets of formulas representing antecedent assumptions and succedent conclusions respectively. Classical propositional sequent calculus LK admits structural rules (weakening, contraction, exchange) and logical rules (left and right introduction for each connective) that collectively characterize classical logic through a purely syntactic derivation system. The fundamental metatheorem of sequent calculus is Gentzen's cut elimination theorem: any provable sequent admits a cut-free derivation, where the cut rule—which allows modus ponens-style intermediate formula elimination—has been systematically removed through a constructive transformation algorithm.
+The sequent calculus, introduced by Gerhard Gentzen in 1934, formalizes logical inference through sequents of the form $\Gamma \vdash \Delta$, where $\Gamma$ and $\Delta$ are finite multisets of formulas representing antecedent assumptions and succedent conclusions respectively. Classical propositional sequent calculus LK admits structural rules (weakening, contraction, exchange) and logical rules (left and right introduction for each connective) that collectively characterize classical logic through a purely syntactic derivation system. The fundamental metatheorem of sequent calculus is Gentzen's cut elimination theorem: any provable sequent admits a cut-free derivation, where the cut rule—which allows modus ponens-style intermediate formula elimination—can be systematically removed through a constructive transformation algorithm, so every sequent provable with cut also has a cut-free proof.
 
 Implement a sequent data structure as a Python class encapsulating antecedent and succedent formula lists. Begin by establishing the formula representation using SymPy's logic types, then construct the sequent container:
 
@@ -226,7 +226,7 @@ Natural deduction, also developed by Gentzen, provides an alternative proof calc
 Implement natural deduction proof trees as recursive structures where each node represents an inference rule application:
 
 ```python
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 @dataclass
@@ -480,6 +480,7 @@ Implement a proof search algorithm with cycle detection to prevent infinite weak
 def proof_search_with_cycle_detection(goal: Sequent, max_depth: int = 10) -> Optional[List[Sequent]]:
     """
     Backward proof search with visited state tracking.
+    Assumes apply_right_and and apply_left_implies are defined (see Exercise 1).
     Returns proof trace if found, None otherwise.
     """
     from collections import deque
@@ -625,6 +626,7 @@ from sympy.logic.boolalg import to_cnf
 def verify_skolem_equisatisfiability(original, skolemized):
     """
     Check that original and skolemized formulas are equisatisfiable.
+    Requires: from sympy.logic.inference import satisfiable
     Original is valid iff skolemized is valid (in the expanded signature).
     """
     # Both should have same satisfiability status
@@ -776,7 +778,7 @@ Execute this to observe resolution deriving the empty clause for unsatisfiable f
 The tableau (analytic tableaux) method provides an alternative complete proof procedure based on systematic case analysis. A tableau is a tree where each branch represents a potential model, and the procedure attempts to close all branches by deriving contradictions. Implement a propositional tableau prover:
 
 ```python
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 @dataclass
@@ -793,6 +795,9 @@ class TableauNode:
         for child in self.children:
             result += child.__str__(indent + 1)
         return result
+
+from sympy.logic.boolalg import Or, And, Not, Implies
+from sympy import symbols
 
 def tableau_expand(node: TableauNode) -> bool:
     """
@@ -1066,7 +1071,7 @@ print(result)  # unsat means original is valid
 # Check theorem
 lean --version
 lean ProofTheory.lean
-# Should output "no errors" if all proofs verify
+# Should complete silently (exit code 0) if all proofs verify; #check commands at the end produce output showing type signatures
 ```
 
 ### Metatheorems

@@ -8,7 +8,7 @@ Optimizing multimodal AI systems built on APIs like Google Gemini requires under
 
 Every performance decision in a multimodal API system is a trade-off across three fundamental constraints:
 
-**Token Budget (Computational Invariant).** Every modality is tokenized before being fed to the transformer. For Gemini, images are encoded into a fixed number of tokens per tile (roughly 258 tokens per 768×768 tile in Gemini 1.5 and later), audio is segmented at ~25 tokens/second, and video is sampled at a configurable frame rate before tiling. The total token count determines FLOPS consumed per forward pass, billing cost, and the probability of hitting the model's context window limit. As of Gemini 1.5 Pro, the context window is 1,000,000 tokens — but this does not mean you should use it carelessly; prefill cost scales super-linearly with sequence length due to the quadratic attention mechanism.
+**Token Budget (Computational Invariant).** Every modality is tokenized before being fed to the transformer. For Gemini, images are encoded into a fixed number of tokens per tile (roughly 258 tokens per 768×768 tile in Gemini 1.5 and later), audio is segmented at ~32 tokens/second, and video is sampled at a configurable frame rate before tiling. The total token count determines FLOPS consumed per forward pass, billing cost, and the probability of hitting the model's context window limit. As of Gemini 1.5 Pro, the context window is 1,000,000 tokens — but this does not mean you should use it carelessly; prefill cost scales super-linearly with sequence length due to the quadratic attention mechanism.
 
 **Memory Bandwidth (Memory Invariant).** The KV-cache for a long multimodal context is enormous. For a 1M-token context with a large model, the KV-cache can exceed tens of gigabytes of HBM. If you are running inference at the edge or on a constrained serving cluster, this becomes the binding constraint before FLOPS does. The practical implication: minimize unnecessary context re-hydration by using context caching (a first-class API feature in Gemini 1.5+) rather than resending the same large media payload on every turn.
 
@@ -287,8 +287,8 @@ def analyze_video_with_caching(
     token_count = count_tokens_for_request(model, request_contents)
     log.info("Request token count: %d", token_count)
 
-    # Gemini 1.5 Pro context window: 1,048,576 tokens
-    if token_count > 1_000_000:
+    # Gemini 1.5 Pro context window: 2,097,152 tokens
+    if token_count > 2_000_000:
         raise ValueError(f"Request exceeds context window: {token_count} tokens.")
 
     # Step 5: Stream the response
@@ -332,6 +332,8 @@ token_budget_analysis.py
 Demonstrates precise token counting across modalities to build a cost model
 before submitting expensive requests.
 """
+
+import os
 
 import google.generativeai as genai
 from pathlib import Path
@@ -394,7 +396,7 @@ def compute_video_token_estimate(duration_seconds: float, fps: float = 1.0) -> i
     """
     video_frames = int(duration_seconds * fps)
     image_tokens_per_frame = 258  # 1 tile per frame at 768px
-    audio_tokens = int(duration_seconds * 25)
+    audio_tokens = int(duration_seconds * 32)
     total = video_frames * image_tokens_per_frame + audio_tokens
     return total
 
@@ -447,7 +449,7 @@ sequenceDiagram
     Note over Cache: Cache expires after TTL; must be renewed
 ```
 
-The KV-cache stores the key and value matrices for every attention layer computed over the prefix tokens. On a cache hit, the inference engine loads these matrices directly into HBM and begins autoregressive generation from where the prefix ends. This eliminates the entire prefill pass for the cached portion — which for a 1-hour video (≈90,000 tokens) is the difference between a ~30-second prefill and a ~200ms load from cache.
+The KV-cache stores the key and value matrices for every attention layer computed over the prefix tokens. On a cache hit, the inference engine loads these matrices directly into HBM and begins autoregressive generation from where the prefix ends. This eliminates the entire prefill pass for the cached portion — which for a 1-hour video (≈950,000–1,000,000 tokens) is the difference between a ~30-second prefill and a ~200ms load from cache.
 
 **When context caching pays off.** The minimum cacheable size is 32,768 tokens, and there is a storage cost per token-hour. The break-even analysis is straightforward:
 
@@ -466,7 +468,7 @@ For Gemini 1.5 Pro at current pricing (input: \$3.50/1M tokens for ≤128K conte
 
 ## 6. Concurrency Architecture for High-Throughput Pipelines
 
-For batch workloads (e.g., analyzing thousands of images or documents), the bottleneck shifts from individual request latency to throughput. The Gemini API enforces per-project rate limits expressed in requests per minute (RPM) and tokens per minute (TPM). As of mid-2025, Gemini 1.5 Pro Tier 1 limits are 1,000 RPM and 4,000,000 TPM.
+For batch workloads (e.g., analyzing thousands of images or documents), the bottleneck shifts from individual request latency to throughput. The Gemini API enforces per-project rate limits expressed in requests per minute (RPM) and tokens per minute (TPM). As of mid-2025, Gemini 1.5 Pro Tier 1 limits are 360 RPM and 2,000,000 TPM; Tier 2 is 1,000 RPM and 4,000,000 TPM.
 
 The correct architecture is a bounded async worker pool with a token-bucket rate limiter, not a naive ThreadPoolExecutor.
 
@@ -728,7 +730,7 @@ Choosing the right Gemini model variant is itself an optimization decision with 
 ```mermaid
 graph TD
     subgraph sub_gemini_1_5_family ["Gemini 1.5 Family"]
-        P["Gemini 1.5 Pro\n• 1M token context\n• Best accuracy\n• ~3-8s TTFT\n• $3.50-7.00/1M input tokens"]
+        P["Gemini 1.5 Pro\n• 2M token context\n• Best accuracy\n• ~3-8s TTFT\n• $1.25-2.50/1M input tokens"]
         F["Gemini 1.5 Flash\n• 1M token context\n• Speed-accuracy balance\n• ~1-3s TTFT\n• $0.075-0.15/1M input tokens"]
         F8["Gemini 1.5 Flash-8B\n• 1M token context\n• Highest throughput\n• <1s TTFT\n• $0.0375/1M input tokens"]
     end
@@ -755,7 +757,7 @@ graph TD
     style G2F fill:#16213e,color:#e0e0e0
 ```
 
-The practical heuristic: use Flash or Flash-8B for all exploratory and batch work during development; use Pro only when you have a validated prompt and need maximum accuracy on production traffic. The cost ratio between Flash-8B and Pro is roughly 100:1 — over a large dataset, model selection dominates total cost more than any other optimization.
+The practical heuristic: use Flash or Flash-8B for all exploratory and batch work during development; use Pro only when you have a validated prompt and need maximum accuracy on production traffic. The cost ratio between Flash-8B and Pro is roughly 33:1 — over a large dataset, model selection dominates total cost more than any other optimization.
 
 ---
 

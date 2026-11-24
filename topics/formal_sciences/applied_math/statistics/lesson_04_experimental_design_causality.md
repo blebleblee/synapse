@@ -35,7 +35,7 @@ where $\alpha_i$ represents the random effect of group $i$ and $\epsilon_{ij}$ i
 **Latin square designs** address situations where two nuisance factors must be controlled but complete blocking is infeasible. In agricultural field trials, for instance, fertility gradients may vary systematically along both North-South and East-West axes. A $p \times p$ Latin square arranges $p$ treatments in a $p \times p$ grid such that each treatment appears exactly once in each row and exactly once in each column, achieving orthogonal blocking on both spatial dimensions with only $p^2$ experimental units rather than the $p^3$ required for a complete factorial with two blocking factors. The linear model is:
 
 $$
-Y_{ijk} = \mu + \tau_i + \rho_j + \gamma_k + \epsilon_{ijk}
+Y_{ij} = \mu + \tau_{T(i,j)} + \rho_i + \gamma_j + \epsilon_{ij}
 $$
 
 where $\tau_i$ is the treatment effect, $\rho_j$ is the row effect, $\gamma_k$ is the column effect, and the Latin square structure ensures that $i$, $j$, and $k$ are in one-to-one correspondence for observed cells. The orthogonality property guarantees that treatment effect estimates remain unbiased even when row and column effects are substantial, and the ANOVA decomposition allocates variance to treatments, rows, columns, and residual components.
@@ -167,7 +167,7 @@ flowchart TD
     subgraph subplot["Subplot stratum"]
         treatB["Treatment B<br/>df: b-1<br/>MS: MS_B<br/>F: MS_B / MS_SP"]
         axb["A × B<br/>df: (a-1)(b-1)<br/>MS: MS_AB<br/>F: MS_AB / MS_SP"]
-        spError["SP Error<br/>df: a(b-1)(r-1)<br/>MS: MS_SP"]
+        spError["SP Error<br/>df: a(b-1)<br/>MS: MS_SP"]
     end
     
     title --> whole

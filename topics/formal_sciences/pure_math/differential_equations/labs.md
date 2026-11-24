@@ -39,7 +39,8 @@ The following script computes the Lipschitz constant symbolically, confirms that
 ```python
 import sympy as sp
 
-x, y, C1 = sp.symbols('x y C1', real=True)
+x, y = sp.symbols('x y', real=True)
+C1 = sp.Symbol('C1')
 
 # IVP: dy/dx = x*y - x, y(0) = 2
 # This is linear: dy/dx = x(y - 1)
@@ -383,7 +384,7 @@ The constructive proof of Picard-Lindelöf builds the solution as the uniform li
 
 $$y_0(x) = y_0, \quad y_{n+1}(x) = y_0 + \int_{x_0}^x f(t,\, y_n(t))\,dt.$$
 
-This is not merely a proof technique—it is a computable algorithm for constructing approximate solutions, and it converges in the sup-norm on $[x_0 - h, x_0 + h]$ for $h < 1/L$ where $L$ is the Lipschitz constant. The following implementation runs five iterations for $y' = y$, $y(0) = 1$, and verifies that each iterate equals the partial sum of $e^x$.
+This is not merely a proof technique—it is a computable algorithm for constructing approximate solutions, and it converges in the sup-norm on $[x_0 - h, x_0 + h]$ for $h \le \min(a, b/M)$ and $Lh < 1$ where $L$ is the Lipschitz constant. The following implementation runs five iterations for $y' = y$, $y(0) = 1$, and verifies that each iterate equals the partial sum of $e^x$.
 
 ```python
 import sympy as sp
@@ -459,8 +460,9 @@ theorem exponential_solves_linear_ode (k y0 : ℝ) :
   constructor
   · intro x
     have hderiv : HasDerivAt (fun x => Real.exp (k * x)) (k * Real.exp (k * x)) x := by
-      have := (Real.hasDerivAt_exp (k * x)).comp x
-              ((hasDerivAt_id x).const_mul k)
+      have hinner : HasDerivAt (fun x => k * x) k x := (hasDerivAt_id x).const_mul k
+      have houter := Real.hasDerivAt_exp (k * x)
+      have := HasDerivAt.comp x houter hinner
       simp [mul_comm] at this ⊢
       exact this
     have : HasDerivAt (fun x => y0 * Real.exp (k * x)) (y0 * (k * Real.exp (k * x))) x :=

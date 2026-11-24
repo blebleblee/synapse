@@ -230,7 +230,7 @@ This introduces false positives: punishment occurs even when no deviation happen
 Formally, let $y$ be an observed signal with distribution $P(\cdot | a)$ conditional on action profile $a$. A public strategy maps histories of signals to actions. The optimal threshold $\bar{y}$ satisfies the incentive constraint for deviators:
 
 $$
-v_i^* \ge \max_{a_i'} \left[ (1 - \delta) \mathbb{E}[u_i(a_i', a_{-i}^*) | y < \bar{y}] + \delta v_i^* P(y \ge \bar{y} | a_i', a_{-i}^*) + \delta \underline{v}_i P(y < \bar{y} | a_i', a_{-i}^*) \right].
+v_i^* \ge \max_{a_i'} \left[ (1 - \delta) u_i(a_i', a_{-i}^*) + \delta v_i^* P(y \ge \bar{y} | a_i', a_{-i}^*) + \delta \underline{v}_i P(y < \bar{y} | a_i', a_{-i}^*) \right].
 $$
 
 Solving for $\bar{y}$ and $\delta$ numerically yields the equilibrium threshold and minimal patience requirement.

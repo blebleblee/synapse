@@ -297,5 +297,5 @@ cube_edges = [
 cube_faces = 6  # 5 square faces + 1 exterior
 verify_euler_formula("Cube graph", cube_edges, cube_faces)
 
-# Test Case 3:
+
 ```

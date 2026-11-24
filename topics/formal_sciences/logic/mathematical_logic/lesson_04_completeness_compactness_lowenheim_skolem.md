@@ -60,7 +60,7 @@ The Skolem Paradox crystallizes this tension. ZFC proves that uncountable sets e
 
 ### Interconnections and the Completeness-Compactness-Löwenheim–Skolem Triangle
 
-These three theorems form a tightly interlocked system, each derivable from the others through metamathematical machinery. Completeness implies compactness: if every finite subset $T_0 \subseteq T$ has a model, then $T_0$ is consistent, hence every finite subset of $T$ is consistent, thus no finite proof of contradiction exists, so $T$ itself is consistent, and by completeness $T$ has a model. Conversely, compactness implies a weak form of completeness through the contrapositive direction.
+These three theorems form a tightly interlocked system, each derivable from the others through metamathematical machinery. Completeness implies compactness: if $T$ is inconsistent (proves $\bot$), then some finite subset $T_0 \subseteq T$ derives $\bot$ (proofs are finite), so $T_0$ is inconsistent; contrapositive: if every finite subset is consistent, then $T$ is consistent, hence by completeness $T$ has a model. Conversely, compactness implies a weak form of completeness through the contrapositive direction.
 
 Downward Löwenheim–Skolem follows from the Henkin construction in the completeness proof: the term model constructed from a countable language is necessarily countable, as the set of closed terms is countable. The Skolem hull method provides a more direct construction applicable to arbitrary models.
 

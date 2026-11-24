@@ -328,7 +328,7 @@ For a smooth parametric curve $\gamma(t) = (x(t), y(t))$, the signed curvature i
 
 $$\kappa(t) = \frac{x'(t) y''(t) - y'(t) x''(t)}{\left( x'(t)^2 + y'(t)^2 \right)^{3/2}}$$
 
-Curvature singularities (points where the formula is undefined or the curvature diverges) occur at inflection points where the numerator vanishes, and at cusps where both $x'(t) = 0$ and $y'(t) = 0$ simultaneously, making the denominator vanish. These are qualitatively different singularities requiring distinct diagnostic treatment.
+Curvature singularities (points where the formula is undefined or the curvature diverges) occur at cusps where both $x'(t) = 0$ and $y'(t) = 0$ simultaneously, making the denominator vanish. Inflection points, where the numerator vanishes, yield zero curvature and are not singularities. These are qualitatively different singularities requiring distinct diagnostic treatment.
 
 We test the curvature formula on the semicubical parabola $\gamma(t) = (t^2, t^3)$, which has a cusp at $t = 0$.
 
@@ -395,13 +395,13 @@ assert kappa_cubic_at_0 == 0, "Inflection curvature should be 0"
 print("Inflection point curvature = 0: VERIFIED")
 ```
 
-The semicubical parabola's curvature diverges to $+\infty$ from both sides of $t = 0$, confirming the cusp. The unit circle returns $\kappa = -1$ (the sign depending on orientation convention), and the inflection point of $y = x^3$ gives $\kappa(0) = 0$, all consistent with classical differential geometry.
+The semicubical parabola's signed curvature diverges to $+\infty$ as $t \to 0^+$ and to $-\infty$ as $t \to 0^-$, confirming the cusp; the unsigned curvature diverges to $+\infty$ from both sides. The unit circle returns $\kappa = -1$ (the sign depending on orientation convention), and the inflection point of $y = x^3$ gives $\kappa(0) = 0$, all consistent with classical differential geometry.
 
 ### 2.4 Geodesic Curvature and Gaussian Curvature on the Sphere
 
 The two-sphere $S^2$ of radius $R$ provides the canonical surface for curvature stress-testing because all relevant quantities are known exactly. The Gaussian curvature is $K = 1/R^2$ everywhere, the geodesics are great circles, and the Gauss–Bonnet theorem asserts:
 
-$$\iint_{S^2} K \, dA = 4\pi \chi(S^2) = 4\pi \cdot 2 = 8\pi$$
+$$\iint_{S^2} K \, dA = 2\pi \chi(S^2) = 2\pi \cdot 2 = 4\pi$$
 
 We verify the Gaussian curvature of the unit sphere from the first and second fundamental forms.
 

@@ -255,7 +255,7 @@ print("\nVerifying Chebyshev minimax property:")
 for n in degrees:
     k         = np.arange(n + 1)
     nodes_ch  = np.cos((2*k + 1) * np.pi / (2*(n + 1)))
-    omega     = np.prod([x_fine - nodes_ch[j] for j in range(n+1)], axis=0)
+    omega     = np.prod(np.array([x_fine - nodes_ch[j] for j in range(n+1)]), axis=0)
     omega_inf = np.max(np.abs(omega))
     theory    = 1.0 / 2**n
     print(f"  n={n:>2}: ||omega||_inf = {omega_inf:.6e}, 1/2^n = {theory:.6e}, "
@@ -307,7 +307,7 @@ for n in range(2, 14):
     b_exact = H_exact * x_star_exact
     
     # Solve exactly with SymPy rational arithmetic
-    x_sym = H_exact.solve(b_exact)
+    x_sym = H_exact.LUsolve(b_exact)
     
     # Convert b to float
     b_float = np.array([float(b_exact[i]) for i in range(n)])
@@ -341,7 +341,7 @@ x_star_exact = sp.Matrix([1] * n)
 b_exact = H_exact * x_star_exact
 b_float = np.array([float(b_exact[i]) for i in range(n)])
 x_float = np.linalg.solve(H_float, b_float)
-x_sym   = H_exact.solve(b_exact)
+x_sym   = H_exact.LUsolve(b_exact)
 
 print(f"{'i':>4} {'x_exact':>25} {'x_float':>22} {'|error|':>18}")
 for i in range(n):
@@ -462,7 +462,7 @@ print(f"Backward Euler (h={h_implicit}):          final y = {ys_be[-1]:.6f},  "
       f"exact = {y_exact_fn(ts_be[-1]):.6f},  error = {abs(ys_be[-1] - y_exact_fn(ts_be[-1])):.4e}")
 ```
 
-The forward Euler run with $h = 0.0021$ produces a solution that grows without bound, with oscillating values that rapidly exceed $10^{30}$ in magnitude. The run with $h = 0.0019$, just barely inside the stability boundary, produces an accurate solution but required over 2.6 steps per period of the stiff transient, which is computationally wasteful for a small transient that decays in time $1/|\lambda| = 0.001$. The backward Euler run with $h = 0.001$ uses a step size that is 1000 times larger than the forward Euler stability limit and produces a correct, smooth solution with modest first-order error. The takeaway is not that implicit methods are always preferable, but that the choice of method must be governed by the stability region and the location of the problem's eigenvalues in the complex plane.
+The forward Euler run with $h = 0.0021$ produces a solution that grows without bound, with oscillating values that rapidly exceed $10^{30}$ in magnitude. The run with $h = 0.0019$, just barely inside the stability boundary, produces an accurate solution but required only about 2.6 steps across the entire interval t_end = 0.005, which barely resolves the fast transient that decays on timescale $1/|\lambda| = 0.001$. The backward Euler run with $h = 0.001$ uses a step size that is 1000 times larger than the forward Euler stability limit and produces a correct, smooth solution with modest first-order error. The takeaway is not that implicit methods are always preferable, but that the choice of method must be governed by the stability region and the location of the problem's eigenvalues in the complex plane.
 
 ### 2.3 Singularities in Numerical Integration
 
@@ -544,7 +544,7 @@ for n in [4, 8, 16, 32, 64, 128, 256]:
     print(f"{n:>5} {err_direct:>18.6e} {err_subst:>18.6e}")
 ```
 
-The direct Gauss-Legendre column shows agonizingly slow algebraic convergence: the error decreases roughly as $n^{-1/2}$, far from the exponential convergence GL achieves on smooth integrands. After the $x = t^2$ substitution, the integrand $x^{-1/2}dx = 2dt$ is constant, and Gauss-Legendre integrates it exactly with $n = 1$. For more general singular integrands, the substitution trades a low-regularity function for a smoother one, restoring rapid convergence. The lesson generalizes: Gaussian quadrature's theoretical guarantees apply to functions in $C^{2n}([a,b])$, and when the integrand violates that regularity at a point, algebraic subtraction or change of variables must precede numerical integration.
+The direct Gauss-Legendre column shows agonizingly slow algebraic convergence: the error decreases roughly as $n^{-1/2}$, far from the exponential convergence GL achieves on smooth integrands. After the $x = t^2$ substitution, the integrand $x^{-1/2}dx = 2dt$ is constant, and Gauss-Legendre integrates it exactly with $n = 1$. For more general singular integrands, the substitution trades a low-regularity function for a smoother one, restoring rapid convergence. The lesson generalizes: Gaussian quadrature achieves spectral convergence only when the integrand is analytic; $C^{2n}$ smoothness gives an algebraic error bound but not exponential decay as $n$ grows. When the integrand lacks analyticity at a point, algebraic subtraction or change of variables must precede numerical integration.
 
 ---
 
@@ -556,7 +556,7 @@ The QR decomposition factors a matrix $A \in \mathbb{R}^{m \times n}$ (with $m \
 
 $$H = I - 2\frac{vv^T}{\|v\|^2},$$
 
-where the vector $v$ is chosen so that $Hx = \|x\|e_1$ for a given column $x$. Each reflection zeroes out the subdiagonal entries of one column while preserving the already-computed structure. The choice $v = x + \|x\|\,\text{sign}(x_1) e_1$ avoids catastrophic cancellation when $x_1 \approx -\|x\|$, which is an important numerical subtlety.
+where the vector $v$ is chosen so that $Hx = \pm\|x\|e_1$ (the sign depending on $x_1$) for a given column $x$. Each reflection zeroes out the subdiagonal entries of one column while preserving the already-computed structure. The choice $v = x + \|x\|\,\text{sign}(x_1) e_1$ avoids catastrophic cancellation when $x_1 \approx -\|x\|$, which is an important numerical subtlety.
 
 The following implementation constructs QR from scratch using Householder reflections, verifies orthogonality of $Q$ and upper-triangularity of $R$ to machine precision, and benchmarks against NumPy's internal QR to confirm that the results agree.
 
@@ -856,7 +856,7 @@ for f_sym, a, b, label in functions:
             errs  = np.abs(f_num(x_vals) - P_num(x_vals))
         curr_err  = np.nanmax(errs)
         if prev_err is not None and curr_err > 1e-16:
-            rate  = np.log(curr_err / prev_err) / np.log((b_float-a_float)) if b_float != a_float else float('nan')
+            rate  = np.log(curr_err / prev_err)
         else:
             rate  = float('nan')
         print(f"    n={n:>2}: ||f - P_n||_inf = {curr_err:.4e}")
@@ -941,7 +941,7 @@ n = 16
 k = np.arange(n+1)
 nodes = np.cos((2*k+1)*np.pi/(2*(n+1)))
 x_fine = np.linspace(-1, 1, 100000)
-omega  = np.prod([x_fine - nodes[j] for j in range(n+1)], axis=0)
+omega  = np.prod(np.array([x_fine - nodes[j] for j in range(n+1)]), axis=0)
 print(f"Chebyshev omega max = {np.max(np.abs(omega)):.6e}, "
       f"1/2^n = {1.0/2**n:.6e}, "
       f"ratio = {np.max(np.abs(omega))/(1.0/2**n):.6f} (should be ~1.0)")

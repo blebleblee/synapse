@@ -1219,13 +1219,13 @@ class FiniteCategory:
         return self.identity_map[A]
 
 
-def yoneda_to_element(alpha: dict, A: str) -> object:
+def yoneda_to_element(alpha: dict, A: str, cat: 'FiniteCategory') -> object:
     """
     Given a natural transformation α: Hom(A,-) => F (encoded as a dict:
       alpha[(B, f)] = F(f)(x)  for each object B and morphism f: A -> B
     ), extract the element α_A(id_A) ∈ F(A).
     """
-    return alpha.get(('component_at', A, 'on', A + '_id'))
+    return alpha.get(('component_at', A, 'on', cat.id(A)))
 
 
 def yoneda_from_element(x, A: str, F_on_objects: dict, F_on_morphisms: dict,

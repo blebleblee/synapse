@@ -8,9 +8,9 @@ A tensor is a generalization of scalars, vectors, and matrices to arbitrary rank
 
 ### 1.1 Tensor Rank, Shape, and Strides
 
-A rank-$n$ tensor has $n$ axes. Its **shape** is the tuple of axis extents, e.g., $(32, 224, 224, 3)$ for a batch of 32 RGB images at $224 \times 224$. Its **strides** describe, in bytes, how far to advance in memory to step one element along each axis. PyTorch and NumPy use row-major (C-contiguous) ordering by default, so for a shape $(B, H, W, C)$ tensor of `float32` the strides are:
+A rank-$n$ tensor has $n$ axes. Its **shape** is the tuple of axis extents, e.g., $(32, 224, 224, 3)$ for a batch of 32 RGB images at $224 \times 224$. Its **strides** describe how far to advance in memory to step one element along each axis. PyTorch reports strides in *elements*; NumPy's `.strides` attribute reports bytes. For a shape $(B, H, W, C)$ tensor in PyTorch's row-major (C-contiguous) layout, the strides in elements are:
 
-$$\text{stride} = (H \cdot W \cdot C \cdot 4,\; W \cdot C \cdot 4,\; C \cdot 4,\; 4) \text{ bytes}$$
+$$\text{stride} = (H \cdot W \cdot C,\; W \cdot C,\; C,\; 1) \text{ elements}$$
 
 Operations like `view` and `reshape` are free (no data copy) when the tensor is contiguous, because they only rewrite the stride metadata. `permute` / `transpose` produce non-contiguous tensors by swapping strides; a subsequent `contiguous()` call forces a physical copy. This distinction matters for performance: a non-contiguous tensor handed to a CUDA kernel often triggers an implicit copy that dominates runtime.
 
@@ -541,7 +541,7 @@ FLOPs comparison for a single layer, input $(B, C, H, W)$, output $C_{out}$ chan
 | Pointwise | $2 B H' W' C_{out} C_{in}$ |
 | **Separable total** | $2 B H' W' C_{in}(K^2 + C_{out})$ |
 
-Reduction ratio: $\frac{1}{C_{out}} + \frac{1}{K^2}$. For $K=3, C_{out}=256$: $\approx 8-9\times$ fewer FLOPs.
+Speedup ratio: $\frac{K^2 C_{out}}{K^2 + C_{out}}$. For $K=3, C_{out}=256$: $\approx 8-9\times$ fewer FLOPs.
 
 ```python
 import torch

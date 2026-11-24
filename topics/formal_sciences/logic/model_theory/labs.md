@@ -26,7 +26,7 @@ For Lean 4, install through the official `elan` toolchain manager and then scaff
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
 lake new model_theory_lab
 cd model_theory_lab
-echo 'import Mathlib' >> lakefile.lean
+echo 'import Mathlib' >> src/Main.lean
 lake update
 ```
 
@@ -168,11 +168,11 @@ def r_z3(a, b):          # We need a relation; use the trivial total relation
 structure_z3 = make_structure(domain_z3, r_z3, add_z3, 0)
 
 # Encode the axioms
-x, y, z = ('var','x'), ('var','y'), ('var','z')
-c = ('const',)
-
 def fterm(t1, t2):
     return ('app', t1, t2)
+
+x, y, z = ('var','x'), ('var','y'), ('var','z')
+c = ('const',)
 
 assoc = ('forall', 'x', ('forall', 'y', ('forall', 'z',
     ('eq', fterm(fterm(x, y), z), fterm(x, fterm(y, z))))))
@@ -506,8 +506,7 @@ def nonstandard_arithmetic_witness(N=15):
     We simulate this by checking satisfiability of linear arithmetic
     constraints over integers using SymPy's satisfiability.
     """
-    from sympy import symbols, And, solve, Integer
-    from sympy.core.relational import Gt
+    from sympy import symbols
 
     print("=" * 60)
     print("NON-STANDARD ARITHMETIC: Compactness Construction")
@@ -630,7 +629,7 @@ if __name__ == '__main__':
         new = set()
         h = sorted(hull)
         for i in range(len(h)):
-            for j in range(i+1, min(i+4, len(h))):  # local pairs only
+            for j in range(i+1, len(h)):
                 mid = Fraction(h[i] + h[j]) / 2
                 if h[i] < mid < h[j]:
                     new.add(mid)
@@ -843,14 +842,13 @@ def diagonal_lemma_construction(psi_sequence):
     # We simulate theta as: substitute x0 -> psi_godel_numeral in psi
     # This gives us a concrete sentence.
     
-    psi_numeral = str(psi_godel)
     # For large numbers, represent numeral as 'succ' iterated — here we use
     # a symbolic stand-in since our alphabet only has '0' and '1'.
     # In full PA, the numeral n̄ is S(S(...S(0)...)) n times.
-    # We simulate: substitute x0 with the Gödel number of psi itself.
+    # We simplify: substitute x0 with '0' as a placeholder.
 
     theta_sequence = substitute_free_variable(psi_sequence, 'x0',
-                                               '0')   # simplified: use 0 as placeholder
+                                               '0')
     theta_godel = sequence_godel_number(theta_sequence)
     print(f"θ(x0) = ψ(sub(x0,x0))  [simulated as ψ with x0 ↦ 0]")
     print(f"θ sequence: {' '.join(theta_sequence)}")
@@ -1026,8 +1024,7 @@ def demonstrate_qe_completeness():
     print("--- Sentence 5: ∀x. x² ≥ 0 (Tarski's decision) ---")
     # QE: eliminate ∀x by converting to ¬∃x. x² < 0, then QE on ∃
     # ∃x. x² < 0 has no real solution, so ∀x. x² ≥ 0 is True.
-    problematic = solve(x**2 - (-1), x)  # x² = -1
-    has_negative_square = any(r.is_real for r in problematic)
+    has_negative_square = len(solve(x**2 + 1, x)) > 0 and any(r.is_real for r in solve(x**2 + 1, x))
     print(f"∃x. x² < 0 in ℝ: {has_negative_square}")
     print(f"∀x. x² ≥ 0 in ℝ (by QE): {not has_negative_square}")
 
@@ -1133,7 +1130,7 @@ To build and check this proof:
 
 ```text
 cd model_theory_lab
-cp ModelTheoryLab.lean lakefile/src/ModelTheoryLab.lean
+cp ModelTheoryLab.lean src/ModelTheoryLab.lean
 lake build ModelTheoryLab
 ```
 

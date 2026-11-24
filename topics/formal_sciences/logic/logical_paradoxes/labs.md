@@ -435,7 +435,7 @@ The derivation proceeds as follows. Assume $C$, which by definition means $C \to
 Implement this derivation using symbolic logic inference rules. Create `paradoxes/symbolic/curry_paradox.py`:
 
 ```python
-from sympy import symbols, Implies, to_cnf
+from sympy import symbols, Implies, to_cnf, Not, And
 from sympy.logic.inference import satisfiable
 
 print("Curry's Paradox Derivation")
@@ -518,7 +518,6 @@ print()
 constraint = And(curry_fixed_point, Not(Bottom))
 result = satisfiable(constraint)
 
-from sympy import Not
 print(f"Can curry_fixed_point hold with Bottom = False?")
 print(f"  Satisfiability of (C ↔ (C → ⊥)) ∧ ¬⊥: {result}")
 print()

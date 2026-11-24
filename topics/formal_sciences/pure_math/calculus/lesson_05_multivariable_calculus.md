@@ -46,7 +46,7 @@ This is the instantaneous rate of change of $f$ in the direction parallel to the
 
 $$\frac{\partial f}{\partial x} = 2xy + y e^{xy}, \quad \frac{\partial f}{\partial y} = x^2 + x e^{xy}$$
 
-At the point $(1, 0)$, we have $\frac{\partial f}{\partial x}(1, 0) = 0$ and $\frac{\partial f}{\partial y}(1, 0) = 1$.
+At the point $(1, 0)$, we have $\frac{\partial f}{\partial x}(1, 0) = 0$ and $\frac{\partial f}{\partial y}(1, 0) = 2$.
 
 Partial derivatives are computed using the same rules as single-variable differentiation, treating all other variables as constants. Higher-order partial derivatives are obtained by iterating: $\frac{\partial^2 f}{\partial x \partial y} = \frac{\partial}{\partial x}\left(\frac{\partial f}{\partial y}\right)$. A critical theorem governs when the order of differentiation can be interchanged.
 
@@ -340,7 +340,7 @@ This yields $n + 1$ equations in $n + 1$ unknowns $(\mathbf{x}, \lambda)$.
 
 $$\frac{\partial L}{\partial x} = y - 2\lambda x = 0, \quad \frac{\partial L}{\partial y} = x - 2\lambda y = 0, \quad \frac{\partial L}{\partial \lambda} = -(x^2 + y^2 - 1) = 0$$
 
-From the first two equations, $y = 2\lambda x$ and $x = 2\lambda y$, so $y = 4\lambda^2 y$. If $y \neq 0$, then $\lambda = \pm \frac{1}{2}$. For $\lambda = \frac{1}{2}$: $y = x$, so $2x^2 = 1$, yielding $x = y = \pm \frac{1}{\sqrt{2}}$. For $\lambda = -\frac{1}{2}$: $y = -x$, so $x = -y$, yielding $x = \pm \frac{1}{\sqrt{2}}, y = \mp \frac{1}{\sqrt{2}}$. Evaluating $f$ at these four points:
+From the first two equations, $y = 2\lambda x$ and $x = 2\lambda y$, so $y = 4\lambda^2 y$. If $y \neq 0$, then $\lambda = \pm \frac{1}{2}$. For $\lambda = \frac{1}{2}$: $y = x$, so $2x^2 = 1$, yielding the critical points $\left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)$ and $\left(-\frac{1}{\sqrt{2}}, -\frac{1}{\sqrt{2}}\right)$. For $\lambda = -\frac{1}{2}$: $y = -x$, so $x = -y$, yielding $x = \pm \frac{1}{\sqrt{2}}, y = \mp \frac{1}{\sqrt{2}}$. Evaluating $f$ at these four points:
 
 $$f\left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right) = \frac{1}{2}, \quad f\left(-\frac{1}{\sqrt{2}}, -\frac{1}{\sqrt{2}}\right) = \frac{1}{2}, \quad f\left(\frac{1}{\sqrt{2}}, -\frac{1}{\sqrt{2}}\right) = -\frac{1}{2}, \quad f\left(-\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right) = -\frac{1}{2}$$
 
@@ -374,7 +374,7 @@ Numerical pitfalls include ill-conditioned Hessians (large condition number, cau
 
 **Constraint Qualification Failures.** Lagrange multipliers require $\nabla g(\mathbf{a}) \neq \mathbf{0}$. If the constraint gradient vanishes, the constraint surface may have a cusp or singularity, and the method fails. For example, minimize $f(x, y) = x$ subject to $(x - 1)^2 + y^2 = 0$. The constraint forces $(x, y) = (1, 0)$, but $\nabla g(1, 0) = (0, 0)$.
 
-**Non-Existence of Smooth Solutions.** The Implicit Function Theorem requires $\frac{\partial F}{\partial y} \neq 0$. If this fails, the level set may fold or become multivalued. The curve $x^2 + y^2 = 0$ consists only of the origin, not a smooth manifold. The equation $y^2 = x$ defines two branches $y = \pm\sqrt{x}$ for $x > 0$, neither smooth at $x = 0$.
+**Non-Existence of Smooth Solutions.** The Implicit Function Theorem requires $\frac{\partial F}{\partial y} \neq 0$. If this fails, the level set may fold or become multivalued. The curve $x^2 + y^2 = 0$ consists only of the origin, a degenerate 0-dimensional manifold rather than a smooth 1-dimensional level set. The equation $y^2 = x$ defines two branches $y = \pm\sqrt{x}$ for $x > 0$, neither smooth at $x = 0$.
 
 **Computational Sensitivity.** Evaluating mixed partials numerically via finite differences $\frac{f(x+h, y+k) - f(x+h, y) - f(x, y+k) + f(x, y)}{hk}$ is highly sensitive to roundoff error when $h, k$ are small. Clairaut's theorem holds in exact arithmetic but may fail numerically if $f_{xy}$ and $f_{yx}$ are computed at different grid points or with different step sizes. Automatic differentiation (AD) avoids these issues by computing derivatives symbolically during execution.
 

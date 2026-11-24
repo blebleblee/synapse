@@ -396,13 +396,20 @@ def partition_function_recurrence(n):
     result = 0
     k = 1
     while True:
-        # Pentagonal numbers: g_k = k(3k-1)/2 for k = 1, -1, 2, -2, 3, -3, ...
-        for sign in [1, -1]:
-            pentagonal = sign * k * (3 * sign * k - 1) // 2
-            if pentagonal > n:
-                return result
+        # Pentagonal numbers: g_k = k(3k-1)/2 and g_{-k} = k(3k+1)/2
+        pentagonal_pos = k * (3 * k - 1) // 2
+        pentagonal_neg = k * (3 * k + 1) // 2
+        
+        # Apply both pentagonal offsets with alternating sign
+        if pentagonal_pos <= n:
             sign_factor = (-1) ** (k + 1)
-            result += sign_factor * partition_function_recurrence(n - pentagonal)
+            result += sign_factor * partition_function_recurrence(n - pentagonal_pos)
+        if pentagonal_neg <= n:
+            sign_factor = (-1) ** (k + 1)
+            result += sign_factor * partition_function_recurrence(n - pentagonal_neg)
+        
+        if pentagonal_pos > n:
+            return result
         k += 1
 
 def partition_asymptotic(n):
@@ -487,7 +494,11 @@ def prufer_decode(sequence):
 
 def cayley_formula(n):
     """Number of labeled trees on n vertices: n^(n-2)."""
-    return n**(n - 2) if n >= 1 else 0
+    if n <= 0:
+        return 0
+    if n == 1:
+        return 1
+    return n**(n - 2)
 
 print("\n=== Cayley's Formula Verification via Prüfer Sequences ===")
 

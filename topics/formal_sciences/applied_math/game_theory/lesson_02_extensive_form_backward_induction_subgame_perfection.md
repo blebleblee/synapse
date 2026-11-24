@@ -60,7 +60,7 @@ Output: Subgame perfect equilibrium strategy profile s*
       Select a*(v) ∈ argmax_{a ∈ A(v)} V_i(v, a)
       Set s*_i(v) = a*(v)
       Compute resulting payoff vector U(v) by following a*(v)
-5. If v ≠ v_0, return to step 3
+5. If k is less than the depth of the root, return to step 3
 6. Output s*
 ```
 
@@ -90,7 +90,7 @@ Optimal implementation exploits the tree's topological structure to minimize mem
 
 Tie-breaking in the backward induction maximization step introduces potential equilibrium multiplicity. When multiple actions at a node yield identical continuation payoffs, any selection constitutes an optimal action, generating distinct subgame perfect equilibria. These equilibria are outcome-equivalent along the equilibrium path by Zermelo's uniqueness result, but they differ in off-path behavior and hence in the credibility of threatened punishments. Applications requiring a unique equilibrium prescription must impose a tie-breaking rule, such as lexicographic action ordering or random selection. The mathematical theory remains agnostic, treating all maximal elements as equally valid.
 
-Imperfect information shatters the computational tractability of backward induction. When information sets contain multiple nodes, the game may lack proper subgames except at the root, rendering the recursive decomposition trivial. Subgame perfection then collapses to Nash equilibrium, failing to refine the equilibrium set. Sequential equilibrium and perfect Bayesian equilibrium provide stronger refinements by imposing consistency conditions on beliefs at off-path information sets, but computing these equilibria is PSPACE-complete in general, reflecting the need to reason about counterfactual beliefs and higher-order strategic reasoning. The perfect-information case thus represents a fortuitous special case where the informational structure aligns with the tree's recursive decomposition, enabling efficient computation.
+Imperfect information shatters the computational tractability of backward induction. When information sets contain multiple nodes, the game may lack proper subgames except at the root, rendering the recursive decomposition trivial. Subgame perfection then collapses to Nash equilibrium, failing to refine the equilibrium set. Sequential equilibrium and perfect Bayesian equilibrium provide stronger refinements by imposing consistency conditions on beliefs at off-path information sets, but computing these equilibria is computationally intractable in general, reflecting the need to reason about counterfactual beliefs and higher-order strategic reasoning. The perfect-information case thus represents a fortuitous special case where the informational structure aligns with the tree's recursive decomposition, enabling efficient computation.
 
 Infinite-horizon games pose both conceptual and computational challenges. When the game tree is infinite, backward induction cannot initiate from terminal nodes, and the recursion fails to terminate. Subgame perfection remains well-defined through the fixed-point characterization, but explicit computation requires alternative techniques. Discounted infinite-horizon games with stationary structure admit value function iteration or policy iteration algorithms analogous to Markov decision process solvers, exploiting the contraction mapping induced by discounting. Undiscounted games may require topological arguments involving limits of finite-horizon approximations, and uniqueness guarantees generally fail.
 

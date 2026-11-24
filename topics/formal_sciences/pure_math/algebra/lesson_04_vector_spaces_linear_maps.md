@@ -180,7 +180,7 @@ flowchart TD
     
     subgraph bottom_dual ["Dual of Dual: Natural Transformation (T*)*"]
         V_dual_dual_2["V**"]
-        W_dual_dual_2["W***"]
+        W_dual_dual_2["W**"]
         W_dual_dual_2 -->|"<br/>ι*"| V_dual_dual_2
     end
     

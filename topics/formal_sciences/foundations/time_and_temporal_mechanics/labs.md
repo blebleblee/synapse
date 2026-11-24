@@ -38,6 +38,7 @@ Verifies irreflexivity, transitivity, and totality for discrete time Z
 
 import sympy as sp
 from sympy.logic.boolalg import And, Or, Not, Implies
+from sympy import ForAll
 from sympy.abc import t, t1, t2, t3
 
 # Define temporal ordering predicate as a symbolic function
@@ -130,6 +131,7 @@ Compares discrete (Z) vs continuous (Q, R) temporal orderings
 import sympy as sp
 from sympy import Q, ask, symbols, Rational
 from fractions import Fraction
+from typing import List
 
 print("="*70)
 print("DENSITY PROPERTY VERIFICATION")
@@ -438,7 +440,7 @@ class LTLEvaluator:
             # Check if ψ holds at position j
             if psi(j):
                 # Check if φ held at all positions from pos to j-1
-                return all(phi(i) for i in range(pos, j + 1))
+                return all(phi(i) for i in range(pos, j))
         return False
 
 # Verification Test Suite
@@ -717,7 +719,6 @@ Models temporal ordering on Z/nZ with modular arithmetic
 """
 
 import sympy as sp
-from sympy import Mod, symbols
 
 print("="*70)
 print("SINGULARITY TEST 3: CIRCULAR TIME (Z/nZ)")
@@ -1247,7 +1248,7 @@ class AllenRelation(Enum):
         }
         return inverses[self]
 
-@dataclass(frozen=True)
+@dataclass
 class Interval:
     """Temporal interval with start and end points"""
     start: float
@@ -1470,7 +1471,7 @@ Verifies temporal properties over finite state systems
 """
 
 from dataclasses import dataclass
-from typing import Set, Dict, List, Callable, Optional
+from typing import Set, Dict, List, Callable, Optional, Tuple
 from collections import deque
 
 print("="*70)

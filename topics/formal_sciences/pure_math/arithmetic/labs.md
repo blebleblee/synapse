@@ -6,7 +6,7 @@ This laboratory sequence transforms abstract arithmetic theory into computationa
 
 Modern symbolic computation engines provide the infrastructure for rigorous mathematical verification. SymPy implements a computer algebra system (CAS) in pure Python, enabling exact symbolic arithmetic free from floating-point approximation errors. NumPy handles high-performance numerical array operations when computational speed matters more than symbolic exactness. SageMath integrates dozens of specialized mathematical libraries into a unified interface, bridging symbolic algebra, number theory, and computational group theory. Lean and Coq represent the proof assistant frontier, where every theorem requires mechanically verified derivations with no logical gaps permitted.
 
-Your working environment must support exact rational arithmetic, symbolic variable manipulation, and automated theorem verification. Install the foundational Python mathematical stack with `pip install sympy numpy matplotlib`. For comprehensive symbolic capabilities, install SageMath through your system package manager or download the distribution from sagemath.org. On Debian-based systems, execute `sudo apt install sagemath`. On macOS with Homebrew, run `brew install sagemath`. Verify your installation by launching an interactive Python session and executing `import sympy; print(sympy.__version__)`. A version string of 1.12 or higher confirms you possess modern symbolic computation capabilities.
+Your working environment must support exact rational arithmetic, symbolic variable manipulation, and automated theorem verification. Install the foundational Python mathematical stack with `pip install sympy numpy matplotlib`. For comprehensive symbolic capabilities, install SageMath through your system package manager or download the distribution from sagemath.org. On Debian-based systems, execute `sudo apt install sagemath`. On macOS, download the distribution from sagemath.org, install via conda (`conda install -c conda-forge sagemath`), or use Docker. Verify your installation by launching an interactive Python session and executing `import sympy; print(sympy.__version__)`. A version string of 1.12 or higher confirms you possess modern symbolic computation capabilities.
 
 The distinction between symbolic and numeric computation governs every verification exercise in this guide. Symbolic engines manipulate mathematical expressions as abstract syntax trees, preserving exact relationships between variables and constants. When you define `x = sympy.Symbol('x')` and compute `sympy.expand((x + 1)**2)`, the system returns `x**2 + 2*x + 1` as an exact algebraic identity, not a floating-point approximation. Numeric computation sacrifices exactness for computational speed, representing numbers as finite-precision binary approximations. NumPy's `np.sqrt(2)` yields approximately `1.4142135623730951`, while SymPy's `sympy.sqrt(2)` preserves the exact irrational value for subsequent symbolic manipulation. Verification labs demand symbolic exactness whenever proving universal properties, switching to numeric methods only when estimating convergence rates or visualizing continuous functions.
 
@@ -256,11 +256,15 @@ def test_division_singularities():
     
     # Numeric division by zero
     print("\n2. Numeric Division by Zero:")
+    print("   Python float 1.0/0.0:")
+    try:
+        result_float = 1.0 / 0.0
+        print(f"     {result_float}")
+    except ZeroDivisionError:
+        print(f"     Raises ZeroDivisionError (unlike NumPy)")
+    
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        result_float = 1.0 / 0.0
-        print(f"   Python float 1.0/0.0 = {result_float}")
-        
         result_np = np.float64(1.0) / np.float64(0.0)
         print(f"   NumPy 1.0/0.0 = {result_np}")
     

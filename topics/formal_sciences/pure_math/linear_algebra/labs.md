@@ -99,7 +99,7 @@ print(f"Symbolic 2x2: rank={r4}, nullity={n4}, n={dim4}, holds={holds4}")
 print(f"Null space basis: {A4.nullspace()}")
 ```
 
-Execute this verification script and observe that the theorem holds across all test cases, including the symbolic parameterization. For the rank-deficient matrix, the rank equals 2 and the nullity equals 1, satisfying $2 + 1 = 3$. The rectangular matrix exhibits rank 2 with nullity 2, confirming $2 + 2 = 4$. The symbolic case reveals that the null space structure depends on the parameter values: when $xy \neq 1$, the matrix has full rank, but the symbolic computation captures the generic behavior.
+Execute this verification script and observe that the theorem holds across all test cases, including the symbolic parameterization. For the rank-deficient matrix, the rank equals 2 and the nullity equals 1, satisfying $2 + 1 = 3$. The rectangular matrix exhibits rank 2 with nullity 2, confirming $2 + 2 = 4$. The symbolic case reveals that the matrix is always rank-deficient with rank 1 (the second row is always a scalar multiple of the first), but the symbolic computation correctly captures the null space structure for all parameter values.
 
 Extend the verification to explore how rank and nullity change under elementary row operations, which preserve the row space but modify the explicit representation:
 
@@ -173,7 +173,7 @@ def verify_cayley_hamilton(A):
     # p_A(A) = c_n A^n + c_{n-1} A^{n-1} + ... + c_1 A + c_0 I
     poly_coeffs = sp.Poly(char_poly, lam).all_coeffs()
     
-    result = zeros(n, n)
+    result = sp.zeros(n, n)
     for i, coeff in enumerate(poly_coeffs):
         power = len(poly_coeffs) - 1 - i
         if power == 0:
@@ -263,7 +263,8 @@ def compute_matrix_exponential_via_cayley_hamilton(A, t):
             for vec in A.eigenvects():
                 if vec[0] == eigval:
                     for v in vec[2]:
-                        v_mat = v * v.T / (v.T * v)[0]
+                        v_norm = v / sqrt((v.T * v)[0])
+                        v_mat = v_norm * v_norm.T
                         exp_matrix += exp(eigval * t) * v_mat
     
     return simplify(exp_matrix)

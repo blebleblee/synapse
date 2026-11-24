@@ -749,7 +749,7 @@ public:
         }
         
         double measured_fpr = false_positives / static_cast<double>(trials);
-        double std_error = std::sqrt(target_fpr * (1 - target_fpr) / trials);
+        double std_error = std::sqrt(measured_fpr * (1 - measured_fpr) / trials);
         double confidence = 2.576 * std_error;  // 99% CI
         
         return {
@@ -902,7 +902,7 @@ Example: ε=0.001, δ=0.05
 ```text
 Given: target relative error σ
 Calculate:
-    m = ⌈(1.04/σ)²⌉ registers
+    m = ⌈(1.04/σ)²⌉ registers  (1.04 is an approximation for standard HyperLogLog)
     b = ⌈log₂(m)⌉ precision bits
     
 Example: σ=0.01 (1%)
@@ -966,7 +966,7 @@ Count-Min Sketch extends to quantile estimation (q-digest), entropy estimation (
 
 **Quantum probabilistic structures**:
 
-Quantum Bloom filters achieve quadratic space savings using quantum superposition, though practical implementations remain theoretical.
+Quantum Bloom filters use Grover's algorithm to reduce query complexity from O(k) to O(√k), though practical implementations remain theoretical.
 
 **Differential privacy**:
 

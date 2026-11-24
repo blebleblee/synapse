@@ -390,7 +390,7 @@ print(f"Relative error: {abs(numerical_integral - float(symbolic_integral)) / fl
 assert abs(numerical_integral - float(symbolic_integral)) < 1e-6, "Trapezoidal integration error exceeds tolerance"
 ```
 
-The symbolic integral evaluates to $2 - 7e^{-5} \approx 1.9953$. The trapezoidal rule with $n = 10000$ subintervals achieves absolute error below $10^{-6}$, validating the numerical integration algorithm.
+The symbolic integral evaluates to $2 - 37e^{-5} \approx 1.7507$. The trapezoidal rule with $n = 10000$ subintervals achieves absolute error below $10^{-6}$, validating the numerical integration algorithm.
 
 Taylor series expansion represents analytic functions as infinite polynomials. The Taylor series of $f(x)$ about $x = a$ is $f(x) = \sum_{n=0}^\infty \frac{f^{(n)}(a)}{n!} (x - a)^n$. Implement a function to compute Taylor series symbolically to arbitrary order and verify against SymPy's built-in series expansion:
 

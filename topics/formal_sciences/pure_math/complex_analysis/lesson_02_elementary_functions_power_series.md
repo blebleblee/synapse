@@ -188,7 +188,7 @@ where $\Arg z \in (-\pi, \pi]$ is the **principal argument**.
 
 To obtain a single-valued analytic branch, we restrict the domain by making a **branch cut**. The standard choice is the **principal logarithm**:
 
-$$\text{Log}\, z = \ln|z| + i \Arg z, \qquad \Arg z \in (-\pi, \pi)$$
+$$\text{Log}\, z = \ln|z| + i \Arg z, \qquad \Arg z \in (-\pi, \pi]$$
 
 defined on the slit plane $\mathbb{C} \setminus (-\infty, 0]$. On this domain, $\text{Log}$ is analytic, and its derivative is $\frac{1}{z}$. This derivative formula is universal: every branch of the logarithm has derivative $1/z$ on its domain of analyticity, because locally the logarithm is an inverse of $e^w$ and $\frac{d}{dz} \log z = \frac{1}{e^{\log z}} = \frac{1}{z}$ by the inverse function theorem.
 
@@ -196,7 +196,7 @@ defined on the slit plane $\mathbb{C} \setminus (-\infty, 0]$. On this domain, $
 flowchart TD
     subgraph domain ["Principal Logarithm: Log z"]
         DEF["Log z = ln|z| + i·Arg z"]
-        ARG["Arg z ∈ (−π, π)"]
+        ARG["Arg z ∈ (−π, π]"]
         JUMP["Jump discontinuity: +2πi across the cut"]
 
         DEF --> ARG
@@ -286,6 +286,6 @@ Several common errors arise when transferring real-function intuition to the com
 
 **Confusing analyticity with continuity across a branch cut.** A branch of $\text{Log}\, z$ is continuous up to the branch cut from one side but jumps by $2\pi i$ when crossing it. Numerical code that evaluates $\text{Log}\, z$ for $z$ near the cut must account for this discontinuity; naively passing $z$ from one side of the cut to the other will produce a jump of $2\pi i$ in the output, which can cascade into large errors in downstream computations involving $z^a$, $\log(\Gamma(z))$, or other functions built on the logarithm.
 
-**Assuming the radius of convergence is infinite.** The exponential, sine, and cosine are entire, but most functions arising in practice are not. The function $\frac{\sin z}{z}$ (with the removable singularity at $z = 0$ filled in as $1$) is entire, but $\frac{1}{\sin z}$ has poles at $z = n\pi$ and its Taylor series at $z_0 = 1$ has radius $R = \pi$ (the distance to the nearest pole at $z = 0$ or $z = \pi$). Misjudging $R$ leads to using a series outside its domain of validity, producing silently incorrect results.
+**Assuming the radius of convergence is infinite.** The exponential, sine, and cosine are entire, but most functions arising in practice are not. The function $\frac{\sin z}{z}$ (with the removable singularity at $z = 0$ filled in as $1$) is entire, but $\frac{1}{\sin z}$ has poles at $z = n\pi$ and its Taylor series at $z_0 = 1$ has radius $R = 1$ (the distance to the nearest pole at $z = 0$). Misjudging $R$ leads to using a series outside its domain of validity, producing silently incorrect results.
 
 **Overlooking branch points when determining $R$.** The function $f(z) = \sqrt{z}$ has a branch point at $z = 0$. Its Taylor series at $z_0 = 1$ is $\sum_{n=0}^{\infty} \binom{1/2}{n} (z-1)^n$ with $R = 1$, the distance to the branch point. The boundary point $z = 0$ is not a pole or an essential singularity; it is a branch point, which is equally an obstruction to analytic continuation and equally sets the radius of convergence.

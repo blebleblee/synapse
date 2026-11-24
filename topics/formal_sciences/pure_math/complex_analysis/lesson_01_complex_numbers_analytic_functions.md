@@ -249,7 +249,7 @@ $$
 f(z) = \begin{cases} \dfrac{z^5}{|z|^4} & z \neq 0 \\ 0 & z = 0. \end{cases}
 $$
 
-Writing $z = re^{i\theta}$, we have $f(z) = re^{i\theta}$, so $|f(z)| = r = |z|$ and $f(z)/z = e^{i\theta}$, which depends on the direction of approach. The difference quotient $f(h)/h = e^{i\theta}$ does not converge as $h \to 0$, so $f$ is not differentiable at the origin despite the Cauchy-Riemann equations holding there. The lesson is that checking the Cauchy-Riemann equations algebraically without verifying real-differentiability is insufficient, and one must always confirm the regularity of the partial derivatives.
+Writing $z = re^{i\theta}$, we have $f(z) = re^{5i\theta}$, so $|f(z)| = r = |z|$ and $f(z)/z = e^{4i\theta}$, which depends on the direction of approach. The difference quotient $f(h)/h = e^{4i\theta}$ does not converge as $h \to 0$, so $f$ is not differentiable at the origin despite the Cauchy-Riemann equations holding there. The lesson is that checking the Cauchy-Riemann equations algebraically without verifying real-differentiability is insufficient, and one must always confirm the regularity of the partial derivatives.
 
 **Confusing analyticity with real-analyticity.** A function $f : \mathbb{R}^2 \to \mathbb{R}^2$ can be real-analytic—expressible as a convergent power series in $x$ and $y$ separately—without being complex-analytic. The function $u(x,y) = x$ is a real-analytic (in fact, real-polynomial) function. As a complex function $f(z) = \text{Re}(z) = (z + \bar{z})/2$, it involves $\bar{z}$ and is therefore nowhere holomorphic. Real-analyticity in the sense of power series in two real variables is strictly weaker than complex-analyticity.
 

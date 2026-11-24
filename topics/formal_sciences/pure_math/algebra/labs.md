@@ -477,9 +477,9 @@ def test_finite_field_extensions():
     poly = x**3 - 2
     print(f"Polynomial: {poly}")
     
-    from sympy import cbrt, exp, pi, I, simplify
+    from sympy import exp, pi, I, simplify, Rational
     
-    root1 = cbrt(2)
+    root1 = 2**(Rational(1,3))
     omega = exp(2 * pi * I / 3)
     root2 = root1 * omega
     root3 = root1 * omega**2

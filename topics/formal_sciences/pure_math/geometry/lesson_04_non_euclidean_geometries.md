@@ -200,7 +200,7 @@ The Klein model is optimal for incidence computations: testing whether two geode
 
 When working with hyperbolic triangles through the law of cosines, a standard computational exercise is: given all three side lengths $a, b, c$, recover all three angles. The formula is:
 
-$$\cos A = \frac{\cosh a - \cosh b \cosh c}{\sinh b \sinh c}$$
+$$\cos A = \frac{\cosh b \cosh c - \cosh a}{\sinh b \sinh c}$$
 
 Numerical instability emerges when two sides are very long (exponentially large $\cosh$ values) but the triangle is very thin — a **degenerate** or **ideal** triangle. In this regime, $\cosh b \cosh c$ and $\cosh a$ are both enormous, and their difference is small. The fix is to reformulate using the **half-angle substitution**. Defining the hyperbolic semi-perimeter $s = (a+b+c)/2$ and applying the identity $\cosh a - \cosh b \cosh c = -2\sinh\frac{a+b+c}{2}\sinh\frac{a-b+c}{2}\ldots$ (which factors the numerator into products of hyperbolic sines), one obtains:
 

@@ -131,7 +131,7 @@ print(f"Coefficient of log2(n): {(1/sp.log(phi, 2)).evalf()} ≈ 1.440")
 
 This symbolic computation confirms that right rotations restore the AVL balance invariant in both subcases and reduce the overall tree height by one level. The recurrence relation for minimum node count establishes the lower bound $N(h) \ge \phi^h / \sqrt{5} - 1$, where $\phi = (1 + \sqrt{5})/2$ is the golden ratio. Inverting this relationship yields the logarithmic height bound $h \le 1.44 \log_2(n + 2) - 1$, proving that AVL trees guarantee $O(\log n)$ operation complexity with an explicit constant factor.
 
-The next verification target addresses red-black tree invariants, which enforce balanced black-height rather than strict height balance. The four red-black properties are: (1) every node is colored red or black, (2) the root is black, (3) all leaves (nil nodes) are black, (4) red nodes have black children only, (5) every path from root to leaf contains the same number of black nodes. We verify that these properties imply height bounds through a counting argument encoded in Z3.
+The next verification target addresses red-black tree invariants, which enforce balanced black-height rather than strict height balance. The five red-black properties are: (1) every node is colored red or black, (2) the root is black, (3) all leaves (nil nodes) are black, (4) red nodes have black children only, (5) every path from root to leaf contains the same number of black nodes. We verify that these properties imply height bounds through a counting argument encoded in Z3.
 
 ```python
 from z3 import *
@@ -355,20 +355,20 @@ class AVLTree:
         balance = self.balance_factor(node)
         
         # Left-Left Case
-        if balance > 1 and key < node.left.key:
+        if balance > 1 and node.left and key < node.left.key:
             return self.rotate_right(node)
         
         # Right-Right Case
-        if balance < -1 and key > node.right.key:
+        if balance < -1 and node.right and key > node.right.key:
             return self.rotate_left(node)
         
         # Left-Right Case
-        if balance > 1 and key > node.left.key:
+        if balance > 1 and node.left and key > node.left.key:
             node.left = self.rotate_left(node.left)
             return self.rotate_right(node)
         
         # Right-Left Case
-        if balance < -1 and key < node.right.key:
+        if balance < -1 and node.right and key < node.right.key:
             node.right = self.rotate_right(node.right)
             return self.rotate_left(node)
         
@@ -401,7 +401,7 @@ def generate_fibonacci_avl_sequence(n: int) -> List[int]:
         # Combine: left subtree, root, right subtree (in-order for BST property)
         # But we need insertion order, not in-order
         # Insertion order: root first, then left subtree, then right subtree
-        sequence = [root_val] + left_seq + right_seq
+        sequence = left_seq + [root_val] + right_seq
         
         return sequence, current
     
@@ -817,12 +817,13 @@ class RBNode(Generic[K, V]):
     left: Optional['RBNode[K, V]']
     right: Optional['RBNode[K, V]']
     
-    def black_height(self) -> int:
-        """Compute black-height of subtree rooted at this node."""
-        if self is None:
+    @staticmethod
+    def black_height(node: Optional['RBNode[K, V]']) -> int:
+        """Compute black-height of subtree rooted at node."""
+        if node is None:
             return 1
-        left_bh = self.left.black_height() if self.left else 1
-        return left_bh + (1 if self.color == Color.BLACK else 0)
+        left_bh = RBNode.black_height(node.left)
+        return left_bh + (1 if node.color == Color.BLACK else 0)
     
     def verify_properties(self) -> bool:
         """Verify red-black tree properties."""
@@ -991,8 +992,9 @@ def test_rbtree_properties(keys: list):
         for j, k in enumerate(keys[:i+1]):
             result = tree.search(k)
             # Should find the most recent value for this key
-            latest_value = max(idx for idx, key_val in enumerate(keys[:i+1]) if key_val == k)
-            assert result == latest_value, f"Search failed for key {k}"
+            latest_insertion_index = max(idx for idx, key_val in enumerate(keys[:i+1]) if key_val == k)
+            expected_value = latest_insertion_index * 10
+            assert result == expected_value, f"Search failed for key {k}"
     
     # Verify height bound: h <= 2*log2(n+1)
     import math
@@ -1289,5 +1291,7 @@ Property testing: `pytest test_structures.py --hypothesis-show-statistics` to ex
 SMT solving: `python3 -c "from z3 import *; s = Solver(); h, n = Ints('h n'); s.add(h > 0, n > 0, h == 2 * Log2(n+1)); print(s.check(), s.model() if s.check() == sat else 'unsat')"` for constraint satisfaction verification.
 
 Lean proof checking: Initialize Lean project with `lake new DataStructures`, implement structure in `DataStructures/AVLTree.lean`, formalize invariants as theorems, verify with `lake build`.
+
+Note: For Z3 logarithmic constraints, compute log2 externally or use bit-length methods, as Z3-Python does not provide Log2; instead use `Int.bit_length()` or precompute logarithmic bounds.
 
 The verification methodology combines symbolic computation for closed-form bounds, property-based testing for behavioral correctness across input domains, SMT solving for constraint satisfaction, and proof assistants for mechanically checked formal proofs. This multi-layered approach ensures that implementations satisfy mathematical specifications with the highest confidence level attainable through current verification technology.

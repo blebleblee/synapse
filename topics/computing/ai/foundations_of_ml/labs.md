@@ -112,7 +112,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from typing import NamedTuple
 
 # ---------------------------------------------------------------------------
-# Reproducibility — fix seeds across NumPy, Python random, and PyTorch
+# Reproducibility — fix seeds across NumPy and PyTorch
 # ---------------------------------------------------------------------------
 SEED = 42
 np.random.seed(SEED)
@@ -265,7 +265,7 @@ def run_supervised_pipeline(
     lr: float = 0.05,
     batch_size: int = 32,
     weight_decay: float = 1e-4,
-) -> None:
+) -> tuple[LogisticRegressionModel, IrisDataPipeline, list[TrainingMetrics]]:
     pipeline = IrisDataPipeline()
     train_loader, test_loader = pipeline.get_loaders(batch_size=batch_size)
 
@@ -675,16 +675,17 @@ def measure_inference_latency(
 
     # Timed trials
     latencies_ms: list[float] = []
+    batch_size = len(data["X_test"])
     with torch.no_grad():
         for _ in range(n_trials):
             t0 = time.perf_counter()
             _ = model(X_test_t)
             t1 = time.perf_counter()
-            latencies_ms.append((t1 - t0) * 1_000)
+            latencies_ms.append((t1 - t0) * 1_000 / batch_size)
 
     arr = np.array(latencies_ms)
-    print("\n[LATENCY] Inference latency distribution (ms) over "
-          f"{n_trials} trials, batch_size={len(data['X_test'])}:")
+    print("\n[LATENCY] Per-sample inference latency distribution (ms) over "
+          f"{n_trials} trials, batch_size={batch_size}:")
     print(f"  mean:   {arr.mean():.4f} ms")
     print(f"  median: {np.median(arr):.4f} ms")
     print(f"  std:    {arr.std():.4f} ms")
@@ -827,10 +828,11 @@ class OODDetector:
         max_prob = probs.max().item()
         return max_prob < self.threshold, max_prob
 
-    def run_demo(self, model: nn.Module) -> None:
+    def run_demo(self, model: nn.Module, scaler: StandardScaler) -> None:
         log.info("=== OOD Detection (Max Softmax Probability baseline) ===")
-        # In-distribution sample: typical Iris setosa measurements
-        in_dist = torch.tensor([[5.1, 3.5, 1.4, 0.2]])
+        # In-distribution sample: typical Iris setosa measurements, scaled
+        in_dist_raw = np.array([[5.1, 3.5, 1.4, 0.2]])
+        in_dist = torch.tensor(scaler.transform(in_dist_raw).astype(np.float32))
         # OOD sample: extreme values far outside the Iris feature range
         ood = torch.tensor([[100.0, -50.0, 999.0, 0.001]])
 

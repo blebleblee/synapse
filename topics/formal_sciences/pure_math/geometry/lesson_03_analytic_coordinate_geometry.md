@@ -104,7 +104,7 @@ for the right branch, or alternatively using hyperbolic functions
 
 $$x(t) = a\cosh t, \quad y(t) = b\sinh t, \quad t \in \mathbb{R},$$
 
-which covers the right branch as $t$ ranges over all reals and the left branch as $t$ ranges over negatives. The parabola $y = x^2$ has the natural parametrization $x(t) = t, y(t) = t^2$.
+which covers the right branch for all real $t$ (since $\cosh t > 0$ always). The parabola $y = x^2$ has the natural parametrization $x(t) = t, y(t) = t^2$.
 
 Parametric curves enable computation of tangent vectors, velocities, and arc lengths. The velocity vector at parameter value $t$ is $\mathbf{v}(t) = \frac{d\mathbf{r}}{dt} = \left(\frac{dx}{dt}, \frac{dy}{dt}\right)$, and the speed is $\|\mathbf{v}(t)\| = \sqrt{(dx/dt)^2 + (dy/dt)^2}$. The arc length from $t = a$ to $t = b$ is
 

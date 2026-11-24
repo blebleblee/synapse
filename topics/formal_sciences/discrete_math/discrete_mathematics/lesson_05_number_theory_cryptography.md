@@ -18,7 +18,7 @@ The units of $\mathbb{Z}/n\mathbb{Z}$—those elements admitting multiplicative 
 
 Fermat's Little Theorem states that for prime $p$ and integer $a$ with $\gcd(a, p) = 1$, we have $a^{p-1} \equiv 1 \pmod{p}$. This result follows from Lagrange's theorem in group theory: the order of any element divides the group order, so $a^{\phi(p)} = a^{p-1} \equiv 1$. The immediate consequence is that $a^p \equiv a \pmod{p}$ for all integers $a$, providing both a primality test heuristic and the foundation for modular exponentiation in cryptographic protocols.
 
-Euler's theorem generalizes Fermat's result to composite moduli: for any integer $a$ with $\gcd(a, n) = 1$, we have $a^{\phi(n)} \equiv 1 \pmod{n}$. This multiplicative periodicity governs the structure of repeated modular multiplication. When we compute $a^k \bmod n$, we can reduce the exponent modulo $\phi(n)$ without changing the result, transforming potentially astronomic exponentiation into tractable computation through the identity $a^k \equiv a^{k \bmod \phi(n)} \pmod{n}$.
+Euler's theorem generalizes Fermat's result to composite moduli: for any integer $a$ with $\gcd(a, n) = 1$, we have $a^{\phi(n)} \equiv 1 \pmod{n}$. This multiplicative periodicity governs the structure of repeated modular multiplication. When we compute $a^k \bmod n$ with $\gcd(a, n) = 1$, we can reduce the exponent modulo $\phi(n)$ without changing the result, transforming potentially astronomic exponentiation into tractable computation through the identity $a^k \equiv a^{k \bmod \phi(n)} \pmod{n}$.
 
 The RSA cryptosystem exploits the computational asymmetry between modular exponentiation and discrete logarithm extraction. Given primes $p$ and $q$, we set $n = pq$ and choose encryption exponent $e$ with $\gcd(e, \phi(n)) = 1$. The decryption exponent $d$ satisfies $ed \equiv 1 \pmod{\phi(n)}$, computable via the extended Euclidean algorithm. Encryption transforms message $m$ into ciphertext $c = m^e \bmod n$, while decryption recovers $m = c^d \bmod n$. The correctness follows from Euler's theorem: since $ed = 1 + k\phi(n)$ for some integer $k$, we have $c^d = (m^e)^d = m^{ed} = m^{1 + k\phi(n)} = m \cdot (m^{\phi(n)})^k \equiv m \cdot 1^k = m \pmod{n}$.
 
@@ -126,7 +126,7 @@ Computing $\phi(720)$ where $720 = 2^4 \cdot 3^2 \cdot 5$:
 
 $$\phi(720) = 720 \cdot \left(1 - \frac{1}{2}\right)\left(1 - \frac{1}{3}\right)\left(1 - \frac{1}{5}\right) = 720 \cdot \frac{1}{2} \cdot \frac{2}{3} \cdot \frac{4}{5} = 192$$
 
-Alternatively, $\phi(720) = 2^3(2-1) \cdot 3^1(3-1) \cdot 5^0(5-1) = 8 \cdot 1 \cdot 2 \cdot 2 \cdot 1 \cdot 4 = 8 \cdot 2 \cdot 4 \cdot 2 = 192$.
+Alternatively, $\phi(720) = 2^3(2-1) \cdot 3^1(3-1) \cdot 5^0(5-1) = 8 \cdot 1 \cdot 3 \cdot 2 \cdot 1 \cdot 4 = 8 \cdot 3 \cdot 2 \cdot 4 = 192$.
 
 The proof of Euler's theorem relies on group theory. The set $U_n = \{a \in \mathbb{Z}/n\mathbb{Z} : \gcd(a, n) = 1\}$ forms a group under multiplication modulo $n$, with identity 1 and inverses guaranteed by the Bézout identity. This group has order $|U_n| = \phi(n)$. By Lagrange's theorem, the order of any element divides the group order, so for any $a \in U_n$, we have $a^{\phi(n)} = 1$ in $U_n$, equivalently $a^{\phi(n)} \equiv 1 \pmod{n}$.
 

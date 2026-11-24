@@ -118,7 +118,7 @@ $$\boldsymbol{\Sigma}_{XX}^{-1}\boldsymbol{\Sigma}_{XY}\boldsymbol{\Sigma}_{YY}^
 
 The eigenvalues $\rho_1^2 \geq \rho_2^2 \geq \cdots \geq \rho_s^2$ where $s = \min(p, q)$ are the squared **canonical correlations**, and the corresponding eigenvectors yield the canonical variates. The first pair $(\mathbf{a}_1^\top \mathbf{X},\, \mathbf{b}_1^\top \mathbf{Y})$ has maximum correlation $\rho_1$. Subsequent pairs are uncorrelated with all previous pairs and have the next highest correlation.
 
-Notice that CCA generalizes multiple regression: when $q = 1$, the single canonical correlation equals the multiple correlation coefficient $R$ between $\mathbf{Y}$ and $\mathbf{X}$, and the canonical variate in $\mathbf{X}$ is exactly the fitted value direction. CCA is also the common framework underlying many multivariate techniques — PCA is CCA between $\mathbf{X}$ and itself, and linear discriminant analysis is a special case of CCA between continuous predictors and a binary group indicator, as the connection to Fisher's discriminant makes precise.
+Notice that CCA generalizes multiple regression: when $q = 1$, the single canonical correlation equals the multiple correlation coefficient $R$ between $\mathbf{Y}$ and $\mathbf{X}$, and the canonical variate in $\mathbf{X}$ is exactly the fitted value direction. CCA is also the common framework underlying many multivariate techniques — linear discriminant analysis is a special case of CCA between continuous predictors and a binary group indicator, as the connection to Fisher's discriminant makes precise.
 
 ### Linear Discriminant Analysis
 
@@ -260,7 +260,7 @@ $$\hat{\boldsymbol{\Sigma}}_{LW} = (1 - \alpha)\mathbf{S} + \alpha \mathbf{T}$$
 
 The optimal shrinkage intensity $\alpha^*$ minimizes the expected Frobenius loss $\mathbb{E}\|\hat{\boldsymbol{\Sigma}} - \boldsymbol{\Sigma}\|_F^2$ and has a closed-form estimate from the data alone, making it a practical drop-in replacement for $\mathbf{S}$ in Hotelling's $T^2$, LDA, and MANOVA. The Ledoit-Wolf estimator is always positive definite for $\alpha \in (0,1]$, resolving the singularity problem while introducing controllable bias. For LDA specifically, **regularized discriminant analysis (RDA)** interpolates between LDA and QDA:
 
-$$\hat{\boldsymbol{\Sigma}}_k(\alpha, \gamma) = \alpha \mathbf{S}_k + (1-\alpha)\mathbf{S}_p, \quad \hat{\boldsymbol{\Sigma}}_k(\alpha, \gamma, \gamma) = (1-\gamma)\hat{\boldsymbol{\Sigma}}_k(\alpha) + \gamma \frac{\text{tr}(\hat{\boldsymbol{\Sigma}}_k(\alpha))}{p}\mathbf{I}$$
+$$\hat{\boldsymbol{\Sigma}}_k(\alpha) = \alpha \mathbf{S}_k + (1-\alpha)\mathbf{S}_p, \quad \hat{\boldsymbol{\Sigma}}_k(\alpha, \gamma) = (1-\gamma)\hat{\boldsymbol{\Sigma}}_k(\alpha) + \gamma \frac{\text{tr}(\hat{\boldsymbol{\Sigma}}_k(\alpha))}{p}\mathbf{I}$$
 
 with $(\alpha, \gamma)$ tuned by cross-validation.
 

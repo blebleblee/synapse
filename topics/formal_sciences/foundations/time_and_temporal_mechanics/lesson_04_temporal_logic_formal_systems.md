@@ -38,7 +38,7 @@ $\phi\, \mathbf{U}\, \psi$ reads "$\phi$ **U**ntil $\psi$": $\psi$ holds at some
 
 $\phi\, \mathbf{R}\, \psi$ reads "$\phi$ **R**eleases $\psi$": $\psi$ holds at every state up to and including the first state where $\phi$ holds, or $\psi$ holds globally if $\phi$ never holds. The release operator is the De Morgan dual of Until: $\phi\, \mathbf{R}\, \psi \equiv \neg(\neg\phi\, \mathbf{U}\, \neg\psi)$.
 
-The derived operators $\mathbf{F}$ and $\mathbf{G}$ are expressible through Until: $\mathbf{F}\phi \equiv \top\, \mathbf{U}\, \phi$ (since $\top$ holds trivially everywhere, $\psi = \phi$ must eventually be reached), and $\mathbf{G}\phi \equiv \phi\, \mathbf{R}\, \bot \equiv \neg\mathbf{F}\neg\phi$. The minimal temporal basis is therefore $\{\mathbf{X}, \mathbf{U}\}$, with everything else definable from these two and classical Boolean connectives.
+The derived operators $\mathbf{F}$ and $\mathbf{G}$ are expressible through Until: $\mathbf{F}\phi \equiv \top\, \mathbf{U}\, \phi$ (since $\top$ holds trivially everywhere, $\psi = \phi$ must eventually be reached), and $\mathbf{G}\phi \equiv \bot\, \mathbf{R}\, \phi \equiv \neg\mathbf{F}\neg\phi$. The minimal temporal basis is therefore $\{\mathbf{X}, \mathbf{U}\}$, with everything else definable from these two and classical Boolean connectives.
 
 ### The Fork in the Road: Linear Time versus Branching Time
 
