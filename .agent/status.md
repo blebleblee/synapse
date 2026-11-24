@@ -17,6 +17,8 @@
 
 - **Batch 25 (2026-11-24, Claude): curriculum review stopped (owner).** Rounds 5 (54 courses, PR #15, about 50 bad edits corrected by hand) and 6 (31 courses, PR #16, about 45 corrected) landed; in total 172 of 539 public courses reviewed and fixed, 185 reviewed. All review processes stopped. Reasons (owner agreed): about 2 real errors per lesson in reviewed courses, the reviewer itself wrong ~30% of the time, automatic edits wrong 10–15% of the time, and shallow coverage that patching cannot fix; regenerating with the same kind of model would likely repeat the result. The vnaipro proxy bills about 9× the tokens it reports (~$55 logged vs close to $500 on the dashboard). **Next (owner):** discuss a different approach (vetted open sources as the core, AI as tutor and exercise generator); no further corpus review, regeneration or credit purchases. Open items from the review stay recorded (needs-content findings, unmatched quotes, truncated sections such as puzzles_and_crosswords lesson 2). verify_all on the round-6 content: "[✔] ALL 6 VERIFICATION PHASES PASSED".
 
+- **Batch 25b (2026-11-24, Claude): owner decisions.** Unattended runs continue until the backlog queue is empty or the owner stops them (queue: backlog "Next Unattended Run"). The merged `security/audit-hardening` branch is already gone locally and on both remotes. Private decks for 860 courses were already committed (`0170a5e8`) and pushed; 142 newer private courses still need decks. Owner approved v1.3.3 (app fixes since v1.3.2, which shipped on red CI) plus a curriculum refresh on both hosts.
+
 ## 1. Saved Checkpoint & Synchronization State
 
 - **Released:** v1.3.2 (2026-11-23) from `94148e4`, `main` pushed to `gitea` and `github` (owner directive). 7 assets on both hosts (Windows setup/portable .exe and win-x64 zip, macOS dmg/zip, wheel, sdist); GitHub sizes match the local builds; GitHub "latest" = v1.3.2. Checks: `check_release_packs.py` passed on all 13 packs; complete pack holds only the 12 core domains; macOS app bundles only those 13 packs; Windows bundle topics contains only public git-tracked files; wheel/sdist carry no curriculum. `curriculum` release updated with all 13 packs carrying full offline `flashcards.csv` decks across all 539 public courses. Earlier: v1.3.1 (2026-11-23, `05c4f22`), v1.3.0 (2026-11-23, `7239c83`), v1.2.2.
@@ -67,7 +69,7 @@ A targeted acceptance audit was performed to close critical evidence gaps in pre
 - **Terminal PTY:** real PTY allocation, signaling and backpressure are only exercised with mocks (tests never spawn host shells). A bounded real-PTY test in `tmp_path` was proposed; awaiting owner answer.
 - **Frontend mentor streaming reconnection:** abrupt TCP drops during streaming are not covered by E2E.
 - **Needs owner decision:** see "Needs Decision" in `backlog.md` (chat "Clear conversation" scope).
-- **Pending owner questions (asked 2026-11-22):** scope of unattended runs once the backlog is empty; ship the unreleased commits as v1.3.0; delete the merged `security/audit-hardening` branch. Until answered: no GitHub push, no release, no branch deletion.
+- **Owner questions of 2026-11-22:** answered 2026-11-24 (see Batch 25b).
 
 ---
 
