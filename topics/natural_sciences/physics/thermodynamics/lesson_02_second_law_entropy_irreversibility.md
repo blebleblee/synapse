@@ -96,7 +96,7 @@ Phase transitions introduce discontinuities in entropy. At the transition temper
 
 $$\Delta S_{\text{trans}} = \frac{L}{T_{\text{trans}}}$$
 
-For water vaporizing at 100°C (373.15 K) with latent heat $L_{\text{vap}} = 40.66$ kJ/mol, the entropy of vaporization is $\Delta S_{\text{vap}} = 108.95$ J/(mol·K). This substantial entropy increase reflects the dramatic expansion in molecular phase space as molecules escape the condensed phase and explore the vapor volume.
+For water vaporizing at 100°C (373.15 K) with latent heat $L_{\text{vap}} = 40.66$ kJ/mol, the entropy of vaporization is $\Delta S_{\text{vap}} = 109.0$ J/(mol·K). This substantial entropy increase reflects the dramatic expansion in molecular phase space as molecules escape the condensed phase and explore the vapor volume.
 
 Irreversible processes require special handling because the heat transfer $\delta Q_{\text{irrev}}$ does not equal $TdS$. The strategy involves identifying the actual initial and final states (which are well-defined equilibrium states) and computing $\Delta S$ via any convenient reversible path, regardless of the actual irreversible trajectory. For irreversible adiabatic expansion, where a gas expands against constant external pressure $P_{\text{ext}} < P_{\text{gas}}$, the work done $W = -P_{\text{ext}}(V_f - V_i)$ determines the final temperature via the First Law: $\Delta U = nC_V(T_f - T_i) = W$. The entropy change then follows from:
 

@@ -194,7 +194,9 @@ where the second term represents migration driven by the electric potential grad
 
 The Einstein relation connects diffusion coefficients to electrical mobility $u_i$:
 
-$$D_i = \frac{RT}{|z_i|F}u_i = \frac{k_B T}{|z_i|e}u_i$$
+$$D_i = \frac{RT}{|z_i|F}u_i$$
+
+where the electrochemical molar mobility $u_i$ (m²/V·s) relates to the mechanical mobility through $u_i = F\mu_i/RT$ with $\mu_i$ the Stokes mobility.
 
 This fluctuation-dissipation relation, derived from both thermodynamic and kinetic arguments, reveals that species experiencing strong friction (low mobility) also exhibit slow diffusion. The ionic conductivity contribution from species $i$ follows as $\kappa_i = F|z_i|u_i C_i = F^2 z_i^2 D_i C_i / RT$, linking macroscopic conductivity measurements to microscopic diffusion coefficients.
 
@@ -226,7 +228,7 @@ $$i_{\text{ss}} = 4nFDCr_0$$
 
 independent of time, with a diffusion layer thickness $\delta \approx r_0$ comparable to the electrode radius. This steady-state behavior enables measurements in resistive media (organic solvents, ionic liquids) where ohmic drop would otherwise preclude quantitative electrochemistry. The small absolute currents (picoamperes to nanoamperes) minimize ohmic drop even when solution resistance reaches megaohms. Additionally, the short diffusion lengths produce millisecond response times, enabling high scan rate voltammetry for studying fast coupled homogeneous reactions and rapid charge transfer kinetics.
 
-Temperature control stabilizes thermodynamic and kinetic parameters—the Nernst equation predicts approximately 0.2 mV K⁻¹ temperature coefficient for typical cell potentials, while rate constants often exhibit Arrhenius activation energies of 20-60 kJ mol⁻¹, corresponding to doubling or tripling per 10 K increase. Maintaining ±0.1 K stability through jacketed cells and circulating thermostats ensures reproducible measurements. For temperature-dependent studies aiming to extract activation parameters, the temperature range should span at least 20 K with measurements at five or more temperatures, fitting $\ln k$ versus $T^{-1}$ to extract the activation energy from the Arrhenius slope $-E_a/R$.
+Temperature control stabilizes thermodynamic and kinetic parameters—the Nernst equation predicts approximately 0.5–1 mV K⁻¹ temperature coefficient for typical cell potentials, while rate constants often exhibit Arrhenius activation energies of 20-60 kJ mol⁻¹, corresponding to doubling or tripling per 10 K increase. Maintaining ±0.1 K stability through jacketed cells and circulating thermostats ensures reproducible measurements. For temperature-dependent studies aiming to extract activation parameters, the temperature range should span at least 20 K with measurements at five or more temperatures, fitting $\ln k$ versus $T^{-1}$ to extract the activation energy from the Arrhenius slope $-E_a/R$.
 
 Reference electrode stability governs measurement reproducibility across experiments. The standard hydrogen electrode, while defining the absolute potential scale, suffers from practical difficulties: hydrogen gas handling hazards, platinum poisoning by trace impurities, and sensitivity to oxygen. The saturated calomel electrode (SCE) offers superior stability based on the equilibrium $\text{Hg}_2\text{Cl}_2(s) + 2e^- \rightleftharpoons 2\text{Hg}(\ell) + 2\text{Cl}^-(aq)$ with saturated potassium chloride ensuring constant chloride activity. The liquid junction potential, arising at the interface between the internal KCl solution and the sample electrolyte, introduces a small (typically < 10 mV) systematic error depending on the difference in ionic mobilities and concentrations. Junction potentials minimize with salt bridges containing high-concentration symmetric electrolytes (such as saturated KCl) where the cation and anion exhibit similar mobilities, producing nearly equal migration contributions that cancel.
 

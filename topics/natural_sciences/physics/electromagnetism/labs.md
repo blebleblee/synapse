@@ -210,7 +210,7 @@ beta = 2 * np.pi / wavelength  # Propagation constant
 z = np.linspace(0, cable_length, 100)
 
 # Termination impedances
-Z_short = 0.1  # Short circuit (small residual)
+Z_short = 0.0  # Short circuit (ideal)
 Z_matched = 50.0  # Matched load
 Z_open = 1e6  # Open circuit (large impedance)
 
@@ -322,7 +322,7 @@ Uncertainty analysis quantifies measurement precision through repeated trials an
 
 Perform boundary condition stress testing by introducing reactive terminations. Replace the resistive load with a series combination of 50 Ω resistance and variable capacitance ranging from 10 pF to 1 nF. The complex load impedance $Z_L = R + 1/(j\omega C)$ produces frequency-dependent reflection coefficients with both magnitude and phase variation. Sweep the excitation frequency from 1 to 50 MHz while monitoring the standing wave pattern. The reflection coefficient traces a circular arc on the Smith chart, demonstrating the capacitive reactance contribution. Extract the capacitance value by curve-fitting the measured reflection phase versus frequency to the theoretical impedance model.
 
-Extend the investigation to transmission line losses by measuring attenuation through long cable cascades. Connect ten 1-meter RG-58 segments in series using barrel connectors, forming a 10-meter lossy line. Drive one end with 10 MHz excitation and measure voltage amplitude at 1-meter intervals. The exponential decay envelope $V(z) = V_0 \exp(-\alpha z)$ reveals the attenuation constant $\alpha$, typically 0.1–0.2 dB/m at 10 MHz for RG-58. Plot measured voltage on a logarithmic scale versus distance, then extract the attenuation constant from the linear slope via $\alpha = -(1/z) \ln(V/V_0)$. Compare this empirical value to manufacturer specifications and verify the frequency-squared scaling of dielectric losses at higher frequencies.
+Extend the investigation to transmission line losses by measuring attenuation through long cable cascades. Connect ten 1-meter RG-58 segments in series using barrel connectors, forming a 10-meter lossy line. Drive one end with 10 MHz excitation and measure voltage amplitude at 1-meter intervals. The exponential decay envelope $V(z) = V_0 \exp(-\alpha z)$ reveals the attenuation constant $\alpha$, typically 0.5–1.0 dB/m at 10 MHz for RG-58. Plot measured voltage on a logarithmic scale versus distance, then extract the attenuation constant from the linear slope via $\alpha = -(1/z) \ln(V/V_0)$. Compare this empirical value to manufacturer specifications and verify the frequency-squared scaling of dielectric losses at higher frequencies.
 
 ## Laboratory Cheat Sheet & Metric Verification Guide
 
@@ -404,7 +404,7 @@ where $A$ is the cross-sectional area and $L_1$ is the primary length.
 
 Characteristic impedance for coaxial cable:
 
-$$Z_0 = \frac{1}{2\pi} \sqrt{\frac{\mu_r}{\epsilon_r}} \ln\left(\frac{D}{d}\right) \times 60 \, \Omega$$
+$$Z_0 = 60 \sqrt{\frac{\mu_r}{\epsilon_r}} \ln\left(\frac{D}{d}\right) \, \Omega$$
 
 where $D$ is the inner diameter of outer conductor, $d$ is the outer diameter of center conductor, $\mu_r$ is relative permeability (≈1 for air), and $\epsilon_r$ is the relative permittivity of dielectric.
 
@@ -466,9 +466,12 @@ def check_import(module_name, min_version=None):
         version = getattr(module, '__version__', 'unknown')
         print(f"✓ {module_name:20s} version {version}")
         if min_version and version != 'unknown':
-            from packaging import version as pkg_version
-            if pkg_version.parse(version) < pkg_version.parse(min_version):
-                print(f"  ⚠ Warning: version {version} < {min_version} recommended")
+            try:
+                from packaging import version as pkg_version
+                if pkg_version.parse(version) < pkg_version.parse(min_version):
+                    print(f"  ⚠ Warning: version {version} < {min_version} recommended")
+            except ImportError:
+                pass
         return True
     except ImportError:
         print(f"✗ {module_name:20s} NOT INSTALLED")

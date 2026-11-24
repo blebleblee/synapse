@@ -30,7 +30,7 @@ where $R$ represents a characteristic radius. This mass estimator forms the back
 
 Jeans equations reduce the full phase space dynamics to spatial moments of the distribution function, yielding a hierarchy of coupled differential equations analogous to fluid dynamics. The zeroth moment corresponds to mass continuity, while the first moment yields the Jeans equation for momentum balance in spherical symmetry:
 
-$$\frac{d(\rho \sigma_r^2)}{dr} + 2\beta \frac{\rho \sigma_r^2}{r} = -\rho \frac{dM(r)}{dr}$$
+$$\frac{d(\rho \sigma_r^2)}{dr} + 2\beta \frac{\rho \sigma_r^2}{r} = -\rho \frac{GM(r)}{r^2}$$
 
 Here $\beta = 1 - \sigma_\theta^2/\sigma_r^2$ quantifies velocity anisotropy, with $\beta = 0$ corresponding to isotropic dispersions and $\beta > 0$ indicating radial anisotropy. The enclosed mass $M(r)$ directly enters the force balance, enabling mass profile reconstruction from observed stellar kinematics. The degeneracy between mass distribution and velocity anisotropy constitutes a fundamental limitation: multiple combinations of $M(r)$ and $\beta(r)$ can reproduce identical line-of-sight velocity dispersion profiles. Breaking this degeneracy requires additional constraints from higher-order velocity moments, gravitational lensing, or independent tracers.
 
@@ -108,7 +108,7 @@ $$\sigma_v^2 = \frac{1}{N-1} \sum_{i=1}^{N} (v_i - \bar{v})^2$$
 
 where $v_i = c(z_i - \bar{z})/(1 + \bar{z})$ represents the peculiar velocity relative to the cluster mean. The virial mass follows:
 
-$$M_{\text{vir}} = \frac{3\pi \sigma_v^2 R_{\text{vir}}}{2G}$$
+$$M_{\text{vir}} = \frac{3\sigma_v^2 R_{\text{vir}}}{G}$$
 
 with virial radius $R_{\text{vir}}$ estimated from the projected galaxy distribution. Corrections for velocity anisotropy and unbound interlopers introduce systematic uncertainties of $\sim 30\%$. X-ray observations provide complementary mass constraints via hydrostatic equilibrium of the hot intracluster medium (ICM). The ICM gas at temperature $T \sim 10^7$-$10^8$ K emits thermal bremsstrahlung with luminosity tracing density squared $L_X \propto \rho_{\text{gas}}^2$. Assuming hydrostatic balance:
 

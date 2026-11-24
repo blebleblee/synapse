@@ -51,7 +51,7 @@ The original lab material used `max_length=50` throughout without acknowledging 
 ## Environment Setup
 
 ```bash
-# Python 3.11+ required (match-statement support, faster asyncio, tomllib stdlib)
+# Python 3.11+ required (tomllib stdlib module, faster asyncio)
 python3.11 -m venv ai-lab-env
 source ai-lab-env/bin/activate  # Windows: ai-lab-env\Scripts\activate
 
@@ -614,11 +614,8 @@ Failure modes tested:
   1. Empty string input
   2. Non-string input (int, None, list)
   3. Context window overflow (prompt > model's max positional embedding)
-  4. Unicode / non-ASCII input
-  5. Injection-style prompts (not a security issue for local inference, but tests
-     that the tokenizer handles arbitrary Unicode code points gracefully)
-  6. Zero-token generation (max_new_tokens=0 edge case)
-  7. Concurrent load (ThreadPoolExecutor, 4 threads)
+  4. Unicode / non-ASCII input (including RTL and emoji)
+  5. Concurrent load (ThreadPoolExecutor, 4 threads)
 """
 
 from __future__ import annotations
@@ -968,11 +965,11 @@ memory_bytes = 2 · num_layers · num_heads · head_dim · seq_len · bytes_per_
 ```
 
 For GPT-2 (12 layers, 12 heads, 64 head_dim, fp32):
-- At seq_len=512: 2 × 12 × 12 × 64 × 512 × 4 ≈ **37.7 MiB**
-- At seq_len=1024: **75.5 MiB**
+- At seq_len=512: 2 × 12 × 12 × 64 × 512 × 4 ≈ **36.0 MiB**
+- At seq_len=1024: **72.0 MiB**
 
-This linear memory growth is why context window size is a hard engineering constraint, not a soft guideline. For larger models (LLaMA-3 70B, 80 layers, 64 heads, 128 head_dim, bf16):
-- At seq_len=8192: 2 × 80 × 64 × 128 × 8192 × 2 ≈ **21.5 GiB** for the KV-cache alone
+This linear memory growth is why context window size is a hard engineering constraint, not a soft guideline. For larger models (LLaMA-3 70B, 80 layers, 8 key-value heads, 128 head_dim, bf16):
+- At seq_len=8192: 2 × 80 × 8 × 128 × 8192 × 2 ≈ **2.5 GiB** for the KV-cache alone
 
 The following diagram shows the KV-cache growth pattern:
 
@@ -981,11 +978,11 @@ flowchart TD
     title["GPT-2 KV-Cache Memory vs. Sequence Length (fp32)"]
 
     subgraph data ["Memory Usage by Sequence Length"]
-        s128["Seq Len 128\n9.4 MiB"]
-        s256["Seq Len 256\n18.9 MiB"]
-        s512["Seq Len 512\n37.7 MiB"]
-        s768["Seq Len 768\n56.6 MiB"]
-        s1024["Seq Len 1024\n75.5 MiB"]
+        s128["Seq Len 128\n9.0 MiB"]
+        s256["Seq Len 256\n18.0 MiB"]
+        s512["Seq Len 512\n36.0 MiB"]
+        s768["Seq Len 768\n54.0 MiB"]
+        s1024["Seq Len 1024\n72.0 MiB"]
     end
 
     title --> data

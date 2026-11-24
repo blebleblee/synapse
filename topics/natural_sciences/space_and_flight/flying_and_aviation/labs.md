@@ -166,11 +166,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-from scipy.optimize import brentq
+
 
 # Physical constants
 RHO_AIR = 1.225  # kg/m^3
-MU_AIR = 1.81e-5  # Pa·s, dynamic viscosity at 15°C
+MU_AIR = 1.789e-5  # Pa·s, dynamic viscosity at 15°C
 NU_AIR = MU_AIR / RHO_AIR  # m^2/s, kinematic viscosity
 CHORD = 0.15  # m
 SPAN = 0.40  # m
@@ -348,6 +348,9 @@ Conduct a comprehensive uncertainty analysis by propagating measurement errors t
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
+import os
+
+os.makedirs('figures', exist_ok=True)
 
 # Nominal values and measurement uncertainties
 U_INF_NOM = 20.0  # m/s
@@ -462,7 +465,7 @@ This reference section consolidates the essential formulas, dimensional analysis
 
 **Reynolds Number and Mach Number:** The Reynolds number quantifies viscous flow regime via $\text{Re} = \rho U_\infty c / \mu = U_\infty c / \nu$ where $\mu$ represents dynamic viscosity and $\nu = \mu / \rho$ denotes kinematic viscosity. At standard sea-level conditions ($T = 15°\text{C}$, $p = 101325 \, \text{Pa}$), use $\rho = 1.225 \, \text{kg/m}^3$ and $\nu = 1.48 \times 10^{-5} \, \text{m}^2/\text{s}$. The Mach number $M = U_\infty / a$ compares flow velocity to the speed of sound $a = \sqrt{\gamma R T}$, where $\gamma = 1.4$ for air and $R = 287.05 \, \text{J/(kg·K)}$ yields $a = 340.3 \, \text{m/s}$ at standard conditions. Compressibility effects become significant for $M > 0.3$.
 
-**Lift Curve Slope and Stall Prediction:** Thin airfoil theory predicts a two-dimensional lift slope $C_{L,\alpha} = 2\pi \approx 0.11$ per degree for inviscid flow. Viscous boundary layers reduce this to approximately $0.10$ per degree at moderate Reynolds numbers. The zero-lift angle $\alpha_{L=0}$ vanishes for symmetric sections but reaches $-2°$ to $-4°$ for cambered airfoils. Stall onset occurs when the adverse pressure gradient over the upper surface exceeds the boundary layer's ability to remain attached, typically at $\alpha_{\text{stall}} = 12°$ to $16°$ for smooth airfoils at $\text{Re} > 10^5$.
+**Lift Curve Slope and Stall Prediction:** Thin airfoil theory predicts a two-dimensional lift slope $C_{L,\alpha} = 2\pi \approx 6.28$ per radian, or approximately $0.11$ per degree, for inviscid flow. Viscous boundary layers reduce this to approximately $0.10$ per degree at moderate Reynolds numbers. The zero-lift angle $\alpha_{L=0}$ vanishes for symmetric sections but reaches $-2°$ to $-4°$ for cambered airfoils. Stall onset occurs when the adverse pressure gradient over the upper surface exceeds the boundary layer's ability to remain attached, typically at $\alpha_{\text{stall}} = 12°$ to $16°$ for smooth airfoils at $\text{Re} > 10^5$.
 
 **Drag Decomposition and Polar Fitting:** Total drag partitions into profile drag (skin friction plus pressure drag) and induced drag (circulation-generated downwash): $C_D = C_{D,0} + k C_L^2$ where $C_{D,0}$ represents the zero-lift drag and $k = 1 / (\pi e AR)$ depends on aspect ratio $AR$ and Oswald efficiency factor $e$. For a finite wing, $AR = b^2 / S$ where $b$ denotes wingspan. Fit this parabolic relationship to your drag polar data via least-squares regression to extract $C_{D,0}$ and $k$.
 

@@ -773,7 +773,7 @@ yielding the final temperature $T_f = \frac{T_H + T_C}{2}$ for equal masses. How
 
 $$\Delta S_{\text{total}} = m c_p \left[\ln\left(\frac{T_f}{T_H}\right) + \ln\left(\frac{T_f}{T_C}\right)\right] = m c_p \ln\left(\frac{T_f^2}{T_H T_C}\right)$$
 
-Substituting $T_f = \sqrt{T_H T_C}$ from the arithmetic-geometric mean inequality applied to equal-mass mixing, the entropy change simplifies to:
+Substituting $T_f = \frac{T_H + T_C}{2}$ from equal-mass energy conservation, the entropy change simplifies to:
 
 $$\Delta S_{\text{total}} = m c_p \ln\left(\frac{(T_H + T_C)^2}{4 T_H T_C}\right) > 0$$
 
@@ -1174,8 +1174,7 @@ for param_name, (p_min, p_max) in param_ranges.items():
         complex_r = absorbance / (eps_range * path_length)
         K_range = complex_r / ((Fe_initial - complex_r) * (SCN_initial - complex_r))
         # Normalize for visualization
-        K_range_norm = K_range / K_equilibrium * absorbance
-        ax4.plot(K_range_norm, K_range, linewidth=2, label=param_name)
+        ax4.plot(eps_range, K_range, linewidth=2, label=param_name)
 
 ax4.axhline(K_equilibrium, color='black', linestyle='--', linewidth=2, 
             alpha=0.7, label=f'K = {K_equilibrium:.1f}')
@@ -1226,7 +1225,7 @@ $$\left(\frac{\partial S}{\partial V}\right)_T = \left(\frac{\partial P}{\partia
 **Temperature Measurement Precision**:
 - Calibrate thermocouples/thermistors against NIST-traceable reference thermometer
 - Ice point (0°C, 273.15 K) provides primary calibration standard
-- Boiling point requires barometric pressure correction: $T_b = 373.15 - 0.037(P - 101.325)$ K where $P$ is in kPa
+- Boiling point requires barometric pressure correction: $T_b = 373.15 + 0.28(P - 101.325)$ K where $P$ is in kPa
 - Digital thermometers: verify reading stability ($\Delta T < 0.01$ K over 60 s before recording)
 - Thermal lag correction: for rapid temperature changes, wait $5\tau$ where $\tau$ is sensor time constant (typically 2-5 s)
 
@@ -1260,7 +1259,7 @@ Use 10-20 Ω power resistor, 1-2 A current, 120-300 s heating duration. Target $
 - Use temperature-controlled cuvette holder with circulating water bath
 - Equilibrate samples in holder for $\geq 10$ minutes before measurement
 - Monitor temperature continuously with in-situ sensor ($\Delta T < \pm 0.1$ K tolerance)
-- Correct for solvent thermal expansion: $A_{\text{corrected}} = A_{\text{measured}} \times \frac{\rho(T)}{\rho(T_{\text{ref}})}$
+- Correct for solvent thermal expansion: $A_{\text{corrected}} = A_{\text{measured}} \times \frac{\rho(T_{\text{ref}})}{\rho(T)}$
 
 ### Python Environment Verification Commands
 

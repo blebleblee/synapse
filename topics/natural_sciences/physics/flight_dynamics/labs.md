@@ -75,9 +75,6 @@ Save your laser gate data as a plain CSV file named `drop_data.csv` with columns
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-from scipy.constants import g as g_standard
-import astropy.units as u
-from astropy.constants import g0
 
 # ── Measured experimental parameters ──────────────────────────────────────────
 # Sphere geometry (from caliper measurements)
@@ -244,7 +241,7 @@ Having measured $C_D$ for a single body at a single velocity, the deeper questio
 
 $$Re = \frac{\rho v L}{\mu}$$
 
-where $L$ is the characteristic length (diameter for a sphere, chord length for a wing) and $\mu$ is dynamic viscosity in Pa·s. For a smooth sphere, $C_D \approx 0.47$ across $10^3 < Re < 2\times10^5$; above $Re \approx 3\times10^5$ the boundary layer transitions to turbulence and $C_D$ drops sharply to about 0.1 — the famous drag crisis. For a cylinder with its axis perpendicular to flow, $C_D \approx 1.0$ to 1.2 in the same sub-critical range. These numbers are not simply memorized — they are measured.
+where $L$ is the characteristic length (diameter for a sphere, chord length for a wing) and $\mu$ is dynamic viscosity in Pa·s. For a smooth sphere, $C_D \approx 0.47$ across $10^3 < Re < 2\times10^5$; above $Re \approx 3\times10^5$ the boundary layer transitions to turbulence and $C_D$ drops sharply to about 0.2 — the famous drag crisis. For a cylinder with its axis perpendicular to flow, $C_D \approx 1.0$ to 1.2 in the same sub-critical range. These numbers are not simply memorized — they are measured.
 
 ### Experimental Protocol: Multi-Body Drop Series
 
@@ -466,8 +463,8 @@ def residual_vT(v, d):
     A  = np.pi * r**2
     m  = rho_sphere * (4/3) * np.pi * r**3
     F_drag    = 0.5 * rho_air * CD * A * v**2
-    F_gravity = m * g_local
-    return F_gravity - F_drag
+    F_net = (rho_sphere - rho_air) * (4/3) * np.pi * r**3 * g_local
+    return F_net - F_drag
 
 vT_SN   = np.zeros(len(diameters_m))
 Re_SN   = np.zeros(len(diameters_m))
@@ -478,7 +475,7 @@ for i, d in enumerate(diameters_m):
     r = d / 2
     A = np.pi * r**2
     m = rho_sphere * (4/3) * np.pi * r**3
-    vT_stokes_est = (2 * m * g_local) / (3 * np.pi * mu_air * d)
+    vT_stokes_est = (d**2 * (rho_sphere - rho_air) * g_local) / (18 * mu_air)
     vT_newton_est = np.sqrt(2 * m * g_local / (rho_air * 0.47 * A))
     v_low  = min(vT_stokes_est, vT_newton_est) * 0.01
     v_high = max(vT_stokes_est, vT_newton_est) * 10

@@ -84,7 +84,7 @@ $$k\tan(ka) = \kappa$$
 
 Combined with the energy relation $k^2 + \kappa^2 = 2mV_0/\hbar^2$, this determines the discrete spectrum graphically through intersection of $y = k\tan(ka)$ with the circle $k^2 + y^2 = 2mV_0/\hbar^2$. Odd parity states satisfy the analogous condition $k\cot(ka) = -\kappa$.
 
-The number of bound states depends on the dimensionless well depth parameter $\xi = \sqrt{2mV_0a^2}/\hbar$. Shallow wells with $\xi < \pi/2$ support only a single bound state, while deep wells with $\xi \gg 1$ approach the infinite well limit with approximately $N \approx 2\xi/\pi$ bound states. The shallowest well capable of binding a particle has depth $V_0 = \pi^2\hbar^2/(8ma^2)$—precisely one-quarter the ground state energy of the corresponding infinite well.
+The number of bound states depends on the dimensionless well depth parameter $\xi = \sqrt{2mV_0a^2}/\hbar$. Shallow wells with $\xi < \pi/2$ support only a single bound state, while deep wells with $\xi \gg 1$ approach the infinite well limit with approximately $N \approx 2\xi/\pi$ bound states. The shallowest well capable of binding a particle has depth $V_0 = \pi^2\hbar^2/(8ma^2)$—equal to the ground state energy of the corresponding infinite well of the same width.
 
 Experimental systems exhibiting finite square well physics include electrons in thin metal films confined between vacuum barriers, ultracold atoms in optical lattices created by standing wave laser fields, and neutrons in nuclear potential wells. In the neutron case, measuring bound state energies through neutron scattering determines the depth and range of the nuclear force potential.
 
@@ -228,7 +228,7 @@ For each time step:
        psi_k = FFT(psi)
     
     3. Apply kinetic evolution (momentum space):
-       psi_k *= exp(-1j * hbar * k^2 * dt / (2*m))
+       psi_k *= exp(-i * hbar * k^2 * dt / (2*m))
     
     4. Inverse transform to position space:
        psi = IFFT(psi_k)

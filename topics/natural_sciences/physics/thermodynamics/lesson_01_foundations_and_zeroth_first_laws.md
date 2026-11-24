@@ -118,7 +118,7 @@ where $R_0$ is the resistance at reference temperature $T_0$ (usually 0°C) and 
 
 Thermocouples generate voltage through the Seebeck effect when junctions of dissimilar metals experience a temperature difference. A Type K (chromel-alumel) thermocouple produces approximately 41 μV per Kelvin, requiring high-resolution voltage measurement (sub-microvolt precision for 0.01 K uncertainty). The cold junction temperature must be independently measured or electronically compensated. Thermocouples respond rapidly (milliseconds) but exhibit nonlinear voltage-temperature relationships requiring polynomial calibration curves or lookup tables. For transient measurements, thermocouple time constants $\tau$ depend on bead diameter $d$, thermal conductivity $k$, density $\rho$, and heat capacity $c$:
 
-$$\tau \approx \frac{\rho c d^2}{6hk}$$
+$$\tau \approx \frac{\rho c d}{6h}$$
 
 where $h$ is the convective heat transfer coefficient between the bead and surrounding fluid.
 
@@ -243,7 +243,7 @@ $$\dot{Q}_\text{rad} \approx 4\epsilon \sigma A_c T_m^3 (T_c - T_a)$$
 
 where $T_m = (T_c + T_a)/2$. Minimizing radiative loss requires low-emissivity surfaces (polished aluminum or gold coatings, $\epsilon \approx 0.05$), radiation shields (concentric shells between calorimeter and ambient), or vacuum gaps (eliminating convective coupling and reducing effective view factors). High-precision calorimeters employ multiple nested shields at intermediate temperatures, exponentially suppressing heat leak.
 
-**Pressure Measurement Uncertainty and Sensor Selection:** Selecting appropriate pressure transducers requires matching sensor range, accuracy class, and response time to the application. Strain gauge transducers offer 0.05–0.5% full-scale accuracy and millisecond response but exhibit temperature sensitivity and zero drift. Piezoelectric transducers provide superior dynamic response (microsecond rise times) for transient measurements but cannot measure static pressure (DC response drifts). For absolute accuracy, a deadweight piston gauge (primary pressure standard) generates reference pressures through the balance of gravitational force on calibrated masses:
+**Pressure Measurement Uncertainty and Sensor Selection:** Selecting appropriate pressure transducers requires matching sensor range, accuracy class, and response time to the application. Strain gauge transducers offer 0.05–0.5% full-scale accuracy and millisecond response but exhibit temperature sensitivity and zero drift. Piezoelectric transducers provide superior dynamic response (microsecond rise times) for transient measurements but are unsuitable for sustained static pressure measurement due to charge leakage and drift. For absolute accuracy, a deadweight piston gauge (primary pressure standard) generates reference pressures through the balance of gravitational force on calibrated masses:
 
 $$P = \frac{Mg}{A}$$
 

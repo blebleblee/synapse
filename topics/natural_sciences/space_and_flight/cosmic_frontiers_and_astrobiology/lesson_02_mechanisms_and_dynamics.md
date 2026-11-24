@@ -78,7 +78,7 @@ Experimental verification of these sublimation rates proceeds via mass loss meas
 
 $$J = P(T)\sqrt{\frac{M}{2\pi RT}}$$
 
-where $M = 0.018$ kg/mol is the molar mass of water. For pure water ice at 200 K, $P \approx 10^{-9}$ bar, yielding a theoretical flux $J \approx 10^{-9}$ g cm⁻² s⁻¹. Over the course of a Martian day (24.6 hours), a square meter of exposed ice would lose approximately 1 gram, consistent with observations from NASA's Phoenix lander, which documented the disappearance of ice exposed by its robotic arm trenching operations.
+where $M = 0.018$ kg/mol is the molar mass of water. For pure water ice at 200 K, $P \approx 1.6 \times 10^{-6}$ bar (0.16 Pa), yielding a free-sublimation flux into vacuum of $J \approx 2 \times 10^{-5}$ g cm⁻² s⁻¹. On Mars the roughly 6 mbar CO₂ atmosphere slows this by orders of magnitude, because the vapor must diffuse away through it; even so, NASA's Phoenix lander saw ice exposed by its robotic arm trenching sublimate away within a few sols.
 
 The microscopic molecular mechanisms underlying these phase transitions involve the breaking and formation of intermolecular bonds. In water ice (ice Ih at standard pressure), each molecule participates in four hydrogen bonds arranged tetrahedrally, with bond energy approximately 20 kJ/mol. The latent heat of sublimation (46 kJ/mol at 273 K) reflects the energy required to overcome these hydrogen bonds and liberate molecules into the gas phase. The sublimation process is fundamentally stochastic at the molecular level: thermal fluctuations occasionally impart sufficient kinetic energy to a surface molecule to overcome the binding potential, causing it to desorb. The rate of desorption events per unit area per unit time is given by transition state theory:
 

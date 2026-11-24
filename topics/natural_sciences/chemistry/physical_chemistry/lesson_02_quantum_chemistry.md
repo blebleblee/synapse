@@ -80,7 +80,7 @@ A quantity of immense practical value in interpreting spectra and chemical react
 
 $$P(r) = r^2 |R_{nl}(r)|^2$$
 
-where the $r^2$ factor is the spherical shell volume element. For the $2s$ orbital, $P(r)$ has two maxima: an inner maximum near $0.76$ Å and a dominant outer maximum near $5.2$ Å, with a radial node between them. This inner lobe is not a curiosity. It is responsible for the penetration of the $2s$ electron into the core electron density, shielding it less effectively than the $2p$ orbital and thus making $2s$ lower in energy than $2p$ in multielectron atoms—the foundation of the Aufbau principle and periodic trends in ionization energy.
+where the $r^2$ factor is the spherical shell volume element. For the $2s$ orbital, $P(r)$ has two maxima: an inner maximum near $0.40$ Å and a dominant outer maximum near $2.75$ Å, with a radial node between them. This inner lobe is not a curiosity. It is responsible for the penetration of the $2s$ electron into the core electron density, shielding it less effectively than the $2p$ orbital and thus making $2s$ lower in energy than $2p$ in multielectron atoms—the foundation of the Aufbau principle and periodic trends in ionization energy.
 
 ### Electron Spin and the Pauli Exclusion Principle
 
@@ -276,7 +276,7 @@ This second-order expression shows that the perturbation mixes the ground state 
 
 Møller-Plesset perturbation theory applies this framework to the many-electron problem by taking $\hat{H}^{(0)}$ as the sum of Fock operators (the HF Hamiltonian) and treating the difference between the true Hamiltonian and the HF mean field as the perturbation. At second order (MP2), the energy correction captures the leading-order pair correlation between electrons:
 
-$$E_{MP2} = \sum_{i<j}^{occ} \sum_{a<b}^{virt} \frac{|\langle ij | ab \rangle - \langle ij | ba \rangle|^2}{\epsilon_i + \epsilon_j - \epsilon_a - \epsilon_b}$$
+$$E_{MP2} = \sum_{i<j}^{occ} \sum_{a<b}^{virt} \frac{|\langle ij | ab \rangle - \langle ij | ba \rangle|^2}{\epsilon_a + \epsilon_b - \epsilon_i - \epsilon_j}$$
 
 where $i,j$ label occupied orbitals, $a,b$ label virtual (unoccupied) orbitals, and $\langle ij|ab\rangle$ are two-electron repulsion integrals. The denominator shows that pairs of occupied orbitals with small gaps to virtual orbitals (small HOMO-LUMO gaps) contribute large correlation corrections. MP2 recovers approximately 80–90% of the correlation energy for well-behaved closed-shell molecules at $O(N^5)$ cost and is the cheapest method that takes electron correlation seriously.
 

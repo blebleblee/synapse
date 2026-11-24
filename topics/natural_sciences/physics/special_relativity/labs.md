@@ -20,7 +20,7 @@ The computational workspace requires organizing data directories and analysis sc
 
 Muons produced by cosmic ray interactions in the upper atmosphere provide a direct empirical test of relativistic time dilation. At rest, muons decay with a mean lifetime of 2.197 microseconds. However, muons created at altitudes of 15 kilometers traveling at 0.98c should traverse only 650 meters before decaying if classical mechanics applied. The observed sea-level muon flux demonstrates that time dilation extends the muon's laboratory-frame lifetime by a factor of gamma, allowing detection at ground level. This exercise measures the muon decay time distribution and extracts the effective gamma factor from the exponential decay constant.
 
-The experimental apparatus consists of two horizontally separated plastic scintillator paddles, each 50 cm × 50 cm × 5 cm, positioned 2 meters apart vertically. Each paddle couples to a photomultiplier tube biased at 1500 volts, with the anode signal feeding a constant-fraction discriminator set to trigger at 50 millivolts above baseline noise. The discriminator outputs connect to a time-to-digital converter (TDC) that timestamps coincident events with 1 nanosecond resolution. A muon passing through both paddles generates a start signal at the upper detector and a stop signal at the lower detector. Muons that stop and decay within the lower paddle produce a delayed stop signal corresponding to the muon's rest-frame decay time, dilated by the factor gamma.
+The experimental apparatus consists of two plastic scintillator paddles, each 50 cm × 50 cm × 5 cm, positioned 2 meters apart vertically. Each paddle couples to a photomultiplier tube biased at 1500 volts, with the anode signal feeding a constant-fraction discriminator set to trigger at 50 millivolts above baseline noise. The discriminator outputs connect to a time-to-digital converter (TDC) that timestamps coincident events with 1 nanosecond resolution. A muon passing through both paddles generates a start signal at the upper detector and a stop signal at the lower detector. Muons that stop and decay within the lower paddle produce a delayed stop signal corresponding to the muon's rest-frame decay time, dilated by the factor gamma.
 
 Configure the coincidence logic to require signals from both paddles within a 100-nanosecond window to suppress accidental coincidences from uncorrelated background events. The true muon event rate depends on the detector solid angle and local cosmic ray flux, typically yielding 10-50 events per hour for this geometry. Collect data continuously for 72 hours to accumulate at least 2000 stop events. For each event, record the time interval between the start and stop pulses, the pulse heights from both PMTs, and the absolute timestamp. Store the data in a CSV file with columns: `event_id`, `start_time_ns`, `stop_time_ns`, `delta_t_ns`, `pmt1_height_mV`, `pmt2_height_mV`.
 
@@ -133,13 +133,13 @@ lyman_alpha_rest = 1215.67 * u.Angstrom
 
 # Locate Lyman-alpha emission peak in observed spectrum
 # Expected observed wavelength from catalog redshift
-lambda_expected = lyman_alpha_rest * (1 + redshift_catalog)
+lambda_expected = (lyman_alpha_rest * (1 + redshift_catalog)).value
 search_window = (wavelength > lambda_expected.value - 50) & (wavelength < lambda_expected.value + 50)
 peak_index = np.argmax(flux[search_window])
 lambda_obs = wavelength[search_window][peak_index] * u.Angstrom
 
 print(f"Catalog redshift: z = {redshift_catalog:.6f}")
-print(f"Observed Lyman-alpha wavelength: {lambda_obs:.2f}")
+print(f"Observed Lyman-alpha wavelength: {lambda_obs.value:.2f} Angstroms")
 
 # Calculate redshift from measured wavelength
 z_measured = (lambda_obs / lyman_alpha_rest) - 1
@@ -355,7 +355,7 @@ print(f"Corresponding velocity: β = {v_threshold:.4f} (v = {v_threshold * c_val
 print(f"Lorentz factor at threshold: γ = {gamma_values[threshold_index]:.4f}")
 ```
 
-The calibration curves reveal that relativistic corrections become significant above 1 percent when the final velocity exceeds approximately 0.14c, corresponding to electric field strengths above 2 megavolts per meter for the 10-meter acceleration distance. At the high-field limit of 10 megavolts per meter, the classical prediction erroneously exceeds the speed of light, yielding beta equals 1.5, while the relativistic velocity asymptotically approaches c with beta equals 0.93 and gamma equals 2.7. This parameter sweep demonstrates the necessity of relativistic mechanics in particle accelerator design and high-energy physics experiments.
+The calibration curves reveal that relativistic corrections become significant above 1 percent when the final velocity exceeds approximately 0.14c, corresponding to electric field strengths above 2 megavolts per meter for the 10-meter acceleration distance. At the high-field limit of 10 megavolts per meter, the classical prediction erroneously exceeds the speed of light, yielding beta equals 1.5, while the relativistic velocity reaches beta equals 0.43 with gamma equals 1.11. This parameter sweep demonstrates the necessity of relativistic mechanics in particle accelerator design and high-energy physics experiments.
 
 ### Length Contraction Measurement Through Muon Flux Altitude Dependence
 
@@ -796,7 +796,7 @@ Mixing reference frames: always specify which frame quantities are measured in. 
 
 Forgetting reciprocity: if observer A measures B's clock running slow by gamma, then B measures A's clock running slow by the same factor. This apparent paradox resolves through relativity of simultaneity.
 
-Misapplying length contraction: only the component of length parallel to the relative velocity contracts. A sphere moving at velocity v becomes a prolate ellipsoid with contracted diameter in the velocity direction and unchanged perpendicular diameters.
+Misapplying length contraction: only the component of length parallel to the relative velocity contracts. A sphere moving at velocity v becomes an oblate ellipsoid with contracted diameter in the velocity direction and unchanged perpendicular diameters.
 
 Classical momentum in relativistic regime: using p equals m v instead of p equals gamma m v introduces errors exceeding 10 percent for beta greater than 0.4. Always compute gamma before calculating momentum.
 

@@ -146,7 +146,7 @@ where $M(r) = \int_0^r 4\pi r'^2 \rho(r') \, dr'$ is the mass enclosed within ra
 
 The central pressure of the Sun can be estimated from a simple scaling argument. Integrating HSE over the stellar radius:
 
-$$P_c \sim \frac{GM_\odot^2}{R_\odot^4} \sim \frac{(6.67\times10^{-11})(1.99\times10^{30})^2}{(6.96\times10^8)^4} \sim 10^{14} \, \mathrm{Pa}$$
+$$P_c \sim \frac{GM_\odot^2}{R_\odot^4} \sim \frac{(6.67\times10^{-11})(1.99\times10^{30})^2}{(6.96\times10^8)^4} \sim 10^{15} \, \mathrm{Pa}$$
 
 The actual value from solar models is $P_c \approx 2.5 \times 10^{16} \, \mathrm{Pa}$; our estimate is order-of-magnitude correct. The discrepancy reflects the radial density concentration: the core is much denser than the mean.
 
@@ -183,7 +183,7 @@ where $m$ is the apparent magnitude and $M$ is the absolute magnitude ($M$ is th
 Key standard candles include:
 
 - **Cepheid variables**: Classical Cepheids pulsate with periods $P \sim 1$–$100$ days. Leavitt (1912) discovered that their period correlates tightly with absolute luminosity: $M_V \approx -2.81 \log_{10}(P/\mathrm{d}) - 1.43$. This period-luminosity relation is the primary extragalactic distance indicator to $\sim 30 \, \mathrm{Mpc}$.
-- **Type Ia supernovae (SNe Ia)**: The thermonuclear destruction of a white dwarf near the Chandrasekhar mass produces a peak luminosity $M_B \approx -19.3 + 1.0 \Delta m_{15}$, where $\Delta m_{15}$ is the decline in magnitude 15 days after peak. After this Phillips relation correction, SNe Ia have dispersion $\sigma_M \approx 0.15 \, \mathrm{mag}$. They are visible to $z \sim 2$ and were the tool that established the accelerating expansion of the universe.
+- **Type Ia supernovae (SNe Ia)**: The thermonuclear destruction of a white dwarf near the Chandrasekhar mass produces a peak luminosity $M_B \approx -19.3 + 0.8\,(\Delta m_{15} - 1.1)$, where $\Delta m_{15}$ is the decline in magnitude 15 days after peak. After this Phillips relation correction, SNe Ia have dispersion $\sigma_M \approx 0.15 \, \mathrm{mag}$. They are visible to $z \sim 2$ and were the tool that established the accelerating expansion of the universe.
 - **Tully-Fisher relation**: For spiral galaxies, the HI line width $W$ (a proxy for rotation velocity $v_c$) correlates with luminosity: $L \propto v_c^4$. This is a consequence of the virial theorem applied to rotationally supported disks.
 
 ---
@@ -224,7 +224,7 @@ where $\mathbf{R}$ is the $3 \times 3$ rotation matrix encoding the Galactic pol
 
 **The Malmquist bias** is a selection effect that systematically overestimates distances and luminosities in flux-limited surveys. Because flux-limited samples preferentially include the brightest objects at large distances, the apparent mean luminosity of a volume element increases with distance even if the true luminosity function is uniform. Any distance-dependent analysis of a flux-limited catalog must correct for this bias or will infer spuriously high luminosities at large distances.
 
-**Extinction and reddening.** Dust grains along the line of sight preferentially absorb and scatter blue photons, making sources appear redder and fainter. The wavelength dependence is approximately $A_\lambda \propto \lambda^{-1.7}$ in the optical. The relation between color excess and total extinction in the $V$ band is parametrized by:
+**Extinction and reddening.** Dust grains along the line of sight preferentially absorb and scatter blue photons, making sources appear redder and fainter. The wavelength dependence is approximately $A_\lambda \propto \lambda^{-1}$ in the optical. The relation between color excess and total extinction in the $V$ band is parametrized by:
 
 $$R_V = \frac{A_V}{E(B-V)} \approx 3.1$$
 

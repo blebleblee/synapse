@@ -14,19 +14,19 @@ where $k_B = 1.380649 \times 10^{-23}\ \text{J K}^{-1}$. This expression is freq
 
 $$V_{n,\text{rms}} = \sqrt{4 k_B T R \,\Delta f}$$
 
-A $1\ \text{k}\Omega$ resistor at $T = 293\ \text{K}$ measured over a $10\ \text{kHz}$ bandwidth contributes $V_{n,\text{rms}} = \sqrt{4 \times 1.38\times10^{-23} \times 293 \times 10^3 \times 10^4} \approx 12.7\ \text{nV}$. This is not an abstract limit—it is the hard floor below which no voltage measurement through that resistor can operate, regardless of amplifier quality. When you are designing a low-noise preamplifier stage for a cryogenic bolometer or a Hall-effect magnetometer, this calculation must appear in your design notebook before component selection begins.
+A $1\ \text{k}\Omega$ resistor at $T = 293\ \text{K}$ measured over a $10\ \text{kHz}$ bandwidth contributes $V_{n,\text{rms}} = \sqrt{4 \times 1.38\times10^{-23} \times 293 \times 10^3 \times 10^4} \approx 402\ \text{nV}$. This is not an abstract limit—it is the hard floor below which no voltage measurement through that resistor can operate, regardless of amplifier quality. When you are designing a low-noise preamplifier stage for a cryogenic bolometer or a Hall-effect magnetometer, this calculation must appear in your design notebook before component selection begins.
 
 Shot noise, by contrast, emerges from the discrete granularity of charge carriers. For a DC photocurrent $I$ measured over bandwidth $\Delta f$, the shot noise is
 
 $$I_{n,\text{rms}} = \sqrt{2 e I \,\Delta f}$$
 
-where $e = 1.602 \times 10^{-19}\ \text{C}$. At a photocurrent of $1\ \mu\text{A}$ and $1\ \text{kHz}$ bandwidth, shot noise contributes $I_{n,\text{rms}} \approx 0.57\ \text{pA}$. The practical implication is that photon-counting experiments operating near this floor cannot improve sensitivity simply by increasing integration time beyond the coherence time of their source; they must reduce bandwidth, cool the detector, or deploy correlation techniques.
+where $e = 1.602 \times 10^{-19}\ \text{C}$. At a photocurrent of $1\ \mu\text{A}$ and $1\ \text{kHz}$ bandwidth, shot noise contributes $I_{n,\text{rms}} \approx 17.9\ \text{pA}$. The practical implication is that photon-counting experiments operating near this floor cannot improve sensitivity simply by increasing integration time beyond the coherence time of their source; they must reduce bandwidth, cool the detector, or deploy correlation techniques.
 
 ### Setting Up for Low-Noise Acquisition: Practical Protocol
 
 The first step when commissioning a precision measurement chain is to characterize the noise floor of the entire system—not individual components—under operating conditions. Connect the input of your signal chain to a $50\ \Omega$ terminator cooled to room temperature (or cryogenically, if the experiment warrants it). Acquire $2^{20}$ samples at your target sampling rate using a 24-bit delta-sigma ADC such as the Linear Technology LTC2500-32. Compute the power spectral density using Welch's method with a Hann window, $2^{14}$-point FFT segments, and 50% overlap. The resulting spectrum tells you immediately whether your $1/f$ corner frequency lies above or below your signal band, whether power-line harmonics at 50 or 60 Hz contaminate the passband, and what the white-noise floor is in $\text{nV}/\sqrt{\text{Hz}}$. This characterization run takes under thirty minutes and prevents weeks of post-hoc confusion about data quality.
 
-Grounding and shielding deserve the same analytical rigor as component selection. A single ground loop of area $A$ in a magnetic field $B(t)$ induces an EMF of $\mathcal{E} = -d\Phi/dt = -A\,dB/dt$. In a laboratory environment with $60\ \text{Hz}$ fluorescent lighting and switching power supplies, $dB/dt$ can reach $10^{-6}\ \text{T s}^{-1}$ over loop areas as small as $1\ \text{cm}^2$, generating tens of nanovolts of interference—enough to swamp Johnson noise in a low-impedance source. The standard countermeasure is a star-ground topology: every shield drain and chassis reference connects to a single point, eliminating the closed loops that couple magnetic flux into the signal path.
+Grounding and shielding deserve the same analytical rigor as component selection. A single ground loop of area $A$ in a magnetic field $B(t)$ induces an EMF of $\mathcal{E} = -d\Phi/dt = -A\,dB/dt$. In a laboratory environment with $60\ \text{Hz}$ fluorescent lighting and switching power supplies, $dB/dt$ can reach $10^{-5}\ \text{T s}^{-1}$ over loop areas as small as $10\ \text{cm}^2$, generating tens of nanovolts of interference—enough to swamp Johnson noise in a low-impedance source. The standard countermeasure is a star-ground topology: every shield drain and chassis reference connects to a single point, eliminating the closed loops that couple magnetic flux into the signal path.
 
 ### Systematic Error Propagation
 
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     fs = 100e3
     t_axis = np.arange(0, 1, 1 / fs)
     rng = np.random.default_rng(seed=42)
-    white = rng.normal(0, 12.7e-9, len(t_axis))             # 12.7 nV white noise
+    white = rng.normal(0, 402e-9, len(t_axis))             # 402 nV white noise
     flicker_freqs = np.arange(1, 500)                        # inject 1/f character
     flicker = sum((1/f) * rng.normal(0, 1e-9, len(t_axis))
                   for f in flicker_freqs)
@@ -270,7 +270,7 @@ def mutual_information_delay(x: np.ndarray, max_tau: int = 100,
         # I = sum p(x,y) log(p(x,y) / (p(x)*p(y)))
         with np.errstate(divide='ignore', invalid='ignore'):
             log_term = np.where(H_joint > 0,
-                                np.log2(H_joint / np.outer(H_x, H_y + 1e-300) + 1e-300),
+                                np.log2((H_joint + 1e-300) / (np.outer(H_x, H_y) + 1e-300)),
                                 0.0)
         mi[tau - 1] = np.sum(H_joint * log_term)
     return mi

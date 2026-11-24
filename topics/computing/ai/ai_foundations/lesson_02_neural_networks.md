@@ -56,8 +56,8 @@ where $\mathbf{W}^{(l)} \in \mathbb{R}^{m_l \times m_{l-1}}$ and element-wise ap
 | Tanh | $\frac{e^z - e^{-z}}{e^z + e^{-z}}$ | $(-1, 1)$ | Zero-centered | Vanishing gradient |
 | ReLU | $\max(0, z)$ | $[0, \infty)$ | Sparse activation, no saturation for $z > 0$ | Dying ReLU (dead neurons) |
 | Leaky ReLU | $\max(\alpha z, z),\ \alpha \ll 1$ | $(-\infty, \infty)$ | Prevents dying neurons | $\alpha$ is a hyperparameter |
-| GELU | $z \cdot \Phi(z)$ | $(-\infty, \infty)$ | Smooth, stochastic interpretation | Computationally heavier |
-| Swish | $z \cdot \sigma(z)$ | $(-\infty, \infty)$ | Self-gated, non-monotonic | Similar cost to GELU |
+| GELU | $z \cdot \Phi(z)$ | $[-0.166, \infty)$ | Smooth, stochastic interpretation | Computationally heavier |
+| Swish | $z \cdot \sigma(z)$ | $[-0.278, \infty)$ | Self-gated, non-monotonic | Similar cost to GELU |
 
 **ReLU** is the default for deep networks. Its gradient is exactly 1 for $z > 0$, eliminating the exponential gradient decay that plague sigmoid and tanh. The **dying ReLU** problem occurs when a neuron's pre-activation permanently falls below zero (e.g., from a large negative bias update), causing it to output zero and receive zero gradient forever. Leaky ReLU and parametric PReLU address this by allowing a small slope $\alpha$ for $z < 0$.
 
@@ -205,7 +205,7 @@ class DenseLayer:
         rng = np.random.default_rng(seed)
         self.activation = activation
 
-        # He initialization for ReLU; Glorot for linear/softmax output
+        # He initialization for ReLU; LeCun for linear/softmax output
         if activation == "relu":
             std = np.sqrt(2.0 / in_features)
         else:
@@ -440,7 +440,7 @@ This is essential for recurrent networks and transformers. The threshold $\tau$ 
 
 **L1 regularization** adds $\lambda\|\theta\|_1$, which produces *sparse* solutions — many weights go to exactly zero. The sub-gradient at zero is defined as 0 by convention. L1 is rarely used in deep learning due to training instability, but is effective for feature selection in shallow linear models.
 
-**Dropout** (Srivastava et al., 2014) stochastically zeros each neuron's output with probability $p$ during training, then scales outputs by $\frac{1}{1-p}$ at test time (inverted dropout). The standard interpretation is an ensemble of $2^m$ sub-networks sharing weights. The correct implementation is:
+**Dropout** (Srivastava et al., 2014) stochastically zeros each neuron's output with probability $p$ during training, and during training scales kept outputs by $\frac{1}{1-p}$ to maintain expected activation magnitude; at test time, outputs are unmodified. The standard interpretation is an ensemble of $2^m$ sub-networks sharing weights. The correct implementation is:
 
 ```python
 def dropout(x: np.ndarray, p: float, training: bool) -> np.ndarray:
@@ -520,7 +520,7 @@ $$\mathbf{a}^{(l+2)} = \phi\!\left(\mathbf{z}^{(l+2)}\right) + \mathbf{a}^{(l)}$
 
 The skip connection creates a direct gradient path from $\mathbf{a}^{(l+2)}$ back to $\mathbf{a}^{(l)}$, with gradient:
 
-$$\frac{\partial \mathcal{L}}{\partial \mathbf{a}^{(l)}} = \frac{\partial \mathcal{L}}{\partial \mathbf{a}^{(l+2)}} \cdot \left(\frac{\partial \mathbf{a}^{(l+2)}}{\partial \mathbf{a}^{(l)}} + \mathbf{I}\right)$$
+$$\frac{\partial \mathcal{L}}{\partial \mathbf{a}^{(l)}} = \frac{\partial \mathcal{L}}{\partial \mathbf{a}^{(l+2)}} \cdot \frac{\partial \mathbf{a}^{(l+2)}}{\partial \mathbf{a}^{(l)}} = \frac{\partial \mathcal{L}}{\partial \mathbf{a}^{(l+2)}} \cdot \left(\mathbf{I} + \frac{\partial \phi(\mathbf{z}^{(l+2)})}{\partial \mathbf{a}^{(l)}}\right)$$
 
 The identity term $\mathbf{I}$ ensures that the gradient contains an additive contribution of 1 regardless of the intermediate layer weights. This prevents vanishing gradients in very deep networks and enables training of networks with 100+ layers.
 
@@ -603,8 +603,8 @@ The following exercise presents intentionally broken training code. The student'
 Lab Exercise: This code contains 5 deliberate bugs related to concepts
 covered in this lesson. Identify and correct all of them.
 
-Bug categories: initialization, normalization, loss computation,
-                gradient flow, train/eval mode.
+Bug categories: initialization, preprocessing, numerical stability,
+                loss computation, gradient flow.
 """
 
 import numpy as np
@@ -667,7 +667,7 @@ for epoch in range(30):
         print(f"Epoch {epoch+1}: loss={loss:.4f}")
 
 # --- CORRECTED VERSION (reference) ---
-# Bug 1: Fit mean/std only on X_train[:split], then apply to both splits.
+# Bug 1: Compute mean/std only from X_all[:split] on the raw data, then apply to both splits.
 # Bug 2: Use He initialization — W1 = rng.normal(0, sqrt(2/D), (D, 64)), etc.
 # Bug 3: Subtract max before exp: exp_z = np.exp(z2 - z2.max(axis=1, keepdims=True))
 # Bug 4: Divide loss by batch size N: loss = -np.sum(...) / split

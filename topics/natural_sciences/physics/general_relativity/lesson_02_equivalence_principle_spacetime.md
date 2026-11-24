@@ -116,7 +116,7 @@ for a uniform field with gravitational acceleration $g$ over a height difference
 
 The direct laboratory confirmation of this prediction came with the **Pound-Rebka experiment** at Harvard University in 1959. Robert Pound and Glen Rebka used the Mössbauer effect — the recoil-free nuclear resonance absorption of gamma rays by ${}^{57}$Fe nuclei — to measure the gravitational redshift over a vertical path of only 22.5 meters in Jefferson Laboratory's tower. The predicted fractional frequency shift for this height is:
 
-$$\frac{\Delta \nu}{\nu} = \frac{g \Delta h}{c^2} = \frac{(9.8 \, \text{m/s}^2)(22.5 \, \text{m})}{(3 \times 10^8 \, \text{m/s})^2} \approx 2.46 \times 10^{-15}$$
+$$\frac{\Delta \nu}{\nu} = -\frac{g \Delta h}{c^2} = -\frac{(9.8 \, \text{m/s}^2)(22.5 \, \text{m})}{(3 \times 10^8 \, \text{m/s})^2} \approx -2.46 \times 10^{-15}$$
 
 This number is extraordinarily small — a part in $10^{15}$ — yet Pound and Rebka measured it to within 10% using the Doppler compensation technique of moving the source at a known velocity to null the shift. The 1965 refinement by Pound and Snider achieved 1% accuracy. This experiment remains one of the clearest direct confirmations that the EEP is physically realized by nature, not merely a theoretical convenience.
 

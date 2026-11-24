@@ -106,7 +106,7 @@ $$t_{\rm cool} = \frac{3 m_e c}{4 \sigma_T \gamma u_B} \approx 1600 \left(\frac{
 
 In young supernova remnants with $B \sim 100 \, \mu{\rm G}$ and TeV electrons ($\gamma \sim 2 \times 10^6$), synchrotron cooling timescales drop to years, producing rapidly variable X-ray filaments tracing the shock front.
 
-The synchrotron emission spectrum from a single electron exhibits a characteristic frequency $\nu_c = (3/2) \gamma^2 \nu_c$ where most power radiates, with a universal spectral shape:
+The synchrotron emission spectrum from a single electron exhibits a characteristic frequency $\nu_c = (3/2) \gamma^2 \nu_B$ where $\nu_B = eB/(2\pi m_e c)$ is the cyclotron frequency where most power radiates, with a universal spectral shape:
 
 $$P(\nu) = \frac{\sqrt{3} e^3 B}{m_e c^2} F\left(\frac{\nu}{\nu_c}\right)$$
 

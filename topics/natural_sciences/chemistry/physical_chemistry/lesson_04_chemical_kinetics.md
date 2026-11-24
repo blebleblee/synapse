@@ -139,7 +139,7 @@ Quantify enzyme catalytic parameters $V_{\max}$ and $K_M$ through substrate satu
 
 5. **Lineweaver-Burk double-reciprocal linearization**: Plot $1/v$ versus $1/[\text{S}]$. The y-intercept equals $1/V_{\max}$, x-intercept equals $-1/K_M$, slope equals $K_M/V_{\max}$. While pedagogically useful, this transformation amplifies noise at low substrate concentrations (high $1/[\text{S}]$ regime), yielding inferior parameter precision compared to nonlinear fitting.
 
-6. **Calculate catalytic efficiency**: Compute turnover number $k_\text{cat} = V_{\max}/[\text{E}]_0$ (units s$^{-1}$) and specificity constant $k_\text{cat}/K_M$ (units M$^{-1}$ s$^{-1}$). Diffusion-limited enzymes approach $k_\text{cat}/K_M \sim 10^8$–$10^9$ M$^{-1}$ s$^{-1}$.
+6. **Calculate catalytic efficiency**: Compute turnover number $k_\text{cat} = V_{\max}/[\text{E}]_0$ (units s$^{-1}$) and specificity constant $k_\text{cat}/K_M$ (units M$^{-1}$ s$^{-1}$). Diffusion-limited enzymes approach $k_\text{cat}/K_M \sim 10^8$ M$^{-1}$ s$^{-1}$.
 
 ### Stopped-Flow Rapid Mixing Architecture
 
