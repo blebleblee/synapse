@@ -127,7 +127,7 @@ Memory forensics occupies a privileged position in the host artifact hierarchy b
 
 The core workflow for memory forensics against a suspected injected process begins with enumerating all running processes and their mapped memory regions, then identifying regions that are executable but not backed by a file on disk — the hallmark of injected shellcode or a reflectively loaded DLL.
 
-```python
+```bash
 # Volatility 3: enumerate processes and find suspicious VAD (Virtual Address Descriptor) entries
 # Run against a full memory image: memory.raw
 
@@ -146,7 +146,7 @@ Reflective DLL injection, as implemented in Stephen Fewer's seminal technique, l
 
 Process Hollowing (a.k.a. RunPE) creates a legitimate process in suspended state, unmaps its original image with `NtUnmapViewOfSection`, writes a replacement PE into the vacated virtual address range, and resumes the thread. The artifact signature here is a process whose image path on disk does not match the PE header bytes at its base address in memory — a discrepancy that `windows.dlllist` or a manual comparison of the on-disk binary hash against a memory dump of the base image will immediately expose.
 
-```python
+```bash
 # Dump the memory-resident image of a suspicious process for offline PE analysis
 python3 vol.py -f memory.raw windows.dumpfiles.DumpFiles --pid 1234
 

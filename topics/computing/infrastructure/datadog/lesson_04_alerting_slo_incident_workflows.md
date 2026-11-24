@@ -88,7 +88,7 @@ The **Agile** algorithm uses SARIMA — Seasonal AutoRegressive Integrated Movin
 
 The **Robust** algorithm is designed for metrics that change slowly over time, such as a system whose baseline grows week over week due to organic load growth. It uses a decomposition approach that separates the trend component from the seasonal and residual components, allowing the model to alert on deviations from the current trend level rather than from a historical absolute value. If your service's p99 latency has been slowly increasing over three months, the agile model will eventually treat elevated latency as normal and stop alerting; the robust model continues to alert if the rate of change itself accelerates beyond what the trend predicts.
 
-```python
+```text
 # Datadog anomaly monitor query syntax
 # Alerts when the metric deviates from the agile seasonal model
 # by more than 2 standard deviations for 80% of a 15-minute window

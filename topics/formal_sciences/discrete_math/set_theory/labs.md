@@ -8,7 +8,7 @@ The computational mathematician requires a rigorous environment where abstract s
 
 Begin by verifying your symbolic computation environment. Execute the following diagnostic sequence to confirm that SymPy's set manipulation modules, cardinality comparison functions, and symbolic logic engines are properly installed and operational. Open a terminal session and invoke Python's symbolic algebra system directly:
 
-```python
+```bash
 python3 -c "import sympy; print('SymPy version:', sympy.__version__); from sympy import FiniteSet, Interval, Union, Intersection, ProductSet, PowerSet, ImageSet, Lambda, symbols; print('Set theory modules loaded successfully')"
 ```
 

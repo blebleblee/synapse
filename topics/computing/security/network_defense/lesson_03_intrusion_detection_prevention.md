@@ -267,7 +267,7 @@ class Incident:
 class CorrelationEngine:
     WINDOW_SECONDS = 300  # 5-minute sliding correlation window
 
-    ATT&CK_STAGE_MAP = {
+    ATTACK_STAGE_MAP = {
         "attempted-recon":    "Reconnaissance",
         "network-scan":       "Reconnaissance",
         "attempted-admin":    "Exploitation",
@@ -286,7 +286,7 @@ class CorrelationEngine:
         self.ip_index: Dict[str, List[int]] = defaultdict(list)
 
     def ingest(self, alert: Alert) -> None:
-        alert.attack_stage = self.ATT&CK_STAGE_MAP.get(
+        alert.attack_stage = self.ATTACK_STAGE_MAP.get(
             alert.attack_stage, "Unknown"
         )
         self.pending_alerts.append(alert)

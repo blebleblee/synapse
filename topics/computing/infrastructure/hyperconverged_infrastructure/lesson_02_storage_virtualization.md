@@ -761,6 +761,9 @@ If model checker finds a violation, it produces a minimal counterexample showing
 
 ```python
 # Pseudocode for Jepsen-style test
+import random
+import time
+
 def test_linearizability():
     # Start storage virtualization cluster (3 nodes)
     cluster = start_cluster(num_nodes=3)

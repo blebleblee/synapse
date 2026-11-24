@@ -740,5 +740,47 @@ def find_device_sysfs():
     for vendor_path in glob.glob(pattern):
         base = os.path.dirname(vendor_path)
         try:
-            vendor =
+            with open(vendor_path) as f:
+                vendor = int(f.read().strip(), 16)
+            with open(os.path.join(base, "device")) as f:
+                device = int(f.read().strip(), 16)
+        except (OSError, ValueError):
+            continue
+        if (vendor, device) == (VENDOR_ID, DEVICE_ID):
+            return base
+    return None
+
+
+# PCI IDs of the device under test (replace with your hardware's IDs)
+VENDOR_ID = 0x1234
+DEVICE_ID = 0x5678
+
+
+class SysfsInterfaceTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.base = find_device_sysfs()
+
+    def setUp(self):
+        if self.base is None:
+            self.skipTest("device not present")
+
+    def test_driver_is_bound(self):
+        driver = os.path.join(self.base, "driver")
+        self.assertTrue(os.path.islink(driver), "no driver bound to the device")
+        self.assertEqual(os.path.basename(os.readlink(driver)), "my_pci_driver")
+
+    def test_config_space_header_matches_ids(self):
+        # The first 4 bytes of config space are vendor and device ID (little endian)
+        with open(os.path.join(self.base, "config"), "rb") as f:
+            vendor, device = struct.unpack("<HH", f.read(4))
+        self.assertEqual((vendor, device), (VENDOR_ID, DEVICE_ID))
+
+
+if __name__ == "__main__":
+    if find_device_sysfs() is None:
+        print("# SKIP: device not present")
+        sys.exit(SKIP)
+    result = unittest.main(exit=False).result
+    sys.exit(PASS if result.wasSuccessful() else FAIL)
 ```

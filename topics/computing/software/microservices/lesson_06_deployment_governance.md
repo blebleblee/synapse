@@ -542,7 +542,7 @@ Undersized resource requests cause Pods to be scheduled on nodes with insufficie
 
 The workflow begins with load testing in a staging environment using tools like k6 or Gatling to generate realistic traffic patterns. Instrument the service with Prometheus metrics exposing CPU usage (`process_cpu_seconds_total`), memory allocation (`process_resident_memory_bytes`), and Go runtime metrics (`go_memstats_*` for garbage collection). Deploy the service with generous resource limits and observe actual resource consumption at different traffic levels—baseline idle, average load, and peak traffic scenarios.
 
-```python
+```javascript
 # k6 load test script simulating realistic order creation traffic
 import http from 'k6/http';
 import { check, sleep } from 'k6';

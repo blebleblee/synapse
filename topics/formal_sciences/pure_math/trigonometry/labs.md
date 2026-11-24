@@ -6,7 +6,7 @@ This lab guide treats trigonometry as a formal algebraic system whose theorems a
 
 Before running any exercise, confirm your environment satisfies the following version contract.
 
-```python
+```bash
 python -c "
 import sympy, numpy, sys
 print(f'Python  : {sys.version}')

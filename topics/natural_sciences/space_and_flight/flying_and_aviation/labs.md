@@ -8,7 +8,7 @@ Your laboratory bench requires a subsonic wind tunnel or equivalent airflow gene
 
 Verify your scientific Python stack integrity by executing the following diagnostic sequence in your terminal environment. Open a command shell and confirm each module loads without import errors, reporting version numbers that meet or exceed the minimum specifications enumerated above.
 
-```python
+```bash
 python -c "import numpy as np; print(f'NumPy: {np.__version__}')"
 python -c "import scipy as sp; print(f'SciPy: {sp.__version__}')"
 python -c "import matplotlib as mpl; print(f'Matplotlib: {mpl.__version__}')"

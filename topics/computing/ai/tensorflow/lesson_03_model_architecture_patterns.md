@@ -268,5 +268,40 @@ class TransformerEncoder(tf.keras.Model):
         ]
         self.ffn_proj = [
             tf.keras.layers.Dense(d_model,
-                                  kernel_initializer='glor
+                                  kernel_initializer='glorot_uniform',
+                                  name=f"ffn_dense2_{i}")
+            for i in range(num_layers)
+        ]
+        self.ffn_norms = [
+            tf.keras.layers.LayerNormalization(epsilon=1e-6, name=f"ffn_norm_{i}")
+            for i in range(num_layers)
+        ]
+        self.pool = tf.keras.layers.GlobalAveragePooling1D()
+        self.classifier = tf.keras.layers.Dense(num_classes)
+        self.d_model = d_model
+
+    @staticmethod
+    def positional_encoding(max_seq_len, d_model):
+        """Sinusoidal encodings (Vaswani et al., 2017), shape (1, max_seq_len, d_model)."""
+        positions = tf.range(max_seq_len, dtype=tf.float32)[:, tf.newaxis]
+        dims = tf.range(d_model, dtype=tf.float32)[tf.newaxis, :]
+        angle_rates = 1.0 / tf.pow(10000.0, (2.0 * tf.floor(dims / 2.0)) / tf.cast(d_model, tf.float32))
+        angles = positions * angle_rates
+        # Even dimensions use sin, odd dimensions use cos
+        encoding = tf.where(tf.cast(dims % 2, tf.bool), tf.cos(angles), tf.sin(angles))
+        return encoding[tf.newaxis, ...]
+
+    def call(self, token_ids, mask=None, training=False):
+        seq_len = tf.shape(token_ids)[1]
+        x = self.embedding(token_ids)
+        x *= tf.math.sqrt(tf.cast(self.d_model, tf.float32))
+        x += self.pos_encoding[:, :seq_len, :]
+        x = self.dropout(x, training=training)
+
+        for attn, ffn1, ffn2, norm in zip(self.attn_blocks, self.ffn_layers,
+                                          self.ffn_proj, self.ffn_norms):
+            x = attn(x, mask=mask, training=training)        # residual + norm inside
+            x = norm(x + ffn2(self.dropout(ffn1(x), training=training)))
+
+        return self.classifier(self.pool(x))                # logits
 ```

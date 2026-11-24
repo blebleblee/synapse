@@ -343,4 +343,39 @@ def register_tool(
         "path": {
             "type": "string",
             "description": "Path to the file, relative to the project root.",
+        },
+    },
+)
+def read_file(path: str) -> str:
+    root = os.path.realpath(os.getcwd())
+    full = os.path.realpath(os.path.join(root, path))
+    # Sandboxing is the environment's job: refuse paths outside the project
+    if os.path.commonpath([root, full]) != root:
+        return f"Error: {path} is outside the project root"
+    if not os.path.isfile(full):
+        return f"Error: {path} does not exist"
+    with open(full, encoding="utf-8") as f:
+        return f.read()
+
+
+@register_tool(
+    name="run_tests",
+    description="Run the project's test suite and return the last lines of its output.",
+    params={},
+)
+def run_tests() -> str:
+    proc = subprocess.run(["pytest", "-q"], capture_output=True, text=True, timeout=600)
+    return "\n".join((proc.stdout + proc.stderr).splitlines()[-40:])
+
+
+def dispatch_tool_call(name: str, arguments_json: str) -> str:
+    """Execute one tool call from the model; errors go back to the model as text."""
+    spec = TOOL_REGISTRY.get(name)
+    if spec is None:
+        return f"Error: unknown tool '{name}'"
+    try:
+        arguments = json.loads(arguments_json or "{}")
+        return spec.handler(**arguments)
+    except Exception as e:  # report to the model instead of crashing the loop
+        return f"Error: {type(e).__name__}: {e}"
 ```

@@ -90,6 +90,8 @@ Note that the probability values in the code use exact combinatorial counts in t
 Define a function to simulate a single ticket outcome. This function draws a random uniform value and maps it to prize tiers according to cumulative probability thresholds:
 
 ```python
+import numpy as np
+
 def simulate_ticket():
     u = np.random.random()
     cumulative_prob = 0
@@ -137,6 +139,8 @@ The mean cumulative profit should converge to approximately negative 858 dollars
 Generate a histogram visualizing the profit distribution:
 
 ```python
+import matplotlib.pyplot as plt
+
 plt.figure(figsize=(12, 6))
 plt.hist(cumulative_profits, bins=100, edgecolor='black', alpha=0.7)
 plt.axvline(mean_profit, color='red', linestyle='--', linewidth=2, label=f'Mean: ${mean_profit:.2f}')

@@ -198,7 +198,7 @@ Modern cloud warehouses inverted this economics: storage is cheap (S3 at ~$0.023
 
 dbt (data build tool) is the canonical ELT transformation framework. It compiles templated SQL (`SELECT` statements with Jinja macros) into DDL/DML, manages dependency graphs via a DAG, runs incremental models, tests data quality assertions, and generates lineage documentation — all as version-controlled SQL files.
 
-```python
+```sql
 # dbt incremental model: models/mart/fct_order_lines.sql
 {{
     config(

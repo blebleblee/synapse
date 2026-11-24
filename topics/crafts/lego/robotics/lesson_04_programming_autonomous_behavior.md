@@ -76,6 +76,8 @@ Implementing this state machine in LEGO block-based programming (EV3-G or SPIKE 
 For more complex systems, text-based programming in Python (SPIKE/EV3) or EV3 Python (via ev3dev) provides greater expressive power. A Python implementation can leverage dictionaries to encode state transition tables compactly and first-class functions to associate actions with states. Consider this fragment implementing the FOLLOWING state:
 
 ```python
+import time
+
 def state_following(events, elapsed):
     if 'OBSTACLE_DETECTED' in events:
         return ('STOPPING', emergency_stop)

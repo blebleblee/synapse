@@ -203,8 +203,8 @@ def bleu_score(
 
     c = len(hyp_tokens)  # hypothesis length
     # Reference length: closest reference length (SacreBLEU default)
-    r = min(len(ref), key=lambda l: (abs(l - c), l)
-            for ref in ref_tokens_list)  # type: ignore
+    r = min((len(ref) for ref in ref_tokens_list),
+            key=lambda l: (abs(l - c), l))
 
     if c == 0:
         return 0.0

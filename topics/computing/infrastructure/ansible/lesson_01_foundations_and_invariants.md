@@ -78,7 +78,7 @@ Ansible's reliability and correctness depend on maintaining several critical inv
 
 **Implementation Mechanism**: Modules achieve idempotence through state inspection before modification:
 
-```python
+```text
 # Pseudocode for idempotent file creation
 def ensure_file_present(path, content):
     if os.path.exists(path):

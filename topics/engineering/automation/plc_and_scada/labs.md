@@ -882,13 +882,16 @@ Simulate complete loss of Ethernet connectivity between the SCADA gateway and PL
 **Pre-Test Configuration**:
 Configure Ignition to log a "Communication Failure" alarm when the OPC UA connection enters disconnected state. Navigate to Gateway → Config → Alarm Notification → Pipelines, and create a new pipeline "Critical Infrastructure Alarms" with immediate email notifications sent to the commissioning engineer. Attach this pipeline to the CODESYS connection watchdog tag created in the gateway scope:
 ```python
+# Project Library script "plc" (Ignition runs it as Jython; `system` is built in)
+def connection_state():
+    state = system.opc.getServerState("OPC UA Connection")  # e.g. "CONNECTED", "FAULTED"
+    return "Connected" if state == "CONNECTED" else "Disconnected"
+```
+
+```text
 # Gateway Tag: System/PLC_Connection_Status (Expression Tag)
-# Expression:
-runScript("
-    import system.opc
-    status = system.opc.getServerState('OPC UA Connection')
-    return 'Connected' if status == 'Good' else 'Disconnected'
-")
+# Expression (calls the library function every 5000 ms):
+runScript("plc.connection_state()", 5000)
 
 # Alarm Configuration:
 # Tag: System/PLC_Connection_Status

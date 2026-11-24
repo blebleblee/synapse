@@ -1878,7 +1878,53 @@ class UserBehaviorFeatures:
             self.unique_src_ips = len(self._src_ips)
         
         # --- Geographic tracking ---
-        country: str = (
-            event.get("src_endpoint", {})
-            .get("location
+        location: dict[str, Any] = event.get("src_endpoint", {}).get("location", {})
+        country: str = location.get("country", "")
+        if country:
+            self._countries.add(country)
+            self.unique_countries = len(self._countries)
+
+        # OCSF `time` is epoch milliseconds (UTC)
+        event_time = datetime.fromtimestamp(event.get("time", 0) / 1000, tz=timezone.utc)
+
+        # --- Geo-velocity: distance / time since the previous located event ---
+        lat, lon = location.get("lat"), location.get("long")
+        if lat is not None and lon is not None:
+            if self._last_location and self._last_event_time:
+                hours = (event_time - self._last_event_time).total_seconds() / 3600
+                km = self._haversine_km(*self._last_location, lat, lon)
+                if hours > 0:
+                    self.max_geo_velocity_kmh = max(self.max_geo_velocity_kmh, km / hours)
+            self._last_location = (lat, lon)
+        self._last_event_time = event_time
+
+        # --- API and resource access ---
+        endpoint: str = event.get("api", {}).get("operation", "")
+        if endpoint:
+            self._endpoints.add(endpoint)
+            self.unique_api_endpoints = len(self._endpoints)
+            if endpoint.startswith(("Create", "Delete", "Put", "Attach", "Update")) and "Policy" in endpoint:
+                self.admin_api_calls += 1
+            if endpoint == "AssumeRole":
+                role = event.get("api", {}).get("request", {}).get("data", {}).get("roleArn", "")
+                if role:
+                    self._roles.add(role)
+                    self.unique_roles_assumed = len(self._roles)
+        for resource in event.get("resources", []):
+            if resource.get("uid"):
+                self._resources.add(resource["uid"])
+        self.unique_target_resources = len(self._resources)
+
+        # --- Volume and failures ---
+        self.total_requests += 1
+        traffic: dict[str, Any] = event.get("traffic", {})
+        self.total_bytes_downloaded += int(traffic.get("bytes_in", 0))
+        self.total_bytes_uploaded += int(traffic.get("bytes_out", 0))
+        if event.get("status") == "Failure" and event.get("class_name") == "Authentication":
+            self.failed_auth_attempts += 1
+
+        # --- Temporal context of the latest event ---
+        self.hour_of_day = event_time.hour
+        self.day_of_week = event_time.weekday()
+        self.is_business_hours = self.day_of_week < 5 and 9 <= self.hour_of_day < 18
 ```

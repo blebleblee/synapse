@@ -125,6 +125,7 @@ The fix requires abandoning `shell=True` entirely and passing arguments as a lis
 import subprocess
 import shlex
 from flask import Flask, request
+import re
 
 app = Flask(__name__)
 
