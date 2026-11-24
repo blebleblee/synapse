@@ -85,7 +85,7 @@ F major:  C  F  A
 
 **Rule 3 — avoid parallel fifths/octaves in close vocal or string writing**, because two voices moving in lockstep by a fifth briefly stop sounding independent and start sounding like one fat unison. This matters for choir/string arrangements. It does **not** matter in rock rhythm guitar — power chords are built on exactly this effect, and that's why they sound massive rather than "wrong."
 
-**Guitar-specific application:** when changing chords, look for a shared fret or finger you can pivot on instead of lifting the whole hand. Am (x02210) → C (x32010) shares the open high E and B strings fretted the same way — only your 3rd finger moves from the D string to the A string. Minimizing hand movement isn't just about tone, it's what makes fast chord changes physically possible.
+**Guitar-specific application:** when changing chords, look for a shared fret or finger you can pivot on instead of lifting the whole hand. Am (x02210) → C (x32010) shares the open high E and B strings fretted the same way — only your 3rd finger moves from the G string to the A string.. Minimizing hand movement isn't just about tone, it's what makes fast chord changes physically possible.
 
 ---
 

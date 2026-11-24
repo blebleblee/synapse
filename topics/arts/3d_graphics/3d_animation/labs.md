@@ -87,7 +87,7 @@ This hierarchy is functional but needs adjustment for production rigging. For no
 
 **Practical anatomy check:** In reality, the elbow cannot extend beyond 180 degrees, and the knee has even tighter constraints. Rotation limits (called bone constraints in Blender) enforce these rules. We will add them next.
 
-Exit Edit Mode by pressing `Tab` again. You are now in Object Mode.
+Exit Edit Mode by pressing `Tab` again, then press `Ctrl + Tab` to enter Pose Mode: bones are selected and constrained in Pose Mode, not Object Mode.
 
 **Step 2: Apply rotation limits to the arm.**
 
@@ -111,7 +111,7 @@ Now test these limits by entering **Pose Mode** (press `Ctrl + Tab` or click the
 
 Inverse Kinematics is a constraint that solves backward through a bone chain: instead of rotating each bone individually, the animator moves the end effector (the foot), and the IK solver rotates the parent bones to reach that target. This is vastly faster for limb animation than rotating each bone separately (FK, or forward kinematics).
 
-Stay in Pose Mode. Select the right leg: select `Calf.R`, then hold `Shift` and select `Foot.R`. Press `Ctrl + I` to open the IK constraint menu. Choose `Create IK Constraint`. A chain of two bones is now IK-driven.
+Stay in Pose Mode. Select the right leg: select `Calf.R`, then hold `Shift` and select `Foot.R`. Press `Shift + I` to open the Add IK menu. Choose `Create IK Constraint`. A chain of two bones is now IK-driven.
 
 An "IK Target" bone will be created automatically, parented to the armature but not in the hierarchy. This target is what you move in animation; the IK solver will rotate the calf and upper leg to reach it. Test this by moving the target bone in Pose Mode: press `G` to grab/move, `X` to constrain movement to the X-axis, and drag the mouse. The foot and calf rotate to follow.
 
@@ -242,7 +242,7 @@ These limits are based on real human anatomy but are stylized for a character ri
 
 **Step 2: Create IK chains for the legs.**
 
-Select `Calf.L`, hold `Shift`, and select `Foot.L`. Press `Ctrl + I` and choose `Create IK Constraint`. An IK target will be created. Rename it `Foot.L_IK` for clarity.
+Select `Calf.L`, hold `Shift`, and select `Foot.L`. Press `Shift + I` and choose `To Active Bone`. An IK target will be created. Rename it `Foot.L_IK` for clarity.
 
 Repeat for the right leg.
 
@@ -408,7 +408,7 @@ Go to frame 60. Press `G > Z > 0 > Enter` and `I` to return to neutral.
 
 **Step 3: Arc and spatial clarity.**
 
-Inspect the motion of the hand in 3D space. Press `F9` to open the Graph Editor and select the hand's X, Y, and Z position curves. The path should trace an arc, not a straight line. If the hand is moving in a straight line, it looks floaty and unnatural.
+Inspect the motion of the hand in 3D space. Press `Shift + F6` to open the Graph Editor and select the hand's X, Y, and Z position curves. The path should trace an arc, not a straight line. If the hand is moving in a straight line, it looks floaty and unnatural.
 
 To create an arc, add an extra keyframe at frame 15 where the hand is not on the direct line between start and end positions. Offset it slightly forward and upward (this creates the arc of the reach).
 
@@ -466,7 +466,7 @@ Use this checklist to evaluate your animation and rig before considering them co
 
 **Spine twist creating mesh pinching:**
 - **Cause**: Vertices along the torso are weighted equally to all spine bones, so they all rotate together instead of gradually transitioning.
-- **Fix**: Use the Smooth Weights tool (press `Shift + S` in Weight Paint Mode) to blend weights smoothly across spine segments. Or manually paint: select `Spine`; paint the lower torso; select `Spine.001`; paint the mid-torso; select `Chest`; paint the upper torso. Each bone should have a gradient of influence.
+- **Fix**: Use the Smooth Weights tool (use Weights > Smooth in Weight Paint Mode) to blend weights smoothly across spine segments. Or manually paint: select `Spine`; paint the lower torso; select `Spine.001`; paint the mid-torso; select `Chest`; paint the upper torso. Each bone should have a gradient of influence.
 
 **Foot sliding during animation:**
 - **Cause**: IK target is not properly pinned to the ground plane; foot rotates or translates unexpectedly.

@@ -481,7 +481,7 @@ Result:   continuous C5, one flute always sounding
 
 ### 9.2 Stravinsky, *The Rite of Spring* (1913): timbral blocks
 
-- In "Augurs of Spring" (opening of the section, rehearsal 13), the strings repeat a stacked chord (E♭ dominant seventh over a E♭-flat major / F♭ major triad) in eighths with irregular accents, all down-bow.
+- In "Augurs of Spring" (opening of the section, rehearsal 13), the strings repeat a stacked chord (E♭ dominant seventh over an F♭ major triad) in eighths with irregular accents, all down-bow.
 - Eight horns reinforce the accents.
 - Instruments are used as unified blocks rather than blended colors.
 

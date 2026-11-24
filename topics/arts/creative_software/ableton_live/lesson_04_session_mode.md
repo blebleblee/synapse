@@ -36,8 +36,8 @@ graph TD
 
 1. Create 4 tracks: Drums, Bass, Keys, FX (Create menu → Insert Audio/MIDI Track, or `Ctrl+T`).
 2. Double-click the first clip slot on the Drums track → record or drag in an 8-bar drum loop.
-3. Right-click the clip slot → **Record Quantization: 1 Bar** so recordings snap cleanly.
-4. Press `Ctrl+Shift+Enter` (Windows) or `Cmd+Shift+Return` (Mac) to trigger **Scene 1**, which fires every clip slot across that row simultaneously.
+3. Set Record Quantization via the top menu (**Edit → Record Quantization → 1 Bar**) so recordings snap cleanly. so recordings snap cleanly.
+4. Select the scene and press `Enter` (or `Shift+Spacebar`) to trigger **Scene 1**., which fires every clip slot across that row simultaneously.
 5. Name scenes meaningfully — double-click the scene name field and type `Intro`, `Build`, `Drop`, `Breakdown`. You will thank yourself during a live set when panicking under stage lights.
 
 ### Clip slot states — know these on sight

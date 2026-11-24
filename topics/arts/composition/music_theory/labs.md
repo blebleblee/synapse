@@ -167,7 +167,7 @@ Root-3rd-5th-b7th box pattern starting on the A string:
 | A | 3 | C (root) |
 | A | 7 | E (3rd) — or D string fret 2 |
 | D | 5 | G (5th) |
-| D | 7 | Bb (b7th) |
+| D | 8 | Bb (b7th) |
 
 Use Simandl 1-2-4 fingering for frets 3-5-7 if staying in position (finger 1 on fret 3, finger 2 bridges to fret 5, finger 4 reaches fret 7). This is the "walking bass" box you'll use constantly over blues and jazz dominant chords — practice outlining it in quarter notes under a C7 vamp at 80 BPM before trying to connect it with chromatic approach tones (e.g., B natural approaching C from below, or Db approaching C from above on the beat before the chord change).
 
@@ -181,7 +181,7 @@ In C7 (C-E-G-Bb), the interval between E and Bb is a tritone — six semitones, 
 graph TD
     subgraph sub_dominant_resolution ["C7 → F Major: The Tritone Resolves"]
         C7["C7: C-E-G-Bb"] -->|"E rises (half step)"| F1["F"]
-        C7 -->|"Bb falls (whole step)"| A1["A"]
+        C7 -->|"Bb falls (half step)"| A1["A"]
         F1 --> FMAJ["F major triad: F-A-C"]
         A1 --> FMAJ
     end
@@ -300,7 +300,7 @@ print("Resolution check: E4 -> F4 is", interval.Interval(e4, f4).directedSimpleN
 print("Resolution check: Bb4 -> A4 is", interval.Interval(bb4, a4).directedSimpleName)
 ```
 
-Expected output confirms `C7` reports `commonName` containing "dominant seventh," the tritone reports exactly 6 semitones, and the two resolution intervals are a minor 2nd ascending (E→F) and a major 2nd descending (Bb→A) — the exact motion you practiced by ear in Section 3.5.
+Expected output confirms `C7` reports `commonName` containing "dominant seventh," the tritone reports exactly 6 semitones, and the two resolution intervals are a minor 2nd ascending (E→F) and a minor 2nd descending (Bb→A) — the exact motion you practiced by ear in Section 3.5.
 
 ---
 

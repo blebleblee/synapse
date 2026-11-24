@@ -111,7 +111,7 @@ flowchart TD
     A4["A4"]
     F4["F4"]
     D4["D4"]
-    B3["B3 (C4)"]
+    B3["C4"]
     G3["G3"]
     E3["E3"]
     C3["C3"]
@@ -259,7 +259,7 @@ Clarion (B4-C6):      bright, clear, even, singing
 Altissimo (C#6-C7):   shrill, penetrating, needs careful voicing to not scream
 ```
 
-**The break (B4→C5) is a real technical hazard** — the player opens the register key and the fingering changes completely. Slow scale practice across the break (60 bpm, E4-F4-G4-A4-B4-C5-D5-E5, listening for timbral smoothness) is standard conservatory homework; as an orchestrator, avoid writing fast passagework that crosses the break repeatedly unless you want that timbral "seam" audible as an effect.
+**The break (B♭4→B4) is a real technical hazard** — the player opens the register key and the fingering changes completely. Slow scale practice across the break (60 bpm, E4-F4-G4-A4-B4-C5-D5-E5, listening for timbral smoothness) is standard conservatory homework; as an orchestrator, avoid writing fast passagework that crosses the break repeatedly unless you want that timbral "seam" audible as an effect.
 
 Clarinet has the widest dynamic range of any woodwind (40+ dB) — it is the woodwind you can genuinely trust with both a true *ppp* and a true *ff*.
 
@@ -345,7 +345,7 @@ flowchart LR
     C3 -->|"P4"| F3
     F3 -->|"M3"| A3
     A3 -->|"m3"| C4
-    C4 -->|"M2"| E4
+    C4 -->|"M3"| E4
     E4 -->|"M3"| F4
     F4 -->|"m3"| A4
     A4 -->|"M3"| C5

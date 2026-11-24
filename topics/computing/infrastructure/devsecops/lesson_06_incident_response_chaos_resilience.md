@@ -816,3 +816,487 @@ def compute_timeout_recommendation(
         ),
     }
 ```
+
+
+## 6. Failure Modes and Production Practice
+
+### 6.1 Cascading Failure Taxonomy
+
+The resilience patterns in Section 5 are individually necessary but collectively insufficient unless the operator understands how failures propagate through a system. Cascading failures follow a small number of topological archetypes; recognising the archetype at the moment of an incident shortens the time-to-stabilise by eliminating irrelevant diagnostic branches.
+
+| Archetype | Trigger | Propagation Path | Typical Mitigation |
+|---|---|---|---|
+| **Resource exhaustion cascade** | Slow dependency holds threads/connections | Thread pool → caller pool → upstream caller pool | Bulkhead + timeout (5.3, 5.4) |
+| **Retry storm** | Transient failure triggers synchronous retries across N callers | Amplified load → dependency saturates → all callers retry simultaneously | Jittered backoff (5.2) + circuit breaker (5.1) |
+| **Failover amplification** | Replica failover concentrates traffic on surviving replicas | Surviving replicas exceed capacity → their dependencies saturate → secondary failover | Progressive failover, connection draining, bulkhead |
+| **Configuration propagation** | Bad config pushed to all instances simultaneously | All instances enter error state in unison → no healthy instance remains | Canary config rollout, feature-flag gating, circuit breaker |
+| **Feedback-loop oscillation** | Autoscaler reacts to latency spike by adding capacity; new capacity warms up slowly, latency stays high, autoscaler adds more | Oscillating capacity, thrashing | Hysteresis in autoscaler, cooldown windows, SLO-based scaling |
+
+The critical insight is that these archetypes are not mutually exclusive. A failover amplification (row 3) that saturates a shared thread pool (row 1) while the autoscaler oscillates (row 5) produces a compound failure that no single pattern addresses. The operator's job is to decompose the compound failure into its constituent archetypes and apply the corresponding mitigation to each.
+
+### 6.2 Anti-Patterns in Resilience Configuration
+
+Production incidents are frequently caused not by the absence of a resilience pattern but by its misconfiguration. The following anti-patterns recur across postmortems at large-scale distributed systems:
+
+**Timeout inheritance without adjustment.** A gateway sets a 30-second timeout. It calls service A with a 30-second timeout. Service A calls service B with a 30-second timeout. If service B is slow, service A blocks for 30 seconds, the gateway blocks for 30 seconds, and the client waits 30 seconds. The correct design subtracts the local processing budget at each hop:
+
+```python
+# Correct: deadline propagation with per-hop budget subtraction.
+# Each service receives a deadline that is the caller's remaining budget
+# minus its own expected processing time.
+
+def propagate_deadline(
+    caller_deadline_ms: float,
+    local_processing_budget_ms: float,
+    downstream_timeout_ms: float,
+) -> float:
+    """
+    Compute the timeout to pass to a downstream call.
+
+    The downstream timeout must not exceed the caller's remaining budget,
+    otherwise the caller will time out before the downstream call completes,
+    wasting the downstream work.
+
+    Parameters
+    ----------
+    caller_deadline_ms : Total time the caller is willing to wait (from its own caller).
+    local_processing_budget_ms : Time this service needs for its own logic
+                                 (serialization, auth, local DB lookups).
+    downstream_timeout_ms : The downstream service's own recommended timeout
+                            (derived from its p99.9 latency, per Section 5.4).
+
+    Returns
+    -------
+    The effective timeout to pass to the downstream call, in milliseconds.
+    """
+    remaining_budget = caller_deadline_ms - local_processing_budget_ms
+    if remaining_budget <= 0:
+        raise ValueError(
+            f"Local processing budget ({local_processing_budget_ms} ms) "
+            f"exceeds caller deadline ({caller_deadline_ms} ms). "
+            "The caller's timeout is too tight for this service's work."
+        )
+    effective = min(downstream_timeout_ms, remaining_budget)
+    return effective
+```
+
+**Circuit breaker with no half-open probe.** A circuit breaker that transitions from Open to Closed only after a fixed cooldown, without probing a single request in the half-open state, will either reopen too early (dependency still down, immediate re-trip) or too late (dependency recovered minutes ago, users experience unnecessary outage). The half-open state must send a small, bounded number of probe requests and only close the breaker if the probe succeeds.
+
+**Retry without idempotency.** As noted in Section 5.2, retrying a non-idempotent operation (payment charge, order creation, email send) without an idempotency key causes duplicate side effects. The anti-pattern is not the retry itself but the absence of a deduplication mechanism. Every retryable endpoint must accept an `Idempotency-Key` header and the server must store the key with a TTL matching the maximum retry window.
+
+**Bulkhead sized by traffic volume rather than criticality.** Allocating 80% of a thread pool to the highest-traffic service and 5% to a low-traffic but revenue-critical service means a traffic spike in the high-volume service starves the critical service. Bulkhead sizing must reflect business criticality, not request volume.
+
+### 6.3 Production Deployment and Rollout Strategy
+
+Resilience patterns are not toggles; they are configurations that interact with each other and with the deployment topology. Deploying a circuit breaker, a new timeout value, or a bulkhead partition into production requires a rollout strategy that prevents the change itself from becoming the failure.
+
+The standard approach is a **canary rollout with automated rollback on SLO breach**:
+
+```mermaid
+sequenceDiagram
+    participant CD as CI/CD Pipeline
+    participant Canary as 5% Traffic (Canary)
+    participant Prod as 95% Traffic (Stable)
+    participant SLO as SLO Monitor
+    participant Alert as Alerting System
+
+    CD->>Canary: Deploy v2 with new circuit-breaker config
+    Note over Canary: 5% of production traffic
+    loop Every 30 s for 10 min
+        SLO->>Canary: Query error rate, p99 latency
+        SLO->>SLO: Compare against SLO budget
+        alt SLO breached
+            SLO->>Alert: Fire "canary SLO breach"
+            Alert->>CD: Trigger automatic rollback
+            CD->>Canary: Roll back to v1
+            Note over Canary: Canary removed, 100% on v1
+        else SLO within budget
+            SLO->>CD: Promote canary to 25%
+            CD->>Canary: Scale to 25%
+            Note over Canary: Repeat at 25%, 50%, 100%
+        end
+    end
+```
+
+The SLO monitor must query the **canary cohort specifically**, not the aggregate. A 5% canary with a 10% error rate is invisible in a 100%-traffic aggregate that shows 0.5% error rate. The query must filter by deployment version or pod label.
+
+A second production concern is **configuration drift in resilience parameters**. Timeout values, circuit-breaker thresholds, and bulkhead sizes are derived from latency percentiles that shift over time (new hardware, traffic growth, dependency changes). A quarterly re-derivation of these parameters from fresh latency samples is a minimum cadence; a continuous re-derivation pipeline that updates a configuration store (e.g., a `ConfigMap` in Kubernetes or a feature-flag service) is preferred.
+
+### 6.4 Testing Resilience in CI/CD
+
+Resilience patterns are only as good as the tests that verify them. A circuit breaker that is never tested in a pipeline will silently misbehave when its threshold is misconfigured. The following test categories should be part of every service's CI pipeline, run against a local test double (for example an HTTP mock such as `respx` for `httpx`, or a fault-injecting proxy such as Toxiproxy) that can be told to fail, delay or return 503 on demand:
+
+| Test | Injected fault | Assertion |
+|---|---|---|
+| Breaker opens | N consecutive 503s from the dependency | Call N+1 fails fast with the breaker's own error, and the mock records no new request |
+| Breaker recovers | Dependency healthy again after the cooldown | Probe requests reach the mock; after the required successes the breaker is closed |
+| Retry is bounded and jittered | 50% transient failures | Attempts never exceed the maximum; recorded delays are not all equal |
+| Retry respects idempotency | One failure on a `POST` | The retried request carries the same `Idempotency-Key` |
+| Bulkhead isolates | Saturate one partition with slow calls | A call on another partition still completes within its own timeout |
+| Deadline propagates | Slow dependency | The downstream call's timeout is at most the caller's remaining budget |
+
+The key principle: **every resilience pattern must have a test that verifies its failure mode, not just its happy path.** A circuit breaker test that only checks "the request succeeds" proves nothing. The test must verify that the breaker *opens*, that it *short-circuits*, and that it *recovers*.
+
+---
+
+## 7. Lab Exercise: Building a Resilient Service Mesh Simulation
+
+### 7.1 Objective
+
+Build a three-service simulation (gateway → order-service → payment-service) in Python that demonstrates the interaction of circuit breaker, retry with decorrelated jitter, bulkhead, and timeout. The simulation must be runnable locally and must produce a trace log showing how a payment-service outage propagates (or is contained) depending on which resilience patterns are enabled.
+
+### 7.2 Architecture
+
+```mermaid
+graph LR
+    Client["Client"] -->|HTTP| GW["Gateway\n(timeout: 5 s)"]
+    GW -->|HTTP| OS["Order Service\n(circuit breaker: 5 fails → open,\nbulkhead: 20 slots,\nretry: 3 attempts with decorrelated jitter)"]
+    OS -->|HTTP| PS["Payment Service"]
+    PS -->|SQL| DB["Payment DB"]
+    GW -->|HTTP| CS["Catalog Service\n(separate call path)"]
+```
+
+### 7.3 Implementation Skeleton
+
+```python
+"""
+resilient_mesh.py — Three-service resilience simulation.
+
+Run: python resilient_mesh.py --payment-failure-rate 0.8 --duration 30
+
+The simulation injects a configurable failure rate into the payment service
+and measures:
+  - Gateway error rate (client-visible)
+  - Order-service circuit-breaker state transitions
+  - Payment-service retry amplification factor
+  - Catalog-service availability (should remain 100%)
+"""
+
+import asyncio
+import argparse
+import time
+import random
+from dataclasses import dataclass, field
+from enum import Enum
+from collections import deque
+from typing import Optional
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+log = logging.getLogger("resilient_mesh")
+
+
+class CircuitState(Enum):
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+
+@dataclass
+class CircuitBreaker:
+    """
+    Minimal circuit breaker with half-open probing.
+
+    Parameters
+    ----------
+    failure_threshold : Number of consecutive failures before opening.
+    recovery_timeout_s : Seconds the breaker stays open before probing.
+    half_open_probes : Number of successful probes required to close.
+    """
+    failure_threshold: int = 5
+    recovery_timeout_s: float = 10.0
+    half_open_probes: int = 2
+
+    state: CircuitState = field(default=CircuitState.CLOSED, init=False)
+    _consecutive_failures: int = field(default=0, init=False)
+    _open_since: float = field(default=0.0, init=False)
+    _half_open_successes: int = field(default=0, init=False)
+    _state_log: deque = field(default_factory=lambda: deque(maxlen=100), init=False)
+
+    def record_success(self) -> None:
+        if self.state == CircuitState.HALF_OPEN:
+            self._half_open_successes += 1
+            if self._half_open_successes >= self.half_open_probes:
+                self._transition(CircuitState.CLOSED)
+                self._half_open_successes = 0
+                self._consecutive_failures = 0
+        elif self.state == CircuitState.CLOSED:
+            self._consecutive_failures = 0
+
+    def record_failure(self) -> None:
+        if self.state == CircuitState.CLOSED:
+            self._consecutive_failures += 1
+            if self._consecutive_failures >= self.failure_threshold:
+                self._transition(CircuitState.OPEN)
+        elif self.state == CircuitState.HALF_OPEN:
+            self._transition(CircuitState.OPEN)
+            self._half_open_successes = 0
+
+    def allow_request(self) -> bool:
+        """Return True if the request should proceed, False if short-circuited."""
+        if self.state == CircuitState.OPEN:
+            elapsed = time.monotonic() - self._open_since
+            if elapsed >= self.recovery_timeout_s:
+                self._transition(CircuitState.HALF_OPEN)
+                self._half_open_successes = 0
+                return True
+            return False
+        return True  # CLOSED or HALF_OPEN
+
+    def _transition(self, new_state: CircuitState) -> None:
+        old = self.state
+        self.state = new_state
+        if new_state == CircuitState.OPEN:
+            self._open_since = time.monotonic()
+        self._state_log.append((time.monotonic(), old, new_state))
+        log.info("CircuitBreaker: %s → %s", old.value, new_state.value)
+
+
+@dataclass
+class Bulkhead:
+    """
+    Semaphore-based bulkhead. Limits concurrent in-flight operations
+    to a fixed number of slots.
+    """
+    max_concurrent: int
+    _sem: asyncio.Semaphore = field(init=False)
+
+    def __post_init__(self) -> None:
+        self._sem = asyncio.Semaphore(self.max_concurrent)
+
+    async def execute(self, coro_factory: "callable") -> object:
+        async with self._sem:
+            return await coro_factory()
+
+
+@dataclass
+class RetryPolicy:
+    """Decorrelated jitter retry (Section 5.2)."""
+    max_attempts: int = 3
+    base_delay_s: float = 0.1
+    max_delay_s: float = 2.0
+
+    async def execute(self, coro_factory: "callable") -> object:
+        prev_delay = self.base_delay_s
+        last_exc: Optional[Exception] = None
+        for attempt in range(self.max_attempts):
+            try:
+                return await coro_factory()
+            except Exception as exc:
+                last_exc = exc
+                if attempt + 1 == self.max_attempts:
+                    raise
+                hi = min(prev_delay * 3, self.max_delay_s)
+                delay = random.uniform(self.base_delay_s, hi)
+                prev_delay = delay
+                log.debug("Retry attempt %d/%d, delay=%.3fs", attempt + 1, self.max_attempts, delay)
+                await asyncio.sleep(delay)
+        raise last_exc  # unreachable, but satisfies type checkers
+
+
+async def payment_service(failure_rate: float) -> str:
+    """Simulated payment service. Fails with probability `failure_rate`."""
+    await asyncio.sleep(random.uniform(0.01, 0.05))  # simulate network + processing
+    if random.random() < failure_rate:
+        raise ConnectionError("payment service unavailable")
+    return "charged"
+
+
+async def order_service(
+    cb: CircuitBreaker,
+    bulkhead: Bulkhead,
+    retry: RetryPolicy,
+    failure_rate: float,
+) -> str:
+    """Order service: applies circuit breaker, bulkhead, and retry to payment calls."""
+    if not cb.allow_request():
+        raise RuntimeError("circuit breaker open — payment service unavailable")
+
+    async def _call_payment() -> str:
+        return await payment_service(failure_rate)
+
+    try:
+        result = await bulkhead.execute(lambda: retry.execute(_call_payment))
+        cb.record_success()
+        return result
+    except Exception:
+        cb.record_failure()
+        raise
+
+
+async def catalog_service() -> str:
+    """Catalog service: independent, should never be affected by payment failures."""
+    await asyncio.sleep(random.uniform(0.005, 0.02))
+    return "catalog_ok"
+
+
+async def gateway(
+    cb: CircuitBreaker,
+    bulkhead: Bulkhead,
+    retry: RetryPolicy,
+    failure_rate: float,
+    timeout_s: float = 5.0,
+) -> dict:
+    """Gateway: routes to order-service and catalog-service with a global timeout."""
+    results: dict = {}
+    try:
+        order_result = await asyncio.wait_for(
+            order_service(cb, bulkhead, retry, failure_rate),
+            timeout=timeout_s,
+        )
+        results["order"] = order_result
+    except asyncio.TimeoutError:
+        results["order"] = "timeout"
+    except RuntimeError as exc:
+        results["order"] = f"cb_open: {exc}"
+    except Exception as exc:
+        results["order"] = f"error: {exc}"
+
+    try:
+        results["catalog"] = await asyncio.wait_for(catalog_service(), timeout=2.0)
+    except Exception as exc:
+        results["catalog"] = f"error: {exc}"
+
+    return results
+
+
+async def run_simulation(
+    failure_rate: float,
+    duration_s: float,
+    num_concurrent: int = 50,
+) -> None:
+    """Run the simulation for `duration_s` seconds, printing periodic stats."""
+    cb = CircuitBreaker(failure_threshold=5, recovery_timeout_s=5.0, half_open_probes=2)
+    bulkhead = Bulkhead(max_concurrent=20)
+    retry = RetryPolicy(max_attempts=3, base_delay_s=0.05, max_delay_s=1.0)
+
+    start = time.monotonic()
+    total_requests = 0
+    order_failures = 0
+    catalog_failures = 0
+    cb_transitions = 0
+
+    async def worker() -> None:
+        nonlocal total_requests, order_failures, catalog_failures
+        while time.monotonic() - start < duration_s:
+            result = await gateway(cb, bulkhead, retry, failure_rate)
+            total_requests += 1
+            if result.get("order") != "charged":  # errors, timeouts and open-breaker rejections
+                order_failures += 1
+            if "error" in result.get("catalog", ""):
+                catalog_failures += 1
+            await asyncio.sleep(0.01)
+
+    tasks = [asyncio.create_task(worker()) for _ in range(num_concurrent)]
+    await asyncio.gather(*tasks)
+
+    elapsed = time.monotonic() - start
+    log.info("=== Simulation complete ===")
+    log.info("Duration: %.1f s", elapsed)
+    log.info("Total requests: %d", total_requests)
+    log.info("Order failures: %d (%.1f%%)", order_failures, 100 * order_failures / max(total_requests, 1))
+    log.info("Catalog failures: %d (%.1f%%)", catalog_failures, 100 * catalog_failures / max(total_requests, 1))
+    log.info("Circuit-breaker state log entries: %d", len(cb._state_log))
+    for ts, old, new in cb._state_log:
+        log.info("  CB transition at t=%.2f: %s → %s", ts - start, old.value, new.value)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Resilient service mesh simulation")
+    parser.add_argument("--payment-failure-rate", type=float, default=0.8,
+                        help="Probability that payment_service fails per call (0.0–1.0)")
+    parser.add_argument("--duration", type=float, default=30.0,
+                        help="Simulation duration in seconds")
+    parser.add_argument("--concurrent", type=int, default=50,
+                        help="Number of concurrent client workers")
+    args = parser.parse_args()
+
+    asyncio.run(run_simulation(
+        failure_rate=args.payment_failure_rate,
+        duration_s=args.duration,
+        num_concurrent=args.concurrent,
+    ))
+```
+
+### 7.4 Expected Observations
+
+Run the simulation with `--payment-failure-rate 0.8` and observe:
+
+1. **Circuit breaker opens** after 5 consecutive failed order calls, short-circuiting subsequent order requests. Orders still fail while it is open, but they fail in microseconds instead of after three retries, so the payment service receives far fewer calls.
+2. **Catalog service remains at 100% availability** because its call does not share the payment bulkhead or breaker. In a real service that shares one thread or connection pool, it would need its own bulkhead to stay this isolated.
+3. **Retry amplification**: with a 0.8 failure rate and 3 attempts, the effective load on the payment service is up to 3× the original request rate. The circuit breaker mitigates this by stopping retries after the threshold.
+4. **Recovery**: after the `recovery_timeout_s` elapses, the breaker enters half-open, probes the payment service, and closes if probes succeed.
+
+Now run with `--payment-failure-rate 0.0` (no failures) and confirm zero order failures and zero circuit-breaker transitions. Then run with `--payment-failure-rate 1.0` (total outage) and confirm that the circuit breaker opens as soon as 5 order calls have failed and that catalog availability remains 100%.
+
+### 7.5 Extension
+
+Add a second failure mode: a **latency spike** in the payment service (inject a 4-second delay with 30% probability instead of a hard failure). Observe that the circuit breaker does not trip (the calls succeed, just slowly), but the **timeout** in the gateway fires, and the **bulkhead** fills up, causing order requests to queue. This demonstrates why timeout configuration (Section 5.4) is as critical as circuit breaking: a slow dependency is as dangerous as a dead one.
+
+---
+
+## Summary
+
+This lesson established that failure is not an anomaly but an invariant of distributed systems, and that the engineering discipline of DevSecOps must treat resilience as a first-class concern alongside security. The key threads:
+
+- **Reliability is a mathematical property.** Nines of availability compound across dependencies; a 99.9% service calling three 99.9% dependencies achieves about 99.6% end-to-end availability (0.999⁴). Queuing theory shows that utilisation above ~80% causes latency to grow non-linearly, making headroom a design requirement, not an optimisation.
+
+- **Incident response is a control loop.** Severity classification, runbooks, and postmortems form a feedback system that reduces mean time to stabilise and mean time to learn. The postmortem is the learning mechanism; without it, the same incident recurs.
+
+- **Observability is the sensor layer.** Metrics, logs, and traces are the three pillars. Alerting on symptoms (SLO burn rate) rather than causes (CPU threshold) reduces alert fatigue and focuses operator attention on user impact.
+
+- **Chaos engineering is the experiment layer.** The scientific method—hypothesis, controlled experiment, observation, conclusion—applied to production with bounded blast radius. Chaos Toolkit provides the tooling; the discipline is in the hypothesis and the analysis.
+
+- **Resilience patterns are the actuator layer.** Circuit breakers bound cascade duration. Retry with jittered backoff handles transient failures without storms. Bulkheads partition resources to prevent cross-subsystem starvation. Timeouts bound resource consumption per call. Together they form a defence-in-depth architecture against the five cascading-failure archetypes.
+
+- **Production practice closes the loop.** Canary rollouts with SLO-gated promotion, quarterly re-derivation of timeout and threshold parameters, and CI-level resilience tests ensure that the patterns are not merely present but correctly configured and continuously validated.
+
+The unifying principle: **design for the failure mode you have not yet experienced, test it before it happens, and measure whether your mitigation worked.**
+
+---
+
+## Key Terms
+
+| Term | Definition |
+|---|---|
+| **Availability (nines)** | The fraction of time a system is operational, expressed as 1 − (downtime / total time). "Three nines" = 99.9% = 8.77 h/year downtime. |
+| **MTTR** | Mean Time To Repair (or Recover): average elapsed time from incident detection to service restoration. |
+| **MTBF** | Mean Time Between Failures: average elapsed time between consecutive failures. |
+| **SLO** | Service Level Objective: a quantitative target for a reliability metric (e.g., "p99 latency < 200 ms for 99.9% of requests"). |
+| **SLI** | Service Level Indicator: the measured value of the metric an SLO targets (e.g., the observed p99 latency). |
+| **Error budget** | The complement of the SLO: the fraction of requests allowed to fail or be slow. An SLO of 99.9% allows a 0.1% error budget. |
+| **Burn rate** | The rate at which the error budget is consumed. A burn rate of 14× means the budget will be exhausted in 1/14 of the SLO window. |
+| **Circuit breaker** | A resilience pattern that stops calling a failing dependency after a threshold of consecutive failures, entering an open state that short-circuits requests for a cooldown period. |
+| **Half-open state** | The intermediate circuit-breaker state in which a small number of probe requests are allowed through to test whether the dependency has recovered. |
+| **Retry with jitter** | Retrying a failed operation after a randomised delay to prevent synchronised retry storms across concurrent callers. |
+| **Decorrelated jitter** | A jitter strategy where each retry delay is drawn uniformly from `[base, prev_delay × 3]`, spreading retries about as well as full jitter while keeping delays growing (Brooker, 2015). |
+| **Bulkhead** | A resource-partitioning pattern that isolates failure domains by allocating separate thread pools, connection pools, or quotas per subsystem. |
+| **Timeout** | A maximum duration for a distributed operation; without it, a blocked call holds resources indefinitely. |
+| **Cascading failure** | A failure that propagates from one component to its dependents, amplifying in scope. |
+| **Blast radius** | The set of components, users, or data affected by a single failure event. Chaos experiments must bound the blast radius. |
+| **Chaos engineering** | The discipline of injecting controlled failures into a system to build confidence in its resilience, following the scientific method. |
+| **Steady-state hypothesis** | The expected normal behaviour of a system (e.g., "error rate < 1%") against which a chaos experiment's results are compared. |
+| **Postmortem** | A blameless, structured analysis of an incident that produces actionable findings and a list of follow-up tasks. |
+| **Runbook** | A documented, step-by-step procedure for diagnosing and resolving a specific class of incident. |
+| **Canary deployment** | A rollout strategy that directs a small fraction of traffic to a new version before promoting it to full traffic, with automated rollback on SLO breach. |
+| **Idempotency key** | A unique identifier attached to a request that allows the server to detect and deduplicate retries of the same logical operation. |
+| **Utilisation cliff** | The non-linear increase in queue length and latency as resource utilisation approaches 100%, described by queuing theory (M/M/1: mean number in system L = ρ / (1 − ρ), so latency grows as 1 / (1 − ρ)). |
+| **SLO burn-rate alerting** | An alerting strategy that fires when the error budget is being consumed faster than a threshold rate, rather than when a single threshold is crossed. |
+| **Failure injection** | The deliberate introduction of a fault (latency, error, resource exhaustion) into a running system to test resilience. |
+| **Graceful degradation** | A system's ability to reduce functionality (e.g., serve cached data, disable non-critical features) rather than fail completely when a dependency is unavailable. |
+| **Connection draining** | A failover technique that allows in-flight requests on a terminating instance to complete before the instance is removed, preventing request loss. |
+| **Hysteresis** | A deliberate asymmetry in a control loop's activation and deactivation thresholds (e.g., autoscaler scales up at 70% CPU but scales down only at 30%) to prevent oscillation. |
+| **Defense in depth** | Layering multiple independent mitigations (bulkhead + circuit breaker + timeout) so that the failure of one layer does not bypass the others. |
+| **Steady-state hypothesis violation** | The condition in a chaos experiment where the observed system behaviour deviates from the predicted normal behaviour, indicating a resilience gap. |
+| **Blast radius limitation** | The set of constraints (namespace, label selector, traffic percentage, time window) that bound the scope of a chaos experiment. |
+| **Observability** | The property of a system that allows its internal state to be inferred from its external outputs (metrics, logs, traces). |
+| **RED metrics** | Rate, Errors, Duration: the three metrics to collect for every service, as recommended by Weaveworks. |
+| **USE method** | Utilisation, Saturation, Errors: the three metrics to collect for every resource, as recommended by Brendan Gregg. |
+| **Post-incident review** | Synonym for postmortem; a structured, blameless analysis conducted after an incident is resolved. |
+| **Severity classification** | The process of assigning a priority level (SEV-1 through SEV-4) to an incident based on user impact and revenue effect. |
+| **On-call rotation** | The scheduled assignment of incident-response responsibility to engineers, typically in shifts of 12–24 hours. |
+| **War room** | The virtual or physical coordination space where the incident commander, responders, and stakeholders collaborate during a SEV-1 incident. |
+| **Incident commander (IC)** | The role responsible for overall coordination of an incident response, delegating to scribe, operations, and communications leads. |
+| **Blameless postmortem** | A postmortem that focuses on system and process failures rather than individual human error, to encourage honest reporting. |
+| **Failure mode** | A specific way in which a component can fail (e.g., "database connection pool exhaustion", "DNS resolution timeout"). |
+| **Fault tree analysis (FTA)** | A top-down deductive method for identifying all combinations of component failures that lead to a system-level failure. |

@@ -102,7 +102,7 @@ The development's job is instability. At the instrument, this means:
 | Variant | What changes | Performance implication | Example |
 |---|---|---|---|
 | Monothematic sonata | One theme group; same tune serves P and S roles | Must create contrast through *key and texture alone* since melody repeats — vary articulation/register | Haydn, String Quartet Op. 33 No. 3 |
-| Slow-movement sonata | Development minimal/absent | Less drama to build; favor warmth and legato over forward drive | Mozart, K. 331, mvt. 2 |
+| Slow-movement sonata | Development minimal/absent | Less drama to build; favor warmth and legato over forward drive | Mozart, K. 332, mvt. 2 |
 | Concerto (double exposition) | Orchestra states theme in tonic only; soloist's exposition follows the full tonal plan | Soloist must "re-arrive" at material the orchestra already played — add ornamentation/elaboration to justify the restatement | Mozart, Piano Concerto K. 491 |
 | Reverse recapitulation | Recap opens with S, not P | The "homecoming" feeling is delayed — don't over-arrive at the start; save your weight for P's later return | Haydn, Symphony No. 46 |
 | Sonata-rondo | Development episode replaces rondo's central C section | Treat the episode with genuine developmental instability, not just "another verse" | Beethoven, Piano Sonata Op. 13, mvt. 3 |

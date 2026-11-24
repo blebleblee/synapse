@@ -46,7 +46,7 @@ Render a frame at 128 samples (Render Properties > Sampling > Samples > 128) and
 
 Now examine how that indirect blue light reached your sphere. In the Shader Editor (with the Camera/World active), navigate to Render Properties > Passes and enable Cryptomatte and Diffuse Indirect. These passes decompose the ray paths that contribute to your final image.
 
-Render again, and in the Compositor, add an input node for Cryptomatte: Shift+A > Input > Cryptomatte. Connect the Cryptomatte output to a Viewer node (Shift+A > Output > Viewer). Enable "Picking" in the Cryptomatte node and hover your cursor over different regions of the sphere render in the Compositor preview. This reveals which objects contributed to each pixel—here, it will show the World, since indirect light bounced from the world background.
+Render again, and in the Compositor, add an input node for Cryptomatte: Shift+A > Matte > Cryptomatte. Connect the Cryptomatte output to a Viewer node (Shift+A > Output > Viewer). Enable "Picking" in the Cryptomatte node and hover your cursor over different regions of the sphere render in the Compositor preview. This reveals which objects contributed to each pixel—here, it will show the World, since indirect light bounced from the world background.
 
 Next, enable Render Properties > Passes > Diffuse Indirect. In the Compositor, add a File Output node (Shift+A > Output > File Output). Create two sockets: one connected to the Combined pass, one to the Diffuse Indirect pass. Render and save both. Open them in an image viewer and compare side by side. The Diffuse Indirect pass shows only the light that bounced indirectly onto your sphere; the Combined pass shows direct plus indirect. The difference between these two images is the visual contribution of global illumination to your final render.
 
@@ -153,7 +153,7 @@ For real-time engines or scenarios where repeated rendering is infeasible, pre-c
 
 Create a new material called "Baked_Target" on your table cube. In the Shader Editor, add a new Image Texture node (Shift+A > Texture > Image Texture) but do not connect it yet. Click "New" in the Image Texture node and create an image called "table_bake" at 2048×2048 pixels. Leave the image unconnected; it is a bake target, not a live shader node.
 
-Select the table object. In Object Properties > Bake, ensure Cycles is active. Set Bake Type to "Combined," which bakes all lighting contributions (direct and indirect) into a single texture. Set Render Passes to include Diffuse and Glossy.
+Select the table object. In Render Properties, make sure Cycles is the render engine; the Bake panel is there, not in Object Properties. Set Bake Type to "Combined," which bakes all lighting contributions (direct and indirect) into a single texture. Set Render Passes to include Diffuse and Glossy.
 
 Before baking, ensure your UV map is correct. Select the table and press Tab to enter Edit Mode. Press U > Unwrap > Smart UV Project to auto-unwrap the cube faces. This maps 3D surface area to 2D texture space, necessary for lightmap baking.
 

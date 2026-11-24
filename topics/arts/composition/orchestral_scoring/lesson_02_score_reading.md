@@ -142,7 +142,7 @@ Written pitch is what's on the page. Concert (sounding) pitch is what the audien
 
 Key signature of the same C-major piece as it appears in each transposing part:
 - B♭ clarinet part: D major, 2♯
-- A clarinet part: A major, 3♯
+- A clarinet part: E♭ major, 3♭
 - F horn part: G major, 1♯
 - E♭ clarinet part: A major, 3♯
 
@@ -267,7 +267,7 @@ Knowing range and timbre tells you what to expect on the page before you've full
 
 **Flute** — cylindrical bore, no reed. Low register breathy/intimate, middle clear and lyrical, high brilliant and penetrating. Written/sounding range C4–D7. Treble clef, non-transposing.
 
-**Piccolo** — cylindrical, no reed. Piercing, cuts through full tutti. Written D5–C8, sounds 8va higher (D6–C9). Treble clef.
+**Piccolo** — cylindrical, no reed. Piercing, cuts through full tutti. Written D4–C7, sounds 8va higher (D5–C8). Treble clef.
 
 **Oboe** — conical bore, double reed. Nasal, penetrating; low register reedy, middle expressive. Range B♭3–A6. Treble clef, non-transposing.
 
@@ -281,7 +281,7 @@ Knowing range and timbre tells you what to expect on the page before you've full
 
 **Bassoon** — conical, double reed. Tenor register warm and expressive, bass register dark. Range B♭1–B♭5 (E5 on modern instruments). Bass clef primary, tenor for high writing, non-transposing.
 
-**Contrabassoon** — conical, double reed. Deep foundational register. Range B♭0–C4. Bass clef, non-transposing in modern scores.
+**Contrabassoon** — conical, double reed. Deep foundational register. Range B♭0–C4. Bass clef, transposes down an octave.
 
 ### Brass
 
@@ -428,7 +428,7 @@ def analyze_score(filepath: str) -> None:
     # transposeAtSoundingPitch() is the programmatic equivalent of a
     # score reader mentally converting every transposing part to
     # concert pitch before stacking the harmony.
-    score_at_pitch = score.transposeAtSoundingPitch()
+    score_at_pitch = score.toSoundingPitch()
     chordified = score_at_pitch.chordify()
     detected_key = score_at_pitch.analyze('key')
     print(f"  Detected key: {detected_key}\n")

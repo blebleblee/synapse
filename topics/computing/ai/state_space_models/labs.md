@@ -1814,7 +1814,7 @@ This section consolidates operational diagnostics for rapid troubleshooting duri
 
 2. **Data augmentation**: Implement token dropout, synonym replacement, or back-translation augmentation.
 
-3. **Reduce model capacity**: If validation loss < training loss, the model overfits. Reduce `d_model` or `n_layers`.
+3. **Reduce model capacity**: If validation loss > training loss, the model overfits. Reduce `d_model` or `n_layers`.
 
 4. **Collect more data**: If feasible, expand training set. State space models scale well with data.
 

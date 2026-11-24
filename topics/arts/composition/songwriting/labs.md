@@ -61,7 +61,7 @@ Fmaj7:  xx3210   (or use Dm7 shape barred, or just play Fmaj as x33210)
 G7:     320001
 ```
 
-**Piano voicings (right hand, rootless — left hand plays the root an octave below):**
+**Piano voicings (right hand — left hand plays the root an octave below):**
 ```text
 Cmaj7:  E4-G4-B4-C5   (fingers 1-2-3-5 if spread, or 1-2-4-5)
 Am7:    A3-C4-E4-G4
@@ -228,7 +228,7 @@ Modulating up a whole step or half step for a final chorus is a genuinely effect
 
 ```text
 Original key: C major, final bridge ends on G7 (V of C)
-Pivot: reinterpret / reharmonize that G7 briefly as a secondary dominant leading to D
+Pivot: reharmonize that G7 to A7 (the secondary dominant leading to D)
 New key: D major, final chorus
 ```
 
@@ -373,7 +373,7 @@ G:    320003      Gmaj7: 320002      G7: 320001
 Am:   x02210      Am7:   x02010      
 ```
 
-### Piano Voicing Library (Rootless Jazz Voicings, "A form" and "B form")
+### Piano Voicing Library (Jazz Voicings, "A form" and "B form")
 
 ```text
 Cmaj7 (A form): E4-G4-B4-C5

@@ -2,7 +2,7 @@
 
 ## 1. Why the Signal Chain Order Matters (Core Intuition)
 
-Every channel in Cubase's MixConsole processes audio in a fixed internal order: **Input Gain → Pre-fader Inserts → EQ → Post-fader Inserts → Fader → Sends → Panner → Output**. This order isn't arbitrary — it determines where in the chain a problem appears and where you should fix it.
+Every channel in Cubase's MixConsole processes audio in a fixed internal order: **Input Gain → Pre-fader Inserts → EQ → Fader → Post-fader Inserts → Sends → Panner → Output**. This order isn't arbitrary — it determines where in the chain a problem appears and where you should fix it.
 
 Two invariants drive every mixing decision you'll make in Cubase:
 
@@ -145,7 +145,7 @@ Open the Compressor insert (pre- or post-EQ, your call — compress-then-EQ tame
 When MixConsole channels sound delayed relative to each other (common with heavy VST instrument or plugin loads), the cause is almost always buffer-related, not a routing bug.
 
 - **Studio → Studio Setup → Audio System**: set your ASIO driver. Buffer size directly trades latency for CPU stability: 64–128 samples for tracking (low latency, higher CPU demand), 512–1024 samples for mixing/mastering (higher latency is irrelevant once you're not playing in real time, and larger buffers dramatically reduce clicks/dropouts under heavy plugin load).
-- **Studio → Studio Setup → VST Audio System → Constrain Delay Compensation**: if you're tracking live through heavy latency-inducing plugins (convolution reverbs, linear-phase EQs) on a monitor bus, enabling this temporarily bypasses or reduces the delay those plugins introduce, at the cost of their full processing quality — toggle it off again for final mixing.
+- **Toggle Constrain Delay Compensation using its button on the main toolbar/MixConsole, or adjust its latency threshold under Preferences → VST.**: if you're tracking live through heavy latency-inducing plugins (convolution reverbs, linear-phase EQs) on a monitor bus, enabling this temporarily bypasses or reduces the delay those plugins introduce, at the cost of their full processing quality — toggle it off again for final mixing.
 - **Plugin Information window** (`F11` or Devices menu) shows per-plugin CPU load. If MixConsole meters show intermittent dropout clicks, this is where to find the offending plugin — usually a convolution reverb or oversampled saturation plugin on too many simultaneous instances.
 - **Disk cache stutters** (audio tracks briefly muting or glitching) point to buffer underrun from slow storage — check **Studio → VST Audio System → Disk Preload** and increase it, or verify your audio files live on an SSD rather than a network drive or external HDD.
 

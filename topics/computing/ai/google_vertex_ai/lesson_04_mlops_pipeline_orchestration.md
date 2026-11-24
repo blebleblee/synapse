@@ -579,7 +579,7 @@ from kfp.v2 import dsl
 
 # Inside the pipeline function, after constructing the train_op:
 train_op.set_accelerator_type("NVIDIA_TESLA_T4")
-train_op.set_accelerator_limit("1")
+train_op.set_accelerator_limit(1)
 train_op.set_cpu_limit("8")
 train_op.set_memory_limit("30G")
 ```

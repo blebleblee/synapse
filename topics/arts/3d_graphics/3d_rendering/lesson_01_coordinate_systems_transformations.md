@@ -62,7 +62,7 @@ View transformation reinterprets world-space geometry from the camera's perspect
 ```text
 | Rx  Ry  Rz  -dot(R,C) |
 | Ux  Uy  Uz  -dot(U,C) |
-| Fx  Fy  Fz  -dot(F,C) |
+| -Fx  -Fy  -Fz  dot(F,C) |
 |  0   0   0      1     |
 ```
 
@@ -139,7 +139,7 @@ Depth precision deserves particular attention, as the nonlinear depth remapping 
 
 This precision distribution causes Z-fighting, the flickering artifact that occurs when two surfaces occupy nearly identical depths. The depth buffer lacks sufficient precision to consistently distinguish which surface lies in front, so rasterization nondeterministically alternates between the surfaces as vertices undergo slight numerical perturbations. Mitigating Z-fighting requires careful selection of near and far plane distances. Pushing the near plane as far from the camera as your scene permits drastically improves depth precision. Reducing the far-to-near plane ratio from 1000:1 to 100:1 can double effective depth precision. Visual artists understand this principle intuitively: just as constraining your tonal or value range allows you to render finer distinctions within that range, reducing the depth range allows a fixed-precision depth buffer to distinguish closer surfaces.
 
-Alternative depth remapping schemes address this precision issue at the cost of additional complexity. Reversed Z projection, which maps the near plane to one and the far plane to zero, exploits the nonuniform distribution of floating-point precision—more representable values exist near one than near zero—to improve distant geometry precision. Logarithmic depth buffers apply a logarithmic remapping in the fragment shader, distributing precision more evenly across the depth range, but require additional per-fragment computation and careful handling of the depth comparison function.
+Alternative depth remapping schemes address this precision issue at the cost of additional complexity. Reversed Z projection, which maps the near plane to one and the far plane to zero, exploits the nonuniform distribution of floating-point precision—more representable values exist near zero than near one—to improve distant geometry precision. Logarithmic depth buffers apply a logarithmic remapping in the fragment shader, distributing precision more evenly across the depth range, but require additional per-fragment computation and careful handling of the depth comparison function.
 
 Gimbal lock represents a notorious failure mode when representing rotations through Euler angles—sequences of rotations around principal axes. When two rotation axes align, the transformation loses a degree of freedom, preventing certain orientations from being reached through incremental Euler angle adjustments. This manifests as sudden discontinuous jumps in animated camera or object orientations when one Euler angle passes through ninety degrees. The standard solution in production rendering engines is representing rotations as quaternions—four-component hypercomplex numbers that encode rotation as a normalized point on the four-dimensional unit hypersphere. Quaternions interpolate smoothly without singularities and compose efficiently through quaternion multiplication, though extracting the rotation matrix for GPU upload requires a conversion step.
 

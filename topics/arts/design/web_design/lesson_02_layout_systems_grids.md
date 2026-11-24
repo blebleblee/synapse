@@ -193,7 +193,7 @@ flowchart TD
     GridItem --> Card4
 ```
 
-Subgrid, introduced in CSS Grid Level 2, permits nested grids to inherit parent grid tracks rather than defining independent column structures. This ensures perfect alignment between parent and child grid items—sidebar content aligns exactly with main content columns despite being in separate containers. Subgrid adoption remains limited due to browser support constraints, but where available, it eliminates the need for complex column calculations in nested layouts.
+Subgrid, introduced in CSS Grid Level 2, permits nested grids to inherit parent grid tracks rather than defining independent column structures. This ensures perfect alignment between parent and child grid items—sidebar content aligns exactly with main content columns despite being in separate containers. Subgrid is supported in all modern browsers, so it can be used wherever nested alignment with parent tracks is needed, with a fallback only for legacy engines., but where available, it eliminates the need for complex column calculations in nested layouts.
 
 ```css
 .main-content {
@@ -228,7 +228,7 @@ Container queries, now widely supported, permit component-level responsive behav
 
 Accessibility failures in grid layouts typically manifest as keyboard navigation traps, incorrect focus order, and screen reader confusion. CSS Grid permits visual reordering through `order` property or explicit grid placement, which can violate source order and confuse assistive technologies. The invariant rule is that visual order must match DOM order for interactive elements—buttons, links, and form inputs must appear in the same sequence in the HTML as they appear visually after grid reordering. If visual design requires reordering, the HTML structure must be reordered to match, not CSS alone. Screen readers traverse the DOM linearly, ignoring CSS visual positioning.
 
-Touch target sizing is critical for mobile grid layouts. Buttons, links, and interactive elements must meet minimum size requirements (44×44px per WCAG 2.1 Level AA) with adequate spacing to prevent mis-taps. Grid gap values should reflect this: cards or buttons placed adjacent in a grid need sufficient gap space that fingers do not accidentally activate neighboring elements. The `gap` property is not merely aesthetic—it is a usability requirement on touch devices.
+Touch target sizing is critical for mobile grid layouts. Buttons, links, and interactive elements must meet minimum size requirements (44×44px per WCAG 2.1 Level AAA (2.5.5; WCAG 2.2 Level AA asks for at least 24×24px)) with adequate spacing to prevent mis-taps. Grid gap values should reflect this: cards or buttons placed adjacent in a grid need sufficient gap space that fingers do not accidentally activate neighboring elements. The `gap` property is not merely aesthetic—it is a usability requirement on touch devices.
 
 Color contrast failures often emerge in responsive layouts when background colors or overlay patterns change at different breakpoints. A text label with sufficient contrast against a light background on desktop might overlay a dark hero image on mobile, failing contrast requirements. The solution is systematic contrast testing at all breakpoints and using CSS custom properties to enforce consistent foreground/background pairings that adapt together.
 

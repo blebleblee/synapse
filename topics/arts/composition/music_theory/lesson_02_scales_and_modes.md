@@ -81,7 +81,7 @@ G major scale starting on the low E string, Simandl fingering:
 
 ```text
 E string:  fret 3 (G) = finger 1
-           fret 5 (A) = finger 2
+           fret 5 (A) = finger 4
 A string:  fret 2 (B) = finger 1   [shift down a string]
            fret 3 (C) = finger 2
            fret 5 (D) = finger 4
@@ -104,7 +104,7 @@ The CAGED system gives five movable shapes covering the whole neck, named for th
 
 ```text
 e |---------------------------5--7--8--|
-B |------------------5--7--8-----------|
+B |------------------5--6--8-----------|
 G |------------4--5--7------------------|
 D |------4--5--7------------------------|
 A |3--5--7-------------------------------|
@@ -151,7 +151,7 @@ To make the Dorian color audible rather than just "D minor," phrase so your line
 
 The fastest way to *hear* a mode is to play its native vamp, not just run its scale.
 
-**Dorian vamp (D Dorian):** Dm7 – Em7 – Dm7 – Cmaj7 (i7–ii7–i7–♭VII∆7). The Cmaj7 is the tell — natural minor would use Cm, not Cmaj7. This is the exact harmonic fingerprint of "So What."
+**Dorian vamp (D Dorian):** Dm7 – Em7 – Dm7 – Cmaj7 (i7–ii7–i7–♭VII∆7). The Cmaj7 is the tell — natural minor would use C or C7, not Cmaj7.. This is the exact harmonic fingerprint of "So What."
 
 **Mixolydian (G Mixolydian):** G – F – G – C (I–♭VII–I–IV). The F major chord (not F# diminished, which pure G major would imply) is Mixolydian's signature — this is "Sweet Child O' Mine" territory.
 

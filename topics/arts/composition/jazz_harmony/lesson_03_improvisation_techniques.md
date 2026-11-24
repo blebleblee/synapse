@@ -119,7 +119,7 @@ Dm7 → G7 → Cmaj7
 7th:  C → F → B
 ```
 
-The useful way to hear this: the 7th of Dm7 (C) is literally the same pitch as the 4th-degree color tone of G7 — it holds. The 3rd of G7 (B) resolves up a half-step to the 7th of Cmaj7 (B — wait, check your chord: it resolves to the root-adjacent tone). The core physical fact to internalize by ear: **3rd of V7 resolves up a half-step to 7th of Imaj7; 7th of V7 resolves down a half-step to 3rd of Imaj7.** That's the whole mechanism, in both directions, in every key.
+The useful way to hear this: the 7th of Dm7 (C) is literally the same pitch as the 4th-degree color tone of G7 — it holds. The 3rd of G7 (B) resolves up a half-step to the 7th of Cmaj7 (B — wait, check your chord: it resolves to the root-adjacent tone). The core physical fact to internalize by ear: **3rd of V7 resolves up a half-step to the root of Imaj7; 7th of V7 resolves down a half-step to 3rd of Imaj7.; 7th of V7 resolves down a half-step to 3rd of Imaj7.** That's the whole mechanism, in both directions, in every key.
 
 ```mermaid
 sequenceDiagram
@@ -203,7 +203,7 @@ Swing subdivides the beat unevenly — roughly 2:1 rather than a straight triple
 ```text
 4/4 grid:        | 1 + 2 + 3 + 4 + | 1 + 2 + 3 + 4 + |
 Grouped in 3s:   [1 2 3][1 2 3][1 2 3][1 2 3]
-                 realigns with the downbeat every 3 bars of 4/4 (12 eighth notes)
+                 realigns with the downbeat every 3 bars of 4/4 (12 quarter notes, 24 eighth notes)
 ```
 
 Coltrane's "Impressions" solo rides extended 3-over-4 passages that create a floating, suspended feel against the underlying meter — the tension comes from implying a different pulse without abandoning the actual one.

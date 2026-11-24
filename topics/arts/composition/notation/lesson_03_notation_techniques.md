@@ -168,7 +168,7 @@ A quintuplet where each note subdivides into a triplet = 15 notes in the space o
 ```text
 Voice 1 (3/4): | 1 2 3 | 1 2 3 | 1 2 3 | 1 2 3 |
 Voice 2 (4/4): | 1 2 3 4 | 1 2 3 4 | 1 2 3 4 |
-Realignment point: beat 1 of measure 4 (voice 1) = beat 1 of measure 3 (voice 2)
+Realignment point: beat 1 of measure 5 (voice 1) = beat 1 of measure 4 (voice 2)
 ```
 
 **Metronome setup:** program a click on every quarter note (the common denominator pulse). Both voices lock to that single click; neither hand adjusts tempo to "feel" the other hand's meter. This is the single most important instruction in polymetric practice — **you are not synchronizing two tempos, you are performing two different barline groupings over one shared, unchanging pulse.**
@@ -362,7 +362,7 @@ Lock this into muscle memory alone first — metronome at ♪=120, repeat until 
 
 - Export **MusicXML** (not MIDI) when moving a score between MuseScore/Dorico/Sibelius/Finale — MIDI loses notation-specific data (beaming, articulation symbols, lyrics placement); MusicXML preserves it.
 - Export **MIDI** only for DAW playback or sample-library rendering. Set program change numbers to match your target sample library's patch list exactly — a mismatched program change silently loads the wrong instrument in many sample players.
-- For **microtonal MIDI**, pitch-bend is your only standard-MIDI tool. Default pitch-bend range is ±2 semitones (±200 cents) — at the receiving synth, set pitch-bend sensitivity (often an RPN message, `0x6401 0x6500` sequence, or a GUI slider in soft-synths) to match your intended range before sending bend data, or your quarter-tones will bend by the wrong amount.
+- For **microtonal MIDI**, pitch-bend is your only standard-MIDI tool. Default pitch-bend range is ±2 semitones (±200 cents) — at the receiving synth, set pitch-bend sensitivity (often an RPN message, `0x6500 0x6400` sequence, or a GUI slider in soft-synths) to match your intended range before sending bend data, or your quarter-tones will bend by the wrong amount.
 
 ---
 

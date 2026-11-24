@@ -151,7 +151,7 @@ G(q) A(q) B(h) | C(q) B(q) A(h)
 | 3.1.5 | A | A | Unison | consonant (brief, passing) |
 | 3.2 | G | B | m3 | consonant |
 | 3.2.5 | F | B | P4 | passing dissonance, OK (weak subdivision) |
-| 3.3 | E | B | m6 | consonant |
+| 3.3 | E | B | P5 | consonant |
 | 3.3.5 | D | B | m6→ | consonant |
 | 3.4 | C | C | Octave | consonant |
 

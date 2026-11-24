@@ -132,7 +132,7 @@ Play open string, fretted note, sing the gap, name it, check against the table. 
 4. Listen specifically to the **third**: does it feel like a half-step reach (minor, closer together) or a wider, brighter stretch (major)?
 5. Cycle through all 12 keys by circle of fifths: C → G → D → A → E → B → F♯ → D♭ → A♭ → E♭ → B♭ → F → C. This is the single highest-leverage drill in this entire lab—triads in all keys, by feel, with no sheet music.
 
-**Guitar movable triad shapes (top 3 strings, D-G-B, root on the G string):**
+**Guitar movable triad shapes (strings D-G-B, or top 3 strings G-B-E, root on the G string):**
 
 This "top-3-strings" triad set is far more useful on guitar than low-string shapes—it's how real comping guitarists voice chords, and it isolates exactly the three notes you're trying to hear.
 
@@ -217,7 +217,7 @@ Add four-note chords: Maj7, Min7, Dominant 7, Half-Diminished 7 (m7♭5), Dimini
 
 | Subdivision | Spoken phrase | Count |
 |---|---|---|
-| Eighth notes | "Pass the god-damn but-ter" | 8 syllables = 8 eighths in 4/4 |
+| Eighth notes | "Pass the but-ter, pass the but-ter" | 8 syllables = 8 eighths in 4/4 |
 | Triplets | "Chi-cken dum-pling" per beat | 3 per beat |
 | Sixteenths | "1-e-&-a" per beat | 4 per beat |
 
@@ -228,8 +228,8 @@ Add four-note chords: Maj7, Min7, Dominant 7, Half-Diminished 7 (m7♭5), Dimini
 **3-against-2 polyrhythm drill:**
 1. Right hand taps 3 evenly spaced hits per measure. Left hand taps 2 evenly spaced hits in the same measure.
 2. Speak the phrase "PASS-the-GOD-damn-BUT-ter" while:
-   - Right hand strikes on: PASS / damn / ter
-   - Left hand strikes on: PASS / BUT
+   - Right hand strikes on: PASS / GOD / BUT
+   - Left hand strikes on: PASS / damn
 3. Record yourself, open the file in Audacity, zoom into the waveform, and visually check that your 3 taps are evenly spaced and your 2 taps land exactly at the start and the halfway point of the bar.
 
 **4-against-3 polyrhythm drill:**
@@ -472,7 +472,7 @@ graph LR
 
 **MuseScore (verify your transcriptions against real notation)**
 - New score: `Cmd+N` / `Ctrl+N`
-- Note input: press `N`, letters A–G set pitch, numbers 1–7 set duration (5 = quarter, 6 = eighth)
+- Note input: press `N`, letters A–G set pitch, numbers 1–7 set duration (4 = eighth, 5 = quarter, 6 = half)
 - Playback: Spacebar; adjust tempo with `[` and `]`
 
 **Teoria.com**

@@ -57,7 +57,7 @@ graph LR
 
 ### Ledger lines
 
-Ledger lines extend the staff using the same line-space alternation. Past two ledger lines, don't count from scratch — use octave displacement: mentally drop the pitch an octave onto a staff position you know instantly, identify it, then shift back up. Example: three ledger lines above treble staff = C6, which is exactly one octave above the first-ledger-line C5.
+Ledger lines extend the staff using the same line-space alternation. Past two ledger lines, don't count from scratch — use octave displacement: mentally drop the pitch an octave onto a staff position you know instantly, identify it, then shift back up. Example: two ledger lines above the treble staff = C6, exactly one octave above C5 (the third space of the staff).
 
 ## 3. Accidentals and Key Signatures — The State Machine You Must Automate
 
@@ -202,7 +202,7 @@ Entirely stepwise quarter notes, 4/4. If you ever see a leap larger than a 3rd i
 5. Press **Space** to audition playback. Export via File → Export → PDF (print), MIDI (DAW/slow-down tools), or MusicXML (cross-platform compatibility with Sibelius/Dorico/Finale).
 
 ### Universal keyboard shortcuts
-`N` note input · `Esc` exit input · `5/6/7/8` quarter/half/eighth/sixteenth duration · `↑/↓` diatonic step · `Ctrl+↑/↓` chromatic step · `R` repeat last note/passage · `Space` play/pause · `Delete` remove selection.
+`N` note input · `Esc` exit input · `3/4/5/6` sixteenth/eighth/quarter/half duration · `↑/↓` chromatic step · `Ctrl+↑/↓` octave step · `R` repeat last note/passage · `Space` play/pause · `Delete` remove selection.
 
 ### Multi-voice piano notation (e.g., Bach, Chopin)
 1. Open a piano (grand staff) score, click the first treble-clef note.

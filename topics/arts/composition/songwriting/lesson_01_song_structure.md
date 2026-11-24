@@ -60,7 +60,7 @@ Bars 1–4:   | C      | G      | Am     | F      |
 Bars 5–8:   | C      | G      | F      | G      |
 ```
 
-Why this exact progression shows up in hundreds of hits: the top note of each chord moves by a small step or stays put (C→G shares no notes but moves by a 5th, which is still the strongest harmonic motion in Western music; G→Am moves the bass up one step; Am→F shares two notes). Your fretting hand or your right hand on piano barely has to travel, which means you can play it fast and clean under pressure, live.
+Why this exact progression shows up in hundreds of hits: the top note of each chord moves by a small step or stays put (C→G shares the note G but moves by a 5th, which is still the strongest harmonic motion in Western music; G→Am moves the bass up one step; Am→F shares two notes). Your fretting hand or your right hand on piano barely has to travel, which means you can play it fast and clean under pressure, live.
 
 **Guitar fingering (open position):** C (x32010) → G (320003) → Am (x02210) → F (133211, or the easier xx3211 using only the top four strings). The C-to-G transition is the one beginners fumble — practice it alone at 60 BPM, four beats per chord, until your fingers move as one block, not finger-by-finger.
 
@@ -240,7 +240,7 @@ Differentiating verse from chorus isn't only a harmony problem — it's an arran
 
 **Rule of thumb you can apply on any instrument, right now:** each chorus must be audibly denser than the one before it. If chorus 2 sounds identical to chorus 1, add exactly one new layer before you record it — a harmony vocal, a second guitar an octave up, a tambourine. One new element is enough; you're not trying to double the arrangement, just signal escalation.
 
-**The half-step/whole-step trick for the final chorus:** transpose the last chorus up a half-step (C→Db) or whole-step (C→D). On guitar, use a capo if the new key is awkward in open position, or shift your barre-chord shapes up one or two frets. On piano, this is just moving your hand shapes up — the fingerings stay identical, only the starting key changes. This single move creates an instant, cheap-but-effective lift; use it once per song, never twice.
+**The half-step/whole-step trick for the final chorus:** transpose the last chorus up a half-step (C→Db) or whole-step (C→D). On guitar, use a capo if the new key is awkward in open position, or shift your barre-chord shapes up one or two frets. On piano, you'll need to adapt your hand shapes and fingerings to account for the new layout of black and white keys. This single move creates an instant, cheap-but-effective lift; use it once per song, never twice.
 
 ---
 
@@ -315,7 +315,7 @@ Fix problems at this stage — it's much cheaper to re-chart eight bars now than
 | Descending motion | Dm–G–C–F (ii–V–I–IV) | Verse, pre-chorus, adds sophistication |
 | Relative minor cycle | Em–Am–Dm–G (iii–vi–ii–V) | Bridge, melancholic verse |
 | Reordered axis | Am–F–C–G (vi–IV–I–V) | Introspective verse or chorus opening |
-| 12-bar blues | C–C–F–C–G–F–C–G | Blues, roots rock, shuffle feel |
+| 12-bar blues | C–C–C–C–F–F–C–C–G–F–C–G | Blues, roots rock, shuffle feel |
 | Minor descent | Am–G–F–G (i–VII–VI–VII, relative to A minor) | Dark pop, rock, dramatic verses |
 
 Learn each of these in closed voicings on guitar (so you can transpose by sliding the whole shape up the neck) and in root-position triads on piano before you try inverting or adding extensions — get the functional motion under your fingers first.

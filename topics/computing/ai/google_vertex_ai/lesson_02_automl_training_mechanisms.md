@@ -1099,7 +1099,7 @@ For deeper analysis, the Vizier study can be queried directly via the API to ret
 from google.cloud import aiplatform_v1
 
 def analyze_study(study_resource_name):
-    client = aiplatform_v1.VizierClient()
+    client = aiplatform_v1.VizierServiceClient()
     request = aiplatform_v1.ListTrialsRequest(
         parent=study_resource_name,
     )

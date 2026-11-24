@@ -4,7 +4,7 @@
 
 Lyric writing fits words to music under constraints poetry never faces. A page poem controls its own rhythm. A lyric surrenders rhythmic control to melody, harmony, and the physical act of singing. Three invariants govern everything that follows.
 
-**Phonological fit.** Vowels are what you sustain; consonants are what you articulate. Open vowels (/aː/ "ah," /oʊ/ "oh," /iː/ "ee" when placed mid-range) ride long notes and high pitches without strain. Plosives (/p/ /t/ /k/ /b/ /d/ /g/) stop airflow and land like percussion hits — great for rhythmic emphasis, bad for sustain. Fricatives (/s/ /f/ /ʃ/ /v/) hiss and sustain tension but can't carry pitch center the way vowels do. Nasals (/m/ /n/ /ŋ/) resonate and blend well into legato phrases. When you choose a word for a note, you're choosing its vowel first, its consonants second.
+**Phonological fit.** Vowels are what you sustain; consonants are what you articulate. Open vowels (/aː/ "ah," /oʊ/ "oh," /ɔː/ "aw") ride long notes and high pitches without strain. ride long notes and high pitches without strain. Plosives (/p/ /t/ /k/ /b/ /d/ /g/) stop airflow and land like percussion hits — great for rhythmic emphasis, bad for sustain. Fricatives (/s/ /f/ /ʃ/ /v/) hiss and sustain tension but can't carry pitch center the way vowels do. Nasals (/m/ /n/ /ŋ/) resonate and blend well into legato phrases. When you choose a word for a note, you're choosing its vowel first, its consonants second.
 
 **Prosodic mapping.** English is stress-timed: every multisyllabic word has a fixed accent pattern baked in (HOME-less, not home-LESS), and connected speech follows a content-word-stressed / function-word-unstressed rhythm ("I WANT to GO HOME," not "I want TO go HOME"). Music imposes its own stress grid — the strong beats of the bar. Your job is to marry the two grids. When they clash, the brain registers "wrong" before it can name why.
 
@@ -492,7 +492,7 @@ graph TD
 
 ```text
 "I never let a setback get me off track when I'm stacking facts"
-(setback / get-back, off-track / stacking-facts)
+(setback / off-track / stacking-facts)
 ```
 
 **Enjambment** lets the grammatical thought run past the line break, creating forward pull instead of a full stop:
@@ -533,7 +533,7 @@ Natural: "Don't wanna see you anymore"
 **Books:**
 - *Writing Better Lyrics* — Pat Pattison (Berklee): prosody, rhyme schemes, object writing.
 - *Tunesmith: Inside the Art of Songwriting* — Jimmy Webb: craft and professional workflow from a working songwriter.
-- *The Addiction Formula* — Friedlander: hook construction and commercial songwriting mechanics.
+- *The Addiction Formula* — Friedemann Findeisen: hook construction and commercial songwriting mechanics.
 
 **Analysis practice:** Hand-transcribe the lyrics of 10 favorite songs. Mark their rhyme scheme. Identify their verse/chorus contrast pattern. Note every place they choose concrete over abstract language, and vice versa.
 

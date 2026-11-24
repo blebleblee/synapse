@@ -25,7 +25,7 @@ pip install music21
 python3 -c "from music21 import chord; print(chord.Chord(['F3','C4','E4','A4']).pitchedCommonName)"
 ```
 
-That should print something resembling `D-minor-ninth`. If it doesn't, you've mis-voiced the chord — trust your ear and the fingerings below over the script, but the check catches typos.
+That should print something resembling `F-major seventh chord` (since without the root D, the analyzer sees an Fmaj7 chord). If it doesn't, you've mis-voiced the chord — trust your ear and the fingerings below over the script, but the check catches typos.
 
 ---
 
@@ -270,7 +270,7 @@ LH shell (all three): G2  B2  F3   (root, 3rd, b7)
 
 RH Db major triad (Db F Ab):  → chord tones added: b5, b7(dup), b9  → sounds as G7(b5,b9)
 RH Eb major triad (Eb G Bb):  → chord tones added: b13, root(dup), b9 → sounds as G7(b9,b13)
-RH F# minor triad (F# A C#):  → chord tones added: maj7(!), 9, #11  → sounds as G7(9,#11) — Lydian dominant color
+RH F# minor triad (F# A C#):  → chord tones added: maj7(!), 9, #11  → sounds over Gmaj7 as Gmaj7(#11) (or use an A major triad (A C# E) over G7 for a true G7(9,#11,13) Lydian dominant color). — Lydian dominant color
 ```
 
 Note the F# minor triad case: it adds an F# which is the major 7th of G, an unusual color on a dominant chord, giving a bright, modern "Lydian dominant" sound rather than a dark altered sound. This is the triad to reach for over a non-resolving or vamping dominant (modal jazz contexts); use the Db or Eb triads when the dominant is resolving strongly to a minor or tonic chord.
@@ -296,7 +296,7 @@ Run this in all twelve keys. This is the actual comping vocabulary you'll use be
 
 Original key Ab major, bridge (measures 17–24):
 ```text
-| Fmaj7  | Fmaj7  | Bbm7 | Eb7 |   (Bbm7 is borrowed iv, in the key of F)
+The bridge of 'All the Things You Are' begins with Am7 | D7 | Gmaj7 | Gmaj7 | (in the original key of Ab, modulating to G major and then E major).
 | Abmaj7 | Abmaj7 | Am7  | D7  |   (Am7-D7 is a ii-V into G major)
 ```
 Transposed to C major for practice:

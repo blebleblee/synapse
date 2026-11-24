@@ -64,7 +64,7 @@ except RuntimeError as e:
 x_tc = x_t.contiguous()
 print(x_tc.stride())        # (150528, 50176, 224, 1)  -- back to C-order
 flat = x_tc.view(-1)
-print(flat.shape)           # torch.Size([50331648])
+print(flat.shape)           # torch.Size([602112])
 ```
 
 The dtype promotion and device invariants are enforced through PyTorch's type promotion rules, which follow a strict lattice. When two tensors of different dtypes meet in an arithmetic operation, PyTorch promotes to the type that can represent both without loss, following the hierarchy `bool < int8 < int16 < int32 < int64 < float16 < bfloat16 < float32 < float64 < complex64 < complex128`. Mixing `float32` and `float64` yields `float64`; mixing `int32` and `float32` yields `float32`. The practical danger is unintended upcasting: if one tensor in a large computation is accidentally `float64`, every downstream operation upcasts to `float64`, immediately halving memory throughput on CUDA and disabling Tensor Core acceleration.

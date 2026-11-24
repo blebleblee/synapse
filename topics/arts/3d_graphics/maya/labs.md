@@ -99,9 +99,9 @@ lock_hierarchy('Geo_Group')
 
 The skeleton is the digital armature upon which deformations hang. Begin by hiding the geometry group so you can see the joints you will create. Select Geo_Group in the Outliner, right-click, and choose "Hide". Alternatively, press H to hide selected objects.
 
-Create a joint chain for the spine. In the Outliner, go to Skeleton > Create Joints (or use the menu Skeleton > Create Joints). This enters joint-creation mode. Click once at the base of the torso to place the first joint, then click at the sternum, then the neck base. Press Enter to exit joint-creation mode. These three joints form a simple spine.
+Create a joint chain for the spine. In the main menu bar, go to Skeleton > Create Joints (or use the menu Skeleton > Create Joints). This enters joint-creation mode. Click once at the base of the torso to place the first joint, then click at the sternum, then the neck base. Press Enter to exit joint-creation mode. These three joints form a simple spine.
 
-Maya names newly created joints as `joint1`, `joint2`, `joint3` by default. Immediately rename them to follow a naming convention. Select `joint1` and in the Attributes panel (press A or Windows > Attributes), change the name to `Spine_1_Jnt`. Select `joint2` and rename to `Spine_2_Jnt`. Select `joint3` and rename to `Spine_3_Jnt` (or `Neck_Base_Jnt` if you prefer semantic clarity). The convention is `BodyRegion_Index_Jnt` or `BodyRegion_Description_Jnt`.
+Maya names newly created joints as `joint1`, `joint2`, `joint3` by default. Immediately rename them to follow a naming convention. Select `joint1` and in the Attributes panel (press Ctrl+A or Windows > Attribute Editor), change the name to `Spine_1_Jnt`. Select `joint2` and rename to `Spine_2_Jnt`. Select `joint3` and rename to `Spine_3_Jnt` (or `Neck_Base_Jnt` if you prefer semantic clarity). The convention is `BodyRegion_Index_Jnt` or `BodyRegion_Description_Jnt`.
 
 Now create an arm chain. Enter joint-creation mode again (Skeleton > Create Joints). Click at the shoulder, elbow, wrist, and hand tip. Exit joint creation. This creates a child joint hierarchy under joint4. Select joint4 (the shoulder) and rename it `Arm_L_1_Jnt`. Select its child and rename to `Arm_L_2_Jnt` (elbow). Select the next to `Arm_L_3_Jnt` (wrist). Create a mirrored chain on the right side by either repeating the process or using Skeleton > Mirror Joints: select the left arm root, then Skeleton > Mirror Joints, choose "YZ" plane (assuming your character faces +X), and Maya will duplicate and mirror the chain, automatically renaming to `Arm_R_*_Jnt`.
 
@@ -131,7 +131,7 @@ Spine_1_Jnt
 
 Bind the skeleton to the geometry. Select all geometry objects, then Shift+click the root joint (`Spine_1_Jnt`). Go to Skin > Bind Skin. Maya opens the Bind Skin dialog. Leave settings at default (Bind To: "Joints", Bind Skin: "Linear", Max Influences: 5). Click Bind. The geometry now deforms when you move joints.
 
-Test deformation by selecting `Spine_2_Jnt` and rotating it slightly (press R for rotate, then middle-mouse-drag in the viewport). The torso should bend. If the deformation looks wrong—skin tears, inverts, or doesn't follow the joint—you will fix this in Exercise 2 using weight painting. For now, the goal is to confirm the bind and understand the relationship between skeleton and geometry.
+Test deformation by selecting `Spine_2_Jnt` and rotating it slightly (press E for rotate, then middle-mouse-drag in the viewport). The torso should bend. If the deformation looks wrong—skin tears, inverts, or doesn't follow the joint—you will fix this in Exercise 2 using weight painting. For now, the goal is to confirm the bind and understand the relationship between skeleton and geometry.
 
 ### Node Architecture and Attribute Editor Inspection
 
@@ -383,7 +383,7 @@ import maya.cmds as cmds
 def document_rig_controls(rig_root='Rig_System'):
     """Generate a control map document."""
     
-    controls = cmds.listRelatives(rig_root, descendants=True, type='transform')
+    controls = cmds.listRelatives(rig_root, allDescendents=True, type='transform')
     control_info = []
     
     for ctrl in controls:

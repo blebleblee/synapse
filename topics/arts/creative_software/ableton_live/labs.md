@@ -86,7 +86,7 @@ To enable MPE on `LEAD_MPE`: load Drift, then in the track's input routing confi
 1. Top-left of the Session View, set **Global Quantization** to `1 Bar`.
 2. Click the Scene 1 launch button. Watch the clip header: a small progress ring fills around the launch button between trigger and actual start — this is quantization waiting for the next bar boundary.
 3. **Verification check:** solo `PERC_LOOP`, let Follow Actions run for 2 minutes, and watch for any visible waveform jump or audible click at transition points. If you hear a click, the loop's start/end points aren't sample-accurate — go to Step 4 below (warping) before continuing.
-4. For legato-feeling transitions (no silence gap, no re-trigger thump), enable **Legato mode** (the `🔗` icon next to Follow Action) on `PERC_LOOP` — this makes a newly triggered clip continue from the same playback position as the clip it replaced, rather than restarting from bar 1. Essential for percussion loops that should feel continuous rather than retriggered.
+4. For legato-feeling transitions (no silence gap, no re-trigger thump), enable **Legato mode** (the Legato toggle button in Clip View) on `PERC_LOOP` — this makes a newly triggered clip continue from the same playback position as the clip it replaced, rather than restarting from bar 1. Essential for percussion loops that should feel continuous rather than retriggered.
 
 ---
 

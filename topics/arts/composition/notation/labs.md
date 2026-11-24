@@ -17,7 +17,7 @@ Before touching software, you must be able to read standard notation at sight, b
 Don't count lines and spaces from scratch every time — that's how sightreading collapses under tempo. Memorize **anchor notes** and read everything else by interval distance from them.
 
 **Treble clef anchors:**
-- Middle line (B4) — mnemonic: lines bottom-to-top "Good Boys Do Fine Always"
+- Middle line (B4) — mnemonic: lines bottom-to-top "Every Good Boy Does Fine"
 - Spaces bottom-to-top spell "FACE"
 - Middle C (C4) sits one line below the staff on its own ledger line
 
@@ -91,7 +91,7 @@ In a single staff, **Voice 1 always carries stems up, Voice 2 always stems down*
 
 This chorale fragment is a I–V⁶–vi–V progression in D. Before moving on, check it against the two cardinal part-writing rules — this is the actual music-theory content notation exists to serve:
 
-- **No parallel 5ths/8ths between any two voices.** Soprano D5→C♯5 against Bass D2→E3: that's a 6th moving to a 10th, no parallel motion — clean.
+- **No parallel 5ths/8ths between any two voices.** Soprano D5→C♯5 against Bass D2→E3: that's an octave moving to a 13th (compound 6th), no parallel motion — clean., no parallel motion — clean.
 - **Leading tone (C♯) resolves up to D** when it's in an outer voice, unless it's in an inner voice and can resolve down by common practice (frequently relaxed in alto/tenor). Here C♯5 in the soprano at beat 2 should resolve to D at the final cadence, not downward — confirm your final soprano note lands on D5 or A5, not C♯ hanging unresolved.
 
 **MuseScore plugin check:** install **"Voice Checker"** (Plugins → Manage Plugins) to flag parallel 5ths/octaves automatically — use it as a second pass, not a crutch; you should be able to spot these by eye first.
@@ -165,7 +165,7 @@ In MuseScore 4, set this explicitly: `Time Signature Properties > Beam Pattern`,
 Stretching a 4-beat idea into a 5/8 feel isn't mechanical — you're deciding which notes get emphasized by landing on the strong subdivision. Using 3+2 beaming:
 
 - Original: D5(♩) E5(♩) F♯5(♩) G5(♩) — four equal quarters, 4/4.
-- 5/8 (3+2) adaptation: D5 (dotted quarter, fills the "3" group) — E5 (eighth, finishes group) | F♯5 (quarter) G5 (eighth) — the melodic contour is preserved, but D5 now gets metric weight (landing on the downbeat *and* occupying the strong 3-group), giving the phrase a lean-and-release feel characteristic of asymmetric folk meters.
+- 5/8 (3+2) adaptation: D5 (quarter) — E5 (eighth, finishes the "3" group) | F♯5 (quarter) G5 (eighth) — the melodic contour is preserved, but D5 now gets metric weight (landing on the downbeat *and* occupying the strong 3-group), giving the phrase a lean-and-release feel characteristic of asymmetric folk meters.
 
 **Why this is useful beyond the exercise:** this is literally how Bartók and Brubeck-era arrangers adapt symmetric tunes into odd meters — stretch the strongest melodic note across the long subdivision, let the shorter subdivision carry the pickup into the next bar.
 
@@ -185,7 +185,7 @@ A transposing instrument's written pitch is **not** what sounds. The instrument 
 | E♭ Alto Sax | Major 6th **lower** | Concert pitch = written − major 6th (down a 6th, or up a minor 3rd + down an octave, same result) |
 | F Horn | Perfect 5th **lower** | Concert pitch = written − perfect 5th |
 | B♭ Bass Clarinet | Major 9th **lower** | Concert pitch = written − major 2nd − octave |
-| Piccolo | Octave **higher** | Concert pitch = written − octave |
+| Piccolo | Octave **higher** | Concert pitch = written + octave |
 
 **The practical consequence:** if you want a clarinet to *sound* the same D5 the piano plays, you must write **E5** on the clarinet's part — a major 2nd higher than concert pitch, because the clarinet sounds a major 2nd below what's written.
 
@@ -293,7 +293,7 @@ Note entry:
   .                 Add dot (increases duration by 50%)
   Ctrl+Alt+1–4      Switch active voice 1–4
   X                 Flip stem/notehead direction
-  J                 Repeat last interval entry
+  R                 Repeat the selection
 
 Transposition / pitch view:
   Ctrl+Shift+C      Toggle Concert Pitch
@@ -335,7 +335,7 @@ At any BPM, one beat in ms = 60,000 ÷ BPM. Everything else scales from there:
 | 2 | Major 2nd down | B♭ Clarinet, B♭ Trumpet, B♭ Soprano Sax |
 | 3 | Minor 3rd down | — (used for some E♭ context shifts) |
 | 7 | Perfect 5th down | F Horn |
-| 9 | Major 6th down | E♭ Alto Sax, E♭ Clarinet (up a m3 + 8ve conventions vary — verify per part) |
+| 9 | Major 6th down | E♭ Alto Sax, E♭ Alto Clarinet |
 | 12 | Octave down | Guitar (written), Bass Clarinet (additional to M2) |
 | 12 | Octave up | Piccolo, Celesta (sometimes notated at pitch) |
 

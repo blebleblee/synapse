@@ -82,7 +82,7 @@ Button states communicate availability and processing status through visual tran
 }
 
 .btn-primary:hover:not(:disabled) {
-  /* Hover state - 10% darker */
+  /* Hover state - about 20% darker */
   background: #0052a3;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }

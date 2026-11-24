@@ -301,7 +301,7 @@ Build the tempo map in broad strokes, not per-hit:
 
 **Fixes:**
 - Bypass the master bus limiter and swap linear-phase EQs for minimum-phase versions during recording passes.
-- Enable Low-Latency Mode (Logic: record button) or "Constrain Delay Compensation" (Cubase: Studio → Audio Performance) — this temporarily disables high-latency plugins for input monitoring only.
+- Enable Low-Latency Mode (Logic: Control Bar toggle button) or "Constrain Delay Compensation" (Cubase: toolbar or transport panel button) — this temporarily disables high-latency plugins for input monitoring only. — this temporarily disables high-latency plugins for input monitoring only.
 - If a track consistently records late by a measurable amount, nudge the recorded region earlier by that measured offset rather than re-recording.
 
 ### 6.3 MIDI Note Bleeding and Stuck Notes
@@ -324,7 +324,7 @@ Build the tempo map in broad strokes, not per-hit:
 **Fixes:**
 - Route all orchestral instruments to a **single** hall reverb bus rather than giving each section its own reverb instance — real orchestras share one room.
 - Vary **send level**, not the reverb's internal settings, to place instruments front-to-back: close/solo instruments at 20–30% send, back-row or ensemble instruments at 50–60%.
-- Match pre-delay to perceived distance: 10–20 ms for close instruments, 30–50 ms for distant ones, mimicking the time sound takes to travel from the stage to the hall mics.
+- Match pre-delay to perceived distance: Match pre-delay to perceived distance: 30–50 ms for close instruments, 10–20 ms for distant ones, mimicking the time sound takes to travel from the stage to the hall mics., mimicking the time sound takes to travel from the stage to the hall mics.
 
 ### 6.5 Director Revisions and Version Control
 

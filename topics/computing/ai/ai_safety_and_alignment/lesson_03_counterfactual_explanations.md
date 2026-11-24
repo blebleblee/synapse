@@ -383,3 +383,110 @@ class CounterfactualEngine:
         ]
         return final.cpu().numpy(), metadata
 ```
+
+
+## 4. Failure Modes and Production Practice
+
+### 4.1 Evaluation Metrics and Validation
+Counterfactual explanations must be validated across four orthogonal axes before deployment:
+- **Validity** (sometimes called fidelity)**:** The empirical probability that the model actually outputs the target class for the generated counterfactual. Computed as $\frac{1}{N}\sum_{i=1}^N \mathbb{I}(f(x'_i) = y_{\text{target}})$.
+- **Sparsity:** The number of features altered relative to the original instance. Fewer changed features make an explanation easier to understand and act on.
+- **Plausibility:** Whether $x'$ lies within the high-density region of the training data manifold. Measured via nearest-neighbor distance, density ratio estimation, or reconstruction error in latent spaces.
+- **Diversity:** Coverage of distinct decision boundary regions. Quantified using pairwise distances, silhouette scores, or Determinantal Point Process (DPP) determinants.
+
+### 4.2 Common Failure Modes
+- **Boundary Discontinuities:** Gradient-based optimizers assume locally smooth decision boundaries. Tree ensembles, piecewise-linear models, and quantized networks create flat regions where gradients vanish, causing optimization to stall or produce unrealistic feature combinations.
+- **Manifold Violation:** L1/L2 proximity metrics treat all feature directions equally. In tabular or structured data, this can generate combinations that never co-occur (e.g., high income + zero employment), violating plausibility and reducing stakeholder trust.
+- **Adversarial Conflation:** When $\lambda_{\text{proximity}} \to 0$, counterfactuals converge to adversarial examples. They achieve the target prediction but exploit model artifacts rather than meaningful decision factors, undermining safety guarantees.
+- **High-Dimensional Sparsity:** In text or image spaces, raw pixel/token perturbations lack semantic meaning. Latent-space search (e.g., VAE or diffusion latents) is required, but introduces reconstruction error that degrades fidelity and complicates gradient flow.
+
+### 4.3 Deployment and Compliance Considerations
+Production systems require bounded latency, deterministic behavior, and audit trails. Key engineering practices include:
+- **Surrogate Caching:** For non-differentiable black-box APIs or legacy systems, train a lightweight differentiable surrogate (e.g., a shallow MLP or Gaussian Process) on historical inference logs. Validate surrogate fidelity via cross-validation before routing counterfactual queries through it.
+- **Batch Generation & Caching:** Counterfactual generation is computationally expensive. Precompute CFs for representative data clusters and cache results keyed by quantized input hashes. Invalidate cache entries when model versioning or feature drift exceeds a threshold.
+- **Regulatory Alignment:** The US Equal Credit Opportunity Act (Regulation B) requires lenders to state the principal reasons for an adverse decision, and GDPR Article 22 gives people safeguards against solely automated decisions, including the right to contest them; neither prescribes counterfactuals, but counterfactuals used to meet them must satisfy actionability constraints: only mutable features may be altered, and changes must remain within legally permissible ranges. Immutable feature masking must be enforced at the optimization level, not post-hoc.
+- **Drift Monitoring:** Track the distribution of generated counterfactuals over time. Shifts in CF density or validity rates indicate model drift or changing decision boundaries, triggering automated retraining or surrogate updates.
+
+```python
+"""
+cf_evaluator.py
+
+Production-grade evaluation utilities for counterfactual explanations.
+Computes validity, sparsity, plausibility, and diversity metrics.
+"""
+import numpy as np
+from sklearn.neighbors import NearestNeighbors
+from typing import Dict, Any
+
+def evaluate_counterfactuals(
+    cfs: np.ndarray,
+    original: np.ndarray,
+    model_preds: np.ndarray,
+    target_class: int,
+    train_data: np.ndarray,
+    mad: np.ndarray
+) -> Dict[str, float]:
+    """
+    Compute standard counterfactual evaluation metrics.
+
+    Args:
+        cfs: (n_cfs, n_features) generated counterfactuals
+        original: (n_features,) original instance
+        model_preds: (n_cfs,) model predictions for cfs
+        target_class: int target prediction class
+        train_data: (n_samples, n_features) reference training set
+        mad: (n_features,) median absolute deviation for normalization
+
+    Returns:
+        Dictionary of metric scores
+    """
+    # Validity: fraction of CFs that actually trigger the target class
+    validity = np.mean(model_preds == target_class)
+
+    # Sparsity: mean number of features changed (normalized by MAD)
+    delta = np.abs(cfs - original) / np.maximum(mad, 1e-8)
+    sparsity = np.mean(np.sum(delta > 1e-6, axis=1))
+
+    # Plausibility: mean distance to nearest neighbor in training data
+    nn = NearestNeighbors(n_neighbors=1, metric='minkowski', p=1)
+    nn.fit(train_data)
+    distances, _ = nn.kneighbors(cfs)
+    plausibility = np.mean(distances.flatten())
+
+    # Diversity: mean pairwise distance among CFs
+    if cfs.shape[0] > 1:
+        diff = cfs[:, np.newaxis, :] - cfs[np.newaxis, :, :]
+        pairwise_dist = np.linalg.norm(diff, axis=2)
+        diversity = np.mean(pairwise_dist[np.triu_indices_from(pairwise_dist, k=1)])
+    else:
+        diversity = 0.0
+
+    return {
+        "validity": float(validity),
+        "sparsity": float(sparsity),
+        "plausibility": float(plausibility),
+        "diversity": float(diversity)
+    }
+```
+
+## 5. Summary & Verification Matrix
+
+Counterfactual explanations bridge the gap between post-hoc feature attribution and actionable model diagnostics. By optimizing for proximity, validity, and diversity, they provide concrete "what-if" scenarios that align with human reasoning and regulatory requirements. The choice of algorithm depends on model differentiability, data modality, and latency constraints. Gradient-based methods excel for neural networks, prototype-based approaches handle discrete or non-differentiable spaces, and SHAP-based approximations offer fast, attribution-grounded alternatives when full optimization is prohibitive.
+
+| Method | Differentiability Required | Computational Complexity | Sparsity Control | Plausibility Guarantee | Diversity Support | Primary Use Case |
+|:---|:---:|:---:|:---:|:---:|:---:|:---|
+| **Gradient-Based (DiCE/Wachter)** | Yes | $O(N \cdot D \cdot I)$ per batch | High (explicit $\lambda_{prox}$) | Moderate (metric-dependent) | High (DPP/repulsion) | Neural networks, differentiable pipelines |
+| **Prototype/Growing Spheres** | No | $O(N^2)$ or $O(N \log N)$ search | Moderate (radius constraint) | High (data-driven) | Moderate (cluster sampling) | Tree ensembles, black-box APIs, discrete data |
+| **SHAP-Based Approximation** | No | $O(N \cdot D)$ or $O(N^2)$ kernel | High (importance masking) | Low (perturbs features independently) | Low (single attribution path) | Fast inference, compliance reporting, tabular data |
+
+## Key Terms
+- **Counterfactual Explanation:** A minimal perturbation of an input instance that changes the model's prediction to a target class.
+- **Causal Ladder:** Pearl's hierarchy of reasoning (Association → Intervention → Counterfactuals); counterfactuals occupy the highest rung, requiring structural causal models or strong assumptions.
+- **Proximity Loss:** Regularization term penalizing distance between original and counterfactual instances, typically L1 or MAD-normalized L1.
+- **Validity Loss:** Objective driving the counterfactual toward the target prediction, usually cross-entropy or hinge loss on model logits.
+- **Determinantal Point Process (DPP):** A probabilistic model for sampling diverse subsets; used in counterfactual generation to maximize pairwise dissimilarity.
+- **Plausibility:** The degree to which a counterfactual lies within the high-density region of the training data manifold.
+- **Sparsity:** The number of features altered in a counterfactual; fewer changes are easier to understand and act on.
+- **Validity:** The fraction of generated counterfactuals for which the model actually outputs the target class (also called fidelity).
+- **Surrogate Model:** A differentiable approximation trained on black-box model outputs to enable gradient-based counterfactual search.
+- **Actionability Constraint:** A regulatory or domain-specific restriction limiting which features may be modified and within what bounds.

@@ -82,10 +82,10 @@ Procedure:
 | Range Selection | `2` | Select time-based regions across tracks, independent of clip boundaries |
 | Split (Scissors) | `3` | Cut clips at playhead or click point |
 | Glue | `4` | Rejoin adjacent split clips |
-| Mute | `5` | Silence individual clips without deleting |
+| Erase | `5` | Delete clips under cursor |
 | Zoom | `6` | Magnify a dragged region |
-| Draw | `7` | Hand-draw automation or MIDI data points |
-| Erase | `8` | Delete clips under cursor |
+| Mute | `7` | Silence individual clips without deleting |
+| Draw | `8` | Hand-draw automation or MIDI data points |
 
 Press `Ctrl` (Windows) / `Cmd` (Mac) while any tool is active to temporarily access **Object Selection** — this is the single most efficient editing habit: stay on Split or Range tool and tap Ctrl to grab/nudge without switching tools constantly.
 
@@ -166,7 +166,7 @@ Cubase's real-time performance lives and dies on three dials you actually contro
 
 Audio clips stream from disk in real time rather than fully loading into RAM (unlike samplers). This is why a failing or slow hard drive produces clicks and dropouts under high track counts even with spare CPU headroom. Fixes:
 - Record and store projects on an SSD, not spinning HDD or network storage.
-- `Edit > Preferences > VST > Disk Preload` — increase preload buffer if you still see dropouts on fast drives (trades a small amount of RAM for read-ahead safety margin).
+- `Studio > Studio Setup — increase the Disk Preload buffer if you still see dropouts on fast drives (trades a small amount of RAM for read-ahead safety margin).` — increase preload buffer if you still see dropouts on fast drives (trades a small amount of RAM for read-ahead safety margin).
 
 ### 6.3 Freeze and Render in Place — the actual CPU-saving workflow
 

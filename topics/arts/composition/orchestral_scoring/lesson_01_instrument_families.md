@@ -41,7 +41,7 @@ Rule of thumb for any orchestral chord below the treble staff: **open it up, 5th
 
 ### Bowing marks you must write into the part
 A string part without bowings is an unfinished part. At minimum, mark:
-- **Down-bow (⌐) / up-bow (V)** at phrase starts and any spot where the natural alternation would land wrong (e.g., you want a down-bow accent on a strong beat)
+- **Down-bow (⊓) / up-bow (V)** at phrase starts and any spot where the natural alternation would land wrong (e.g., you want a down-bow accent on a strong beat)
 - **Slurs** for legato groupings — the bow determines phrasing, not just pitch grouping
 - **div.** (divisi) when you split a section into two different pitches, and **unis.** when they rejoin — forgetting the unis. marking is a common score error that causes real rehearsal confusion
 - **arco** after any pizzicato passage — players will not know when to put the bow back without it
@@ -215,7 +215,7 @@ Work out your harmony in concert pitch first. Transposing in your head while com
 | Piccolo | octave higher | up an 8ve |
 | Contrabassoon | octave lower | down an 8ve |
 
-**Proofreading drill**: write a four-note concert-pitch motif (say, C4-E4-G4-C5). Transpose it by hand for B♭ clarinet (should read D5-F#5-A5-D6), horn in F (should read G4-B4-D5-G5), and B♭ trumpet (D5-F#5-A5-D6). Check your written transpositions against a piano playback set to "concert pitch" — any mismatch means you made an error, catch it before it reaches a player's stand.
+**Proofreading drill**: write a four-note concert-pitch motif (say, C4-E4-G4-C5). Transpose it by hand for B♭ clarinet (should read D4-F#4-A4-D5), horn in F (should read G4-B4-D5-G5), and B♭ trumpet (D5-F#5-A5-D6). Check your written transpositions against a piano playback set to "concert pitch" — any mismatch means you made an error, catch it before it reaches a player's stand.
 
 ## 8. Textural Hierarchy — The Four-Layer Scoring Checklist
 

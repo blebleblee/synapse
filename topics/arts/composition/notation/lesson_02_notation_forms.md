@@ -145,7 +145,7 @@ Metronome at 60 BPM. For each chord, play **left hand: nothing (or a single root
 
 1. **I–ii–V–I in C**: Cmaj7 → Dm7 → G7 → Cmaj7
    - Cmaj7 (A-form): E-G-B-D
-   - Dm7 (B-form): C-E♭-F-A — wait, confirm by ear: F-A-C-E (7-9-3-5 of Dm7 is C-E-F-A)
+   - Dm7 (B-form): C-E-F-A (7-9-3-5 of Dm7).
    - G7 (A-form): B-D-F-A
    - Resolve back to Cmaj7
 2. **vi–II–V–I in C**: Am7 → D7 → Gmaj7 → Cmaj7
@@ -185,7 +185,7 @@ Fingering: A-string 3rd fret (C, index), D-string open (D), D-string 2nd fret (E
   E A D G B e
   x 3 2 0 1 0
 ```
-x = mute/don't play, 3 = A-string 3rd fret (index), 2 = D-string 2nd fret (middle), 0 = open G, 1 = B-string 1st fret (ring), 0 = open high e.
+x = mute/don't play, 3 = A-string 3rd fret (ring), 2 = D-string 2nd fret (middle), 0 = open G, 1 = B-string 1st fret (index), 0 = open high e., 0 = open high e.
 
 **Technique shorthand you must recognize instantly when sight-reading a riff:**
 
@@ -238,7 +238,7 @@ E |------------------3--|
 
 Root on the E string, octave two strings up and two frets over (e.g., G on E-string 3rd fret → G octave on D-string 5th fret). Slide the shape up the neck: A-root at 5th fret, B-root at 7th fret, C-root at 8th fret.
 
-**Fingering discipline matters here**: use Simandl 1-2-4 fingering for frets 1–5 (index on fret 1, middle unused for the stretch, ring finger covers fret 2, pinky covers fret 4 — this spacing matches the wider fret gaps in the low register and prevents tendon strain from overstretching). Switch to one-finger-per-fret (OFPF) at fret 7 and above, where the frets are close enough together that 1-2-3-4 mapping directly to frets 7-8-9-10 is both comfortable and faster.
+**Fingering discipline matters here**: use Simandl 1-2-4 fingering for frets 1–5 (index (1) covers the first note, middle finger (2) covers the note a semitone higher, and pinky (4) covers the note a tone above index with ring-finger reinforcement. — this spacing matches the wider fret gaps in the low register and prevents tendon strain from overstretching). Switch to one-finger-per-fret (OFPF) at fret 7 and above, where the frets are close enough together that 1-2-3-4 mapping directly to frets 7-8-9-10 is both comfortable and faster.
 
 ## 5. Drum Notation: The Kit as a Pitch-Free Staff
 

@@ -128,7 +128,7 @@ Below ~200 Hz, anything closer than a fifth risks audible beating.
 
 This is the band where close-position triads actually sound *better* close, because the overlapping overtones reinforce the chord instead of beating. A string section playing a tight triad here is the textbook "lush strings" sound.
 
-*Example*: Cellos C3, Violas E3+G3 divisi, Violins II C4, Violins I E4 — everything inside one octave, melody line (if any) riding on top.
+*Example*: Cellos C3, Violas E3+G3 divisi, Violins II C4, Violins I E4 — everything inside a tenth, melody line (if any) riding on top.
 
 ### High register (above ~2 kHz): mixed spacing, your choice
 
