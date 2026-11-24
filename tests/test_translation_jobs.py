@@ -224,3 +224,52 @@ def test_status_rejects_unknown_course_and_bad_language(queue_client):
     assert client.get("/api/translate/status", params={"query": "no/such/course", "lang": "cs"}).status_code == 404
     query, _ = _course("status_course_2")
     assert client.get("/api/translate/status", params={"query": query, "lang": "../x"}).status_code == 422
+
+
+def _queue_with_state(provider_holder):
+    return be_main.TranslationQueue(
+        get_provider=lambda **kw: (provider_holder[0], "mock-model"),
+        executor=be_main.AI_EXECUTOR,
+        cache_dir=be_main.translation_cache_dir,
+        state_file=be_main.translation_queue_file,
+    )
+
+
+def test_unfinished_translations_survive_a_server_restart(monkeypatch):
+    # Owner, 2026-11-23: restarting the server silently dropped queued lessons.
+    holder = [GatedProvider()]
+    monkeypatch.setattr(be_main, "TRANSLATIONS", _queue_with_state(holder))
+    with TestClient(be_main.app) as client:
+        running = client.post("/api/translate/jobs", json={"text": TEXT, "target_lang": "cs", "title": "L1",
+                                                           "path": "computing/x", "lesson_id": "1"}).json()
+        client.post("/api/translate/jobs", json={"text": TEXT, "target_lang": "de", "title": "L2"})
+        dropped = client.post("/api/translate/jobs", json={"text": TEXT, "target_lang": "es", "title": "L3"}).json()
+        wait_for(client, running["id"], lambda j: j["status"] == "running")
+        client.delete(f"/api/translate/jobs/{dropped['id']}")  # stopped by the user: not resumed
+    for _ in range(5):
+        holder[0].gate.release()
+
+    holder[0] = GatedProvider()
+    monkeypatch.setattr(be_main, "TRANSLATIONS", _queue_with_state(holder))
+    with TestClient(be_main.app) as client:
+        jobs = client.get("/api/translate/jobs").json()["jobs"]
+        assert sorted((j["title"], j["target_lang"]) for j in jobs) == [("L1", "cs"), ("L2", "de")]
+        assert all(j["status"] in ("queued", "running") for j in jobs)
+        l1 = next(j for j in jobs if j["title"] == "L1")
+        assert (l1["path"], l1["lesson_id"]) == ("computing/x", "1")
+        # The resumed job finishes normally and leaves nothing to resume.
+        for _ in range(4):
+            holder[0].gate.release()
+        wait_for(client, l1["id"], lambda j: j["status"] == "done")
+        be_main.TRANSLATIONS.stop_all()
+        for _ in range(5):
+            holder[0].gate.release()
+    assert not be_main.translation_queue_file().exists() or "L1" not in be_main.translation_queue_file().read_text()
+
+
+def test_corrupt_queue_file_is_ignored(monkeypatch):
+    be_main.translation_queue_file().parent.mkdir(parents=True, exist_ok=True)
+    be_main.translation_queue_file().write_text("{not json")
+    monkeypatch.setattr(be_main, "TRANSLATIONS", _queue_with_state([GatedProvider()]))
+    with TestClient(be_main.app) as client:
+        assert client.get("/api/translate/jobs").json()["jobs"] == []

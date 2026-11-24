@@ -4,12 +4,16 @@ Lesson translation: the shared translation routine and a background queue.
 The queue runs one translation at a time, so a local model is never asked to
 translate several lessons at once. Jobs keep running when the reader moves to
 another lesson; they can be stopped, and they all stop when the server exits
-(the process ends and its open model connections close).
+(the process ends and its open model connections close). With a state file,
+queued and running jobs are written down and start again after a restart
+(from the first section: partial results are not kept).
 """
 
 import asyncio
 import hashlib
 import itertools
+import json
+import os
 import re
 import threading
 import time
@@ -196,8 +200,10 @@ class TranslationQueue:
     """One worker, first in first out. Lives on the server's event loop."""
 
     def __init__(self, get_provider: Callable[..., Tuple[Any, str]], executor,
-                 cache_dir: Callable[[], Path]):
+                 cache_dir: Callable[[], Path], state_file: Optional[Callable[[], Path]] = None):
         self._get_provider = get_provider
+        self._state_file = state_file
+        self._saving = state_file is not None
         self._executor = executor
         self._cache_dir = cache_dir
         self._jobs: Dict[str, TranslationJob] = {}
@@ -221,7 +227,27 @@ class TranslationQueue:
         self._ensure_worker()
         self._wakeup.set()
         self._prune()
+        self._save()
         return job
+
+    def restore(self) -> int:
+        """Queue again the jobs a previous server left unfinished. Returns how many."""
+        if not self._state_file:
+            return 0
+        try:
+            saved = json.loads(self._state_file().read_text(encoding="utf-8"))
+            entries = [e for e in saved.get("jobs", []) if isinstance(e, dict)]
+        except (OSError, ValueError, AttributeError):
+            return 0
+        restored = 0
+        for e in entries:
+            if not isinstance(e.get("text"), str) or not isinstance(e.get("target_lang"), str):
+                continue
+            args = e.get("provider_args") if isinstance(e.get("provider_args"), dict) else {}
+            self.submit(e["text"], e["target_lang"], title=e.get("title") or "", path=e.get("path"),
+                        lesson_id=e.get("lesson_id"), **args)
+            restored += 1
+        return restored
 
     def find_active(self, text: str, target_lang: str) -> Optional[TranslationJob]:
         """The queued or running job for this text, as submit() would reuse it."""
@@ -241,6 +267,7 @@ class TranslationQueue:
         else:
             # The section being translated finishes in the model; no new one starts.
             job.stop_requested = True
+            self._save()
         return job
 
     def stop_all(self) -> None:
@@ -259,6 +286,9 @@ class TranslationQueue:
         return [self.describe(j) for j in self._jobs.values()]
 
     async def shutdown(self) -> None:
+        # Unfinished jobs stay in the state file for the next start.
+        self._save()
+        self._saving = False
         self.stop_all()
         if self._worker:
             self._worker.cancel()
@@ -353,6 +383,26 @@ class TranslationQueue:
         job.status = status
         job.finished = time.time()
         self._prune()
+        self._save()
+
+    def _save(self) -> None:
+        """Write the unfinished jobs (not those being stopped) to the state file."""
+        if not self._saving:
+            return
+        jobs = [{"text": j.text, "target_lang": j.target_lang, "title": j.title, "path": j.path,
+                 "lesson_id": j.lesson_id, "provider_args": j.provider_args}
+                for j in self._jobs.values() if j.active and not j.stop_requested]
+        try:
+            f = self._state_file()
+            if not jobs:
+                f.unlink(missing_ok=True)
+                return
+            f.parent.mkdir(parents=True, exist_ok=True)
+            tmp = f.with_suffix(f".tmp{os.getpid()}")
+            tmp.write_text(json.dumps({"jobs": jobs}, ensure_ascii=False), encoding="utf-8")
+            os.replace(tmp, f)
+        except OSError:
+            pass  # a read-only workspace: translations still work, they just do not resume
 
     def _prune(self) -> None:
         finished = sorted((j for j in self._jobs.values() if not j.active), key=lambda j: j.finished or 0)

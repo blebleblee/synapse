@@ -181,6 +181,13 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
+    try:
+        resumed = TRANSLATIONS.restore()
+        if resumed:
+            print(f"[*] Resumed {resumed} unfinished translation(s) from the last run.", flush=True)
+    except Exception as e:
+        print(f"[!] Could not resume translations: {e}")
+
     idle_task = None
     idle_timeout_str = os.environ.get("SYNAPSE_IDLE_TIMEOUT")
     if idle_timeout_str:
@@ -868,10 +875,15 @@ def translation_cache_dir() -> Path:
     return WORKSPACE_ROOT / ".cache" / "translations"
 
 
+def translation_queue_file() -> Path:
+    return WORKSPACE_ROOT / ".cache" / "translation_queue.json"
+
+
 TRANSLATIONS = TranslationQueue(
     get_provider=lambda **kw: get_translation_provider(**kw),
     executor=AI_EXECUTOR,
     cache_dir=translation_cache_dir,
+    state_file=translation_queue_file,
 )
 
 

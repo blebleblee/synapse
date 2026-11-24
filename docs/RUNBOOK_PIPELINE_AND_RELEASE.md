@@ -101,7 +101,7 @@ git push gitea main && git push github main
 .venv/bin/python scripts/publish_all_releases.py
 ```
 
-`publish_all_releases.py` creates the `v<ver>` release on both hosts, uploads the installers, portable builds and Python packages, and sets the notes from `CHANGELOG.md`. It exits non-zero if any upload fails.
+`publish_all_releases.py` first checks that the working tree is committed, `HEAD` is `gitea/main`, and CI passed on that commit; otherwise it publishes nothing. It then creates the `v<ver>` release on both hosts, uploads the installers, portable builds and Python packages, and sets the notes from `CHANGELOG.md`. It exits non-zero if any upload fails.
 
 ### Curriculum release
 
